@@ -1,0 +1,254 @@
+﻿<UserControl x:Class="Application.Production.Views.ScreenConfigEditor"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:controls="clr-namespace:KEI.UI.Wpf.Controls;assembly=KEI.UI.Wpf"
+             xmlns:converters="clr-namespace:KEI.UI.Wpf.Converters;assembly=KEI.UI.Wpf"
+             xmlns:ap="clr-namespace:KEI.UI.Wpf.AttachedProperties;assembly=KEI.UI.Wpf"
+             xmlns:prism="http://prismlibrary.com/"
+             prism:ViewModelLocator.AutoWireViewModel="True"
+             mc:Ignorable="d" 
+             d:DesignHeight="720" d:DesignWidth="1280">
+    <UserControl.Resources>
+        <DataTemplate x:Key="LockedTemplate">
+            <StackPanel>
+                <ContentControl ap:IconManager.Icon="Lock16x" Height="10" Width="10"/>
+            </StackPanel>
+        </DataTemplate>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="60"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions> 
+        
+        <!--Active Screens-->
+        <Border Grid.Column="0" BorderBrush="Black" 
+                BorderThickness="0.8"
+                Padding="15"
+                CornerRadius="8">
+            <StackPanel>
+                
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="70"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Active Screens"
+                               Foreground="Green"
+                               FontSize="35" 
+                               Padding="10"/>
+                    <ToggleButton Grid.Column="1" x:Name="reorderToggleBtn" 
+                                  Margin="10"
+                                  Background="White"
+                                  ap:IconManager.Icon="HamburgerMenu16x"/>
+                </Grid>
+                
+                <DataGrid ItemsSource="{Binding ActiveScreens, FallbackValue=ab}" 
+                          AutoGenerateColumns="False"
+                          CanUserAddRows="False"
+                          CanUserDeleteRows="False"
+                          CanUserSortColumns="False"
+                          x:Name="activeScreens"
+                          ap:VisualHelper.EnableRowsMove="{Binding IsChecked, ElementName=reorderToggleBtn}">
+                    <DataGrid.Resources>
+                        <Style TargetType="DataGridRow">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsMandatory}" Value="true">
+                                    <Setter Property="HeaderTemplate" Value="{StaticResource LockedTemplate}"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGrid.Resources>
+                    <DataGrid.Columns>
+
+                        <!--DisplayName-->
+                        <DataGridTextColumn IsReadOnly="true" Binding="{Binding DisplayName, FallbackValue='Display Name'}" Width="*">
+                            <DataGridTextColumn.HeaderTemplate>
+                                <DataTemplate>
+                                    <Border HorizontalAlignment="Stretch">
+                                        <TextBlock FontSize="20" Text="Display Name" FontWeight="Bold"/>
+                                    </Border>
+                                </DataTemplate>
+                            </DataGridTextColumn.HeaderTemplate>
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="VerticalAlignment" Value="Center" />
+                                    <Setter Property="Padding" Value="3"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+
+                        <!--ScreenName-->
+                        <DataGridTextColumn IsReadOnly="true" Binding="{Binding ScreenName, FallbackValue='Screen Name'}" Width="*" >
+                            <DataGridTextColumn.HeaderTemplate>
+                                <DataTemplate>
+                                    <Border HorizontalAlignment="Stretch">
+                                        <TextBlock FontSize="20" Text="Screen Name" FontWeight="Bold"/>
+                                    </Border>
+                                </DataTemplate>
+                            </DataGridTextColumn.HeaderTemplate>
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="VerticalAlignment" Value="Center" />
+                                    <Setter Property="Padding" Value="3"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+
+                        <!--ParentScreenName-->
+                        <DataGridTextColumn IsReadOnly="true" Binding="{Binding ParentScreenName, FallbackValue='Parent name'}" Width="*" >
+                            <DataGridTextColumn.HeaderTemplate>
+                                <DataTemplate>
+                                    <Border HorizontalAlignment="Stretch">
+                                        <TextBlock FontSize="20" Text="Parent Name" FontWeight="Bold"/>
+                                    </Border>
+                                </DataTemplate>
+                            </DataGridTextColumn.HeaderTemplate>
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="VerticalAlignment" Value="Center" />
+                                    <Setter Property="Padding" Value="3"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+
+                        <!--Icon-->
+                        <DataGridTemplateColumn IsReadOnly="true" Header="Icon" Width="50">
+                            <DataGridTemplateColumn.HeaderTemplate>
+                                <DataTemplate>
+                                    <Border HorizontalAlignment="Stretch">
+                                        <TextBlock FontSize="20" Text="Icon" FontWeight="Bold"/>
+                                    </Border>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.HeaderTemplate>
+
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <controls:IconPicker Icon="{Binding Icon, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="50"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+
+                        </DataGridTemplateColumn>
+
+                    </DataGrid.Columns>
+                </DataGrid>
+                
+            </StackPanel>
+        </Border>
+        
+        <!--Buttons-->
+        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+            <Button Width="40" Height="40" 
+                    Margin="0 0 0 19"  
+                    CommandParameter="{Binding SelectedItems, ElementName=inactiveScreens, Mode=OneWay}"
+                    Command="{Binding AddScreenCommand}"
+                    ap:IconManager.Icon="CollapseChevronLeft16x"/>
+            <Button Width="40" Height="40" 
+                    CommandParameter="{Binding SelectedItems, ElementName=activeScreens, Mode=OneWay}"
+                    Command="{Binding RemoveScreenCommand}"
+                    ap:IconManager.Icon="ExpandChevronRight16x"/>
+        </StackPanel>
+
+
+
+        <!--Inactive Screens-->
+        <Border Grid.Column="2" BorderBrush="Black" 
+                BorderThickness="0.8"
+                Padding="15"
+                CornerRadius="8">
+            <StackPanel>
+                
+                <TextBlock Text="Inactive Screens"
+                               Foreground="Red"
+                               FontSize="35" 
+                               Padding="10"/>
+
+                <DataGrid ItemsSource="{Binding InactiveScreens}"
+                          Visibility="{Binding InactiveScreens, Converter={ObjectToVisibilityConverter}}"
+                          AutoGenerateColumns="False"
+                          CanUserAddRows="False"
+                          CanUserDeleteRows="False"
+                          x:Name="inactiveScreens">
+                    <DataGrid.Columns>
+
+                        <!--DisplayName-->
+                        <DataGridTextColumn IsReadOnly="true" Binding="{Binding DisplayName, FallbackValue='Display Name'}" Width="*">
+                            <DataGridTextColumn.HeaderTemplate>
+                                <DataTemplate>
+                                    <Border HorizontalAlignment="Stretch">
+                                        <TextBlock FontSize="20" Text="Display Name" FontWeight="Bold"/>
+                                    </Border>
+                                </DataTemplate>
+                            </DataGridTextColumn.HeaderTemplate>
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="VerticalAlignment" Value="Center" />
+                                    <Setter Property="Padding" Value="3"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+
+                        <!--ScreenName-->
+                        <DataGridTextColumn IsReadOnly="true" Binding="{Binding ScreenName, FallbackValue='Screen Name'}" Width="*" >
+                            <DataGridTextColumn.HeaderTemplate>
+                                <DataTemplate>
+                                    <Border HorizontalAlignment="Stretch">
+                                        <TextBlock FontSize="20" Text="Screen Name" FontWeight="Bold"/>
+                                    </Border>
+                                </DataTemplate>
+                            </DataGridTextColumn.HeaderTemplate>
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="VerticalAlignment" Value="Center" />
+                                    <Setter Property="Padding" Value="3"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+
+                        <!--ParentScreenName-->
+                        <DataGridTextColumn IsReadOnly="true" Binding="{Binding ParentScreenName, FallbackValue='Parent name'}" Width="*" >
+                            <DataGridTextColumn.HeaderTemplate>
+                                <DataTemplate>
+                                    <Border HorizontalAlignment="Stretch">
+                                        <TextBlock FontSize="20" Text="Parent Name" FontWeight="Bold"/>
+                                    </Border>
+                                </DataTemplate>
+                            </DataGridTextColumn.HeaderTemplate>
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="VerticalAlignment" Value="Center" />
+                                    <Setter Property="Padding" Value="3"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+
+                        <!--Icon-->
+                        <DataGridTemplateColumn IsReadOnly="true" Header="Icon" Width="50">
+                            <DataGridTemplateColumn.HeaderTemplate>
+                                <DataTemplate>
+                                    <Border HorizontalAlignment="Stretch">
+                                        <TextBlock FontSize="20" Text="Icon" FontWeight="Bold"/>
+                                    </Border>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.HeaderTemplate>
+
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <controls:IconPicker Icon="{Binding Icon, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="50"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+
+                        </DataGridTemplateColumn>
+
+                    </DataGrid.Columns>
+                </DataGrid>
+                
+            </StackPanel>
+            
+        </Border>
+        
+    </Grid>
+</UserControl>

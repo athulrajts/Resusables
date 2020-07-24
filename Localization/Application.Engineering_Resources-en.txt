@@ -1,0 +1,20 @@
+Start
+Execute Test
+Open
+Open Recipe
+Open Layout
+Open Database
+Save
+Save Recipe
+Save View
+Section
+Setup
+Advanced Setup
+Layout Setup
+Language
+Folders
+Database
+Logs
+Logs Folder
+View Logs
+Images

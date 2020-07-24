@@ -1,0 +1,102 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <OutputType>Library</OutputType>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <OutputPath>..\..\Build\x64\Debug\Plugins\</OutputPath>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <DocumentationFile></DocumentationFile>
+    <RegisterForComInterop>false</RegisterForComInterop>
+    <LangVersion>7.2</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>..\..\Build\Release\Plugins\</OutputPath>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <LangVersion>7.2</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <OutputPath>..\..\Build\x86\Debug\Plugins\</OutputPath>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <OutputPath>..\..\Build\Debug\Plugins\</OutputPath>
+    <LangVersion>7.2</LangVersion>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <OutputPath>..\..\Build\Release\Plugins\</OutputPath>
+    <LangVersion>7.2</LangVersion>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="CommonServiceLocator">
+      <HintPath>..\..\3rdParty\Prism.7.2.0.1422\CommonServiceLocator.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Prism">
+      <HintPath>..\..\3rdParty\Prism.7.2.0.1422\Prism.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Prism.Unity.Wpf">
+      <HintPath>..\..\3rdParty\Prism.7.2.0.1422\Prism.Unity.Wpf.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Prism.Wpf">
+      <HintPath>..\..\3rdParty\Prism.7.2.0.1422\Prism.Wpf.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.Abstractions">
+      <HintPath>..\..\3rdParty\Prism.7.2.0.1422\Unity.Abstractions.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.Container">
+      <HintPath>..\..\3rdParty\Prism.7.2.0.1422\Unity.Container.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Infrastructure\KEI.Infrastructure.Core\KEI.Infrastructure.Core.csproj">
+      <Private>false</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Infrastructure\KEI.UI.Wpf\KEI.UI.Wpf.csproj">
+      <Private>false</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\Application.Core\Application.Core.csproj">
+      <Private>false</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\Application.UI\Application.UI.csproj">
+      <Private>false</Private>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="ges.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
+  </ItemGroup>
+  <PropertyGroup>
+    <PostBuildEvent>del /f  System.Net.Sockets.dll 2&gt;nul
+del /f "System.Net.Http.dll" 2&gt;nul
+del /f "System.Runtime.Serialization.Primitives.dll" 2&gt;nul
+del /f "System.Security.Cryptography.Algorithms.dll" 2&gt;nul
+del /f "System.Security.SecureString.dll" 2&gt;nul
+del /f "System.Threading.Overlapped.dll" 2&gt;nul
+del /f "System.Xml.XPath.XDocument.dll" 2&gt;nul
+del /f "System.Data.Common.dll" 2&gt;nul
+del /f "System.Diagnostics.StackTrace.dll" 2&gt;nul
+del /f "System.Diagnostics.Tracing.dll" 2&gt;nul
+del /f "System.Globalization.Extensions.dll" 2&gt;nul
+del /f "System.IO.Compression.dll" 2&gt;nul
+
+del /f "../System.Threading.Tasks.Extensions.xml" 2&gt;nul</PostBuildEvent>
+  </PropertyGroup>
+</Project>

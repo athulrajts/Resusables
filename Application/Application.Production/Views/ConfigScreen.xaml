@@ -1,0 +1,269 @@
+﻿<UserControl x:Class="Application.Production.Views.ConfigScreen"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:keiUI="clr-namespace:KEI.UI.Wpf.Configuration;assembly=KEI.UI.Wpf"
+             xmlns:cofigs="clr-namespace:KEI.Infrastructure.Configuration;assembly=KEI.Infrastructure"
+             xmlns:inf="clr-namespace:KEI.Infrastructure.Configuration;assembly=KEI.Infrastructure"
+             xmlns:ap="clr-namespace:KEI.UI.Wpf.AttachedProperties;assembly=KEI.UI.Wpf"
+             xmlns:converters="clr-namespace:Application.UI.Converters;assembly=Application.UI"
+             xmlns:converters1="clr-namespace:KEI.UI.Wpf.Converters;assembly=KEI.UI.Wpf"
+             xmlns:prism="http://prismlibrary.com/"
+             prism:ViewModelLocator.AutoWireViewModel="True"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+
+        <SolidColorBrush x:Key="Item.MouseOver.Background" Color="DarkOrange" Opacity="0.5"/>
+        <SolidColorBrush x:Key="Item.MouseOver.Border" Color="Black"/>
+        <SolidColorBrush x:Key="Item.SelectedInactive.Background" Color="Blue" Opacity="0.2"/>
+        <SolidColorBrush x:Key="Item.SelectedInactive.Border" Color="DarkBlue"/>
+        <SolidColorBrush x:Key="Item.SelectedActive.Background" Color="Blue" Opacity="0.2"/>
+        <SolidColorBrush x:Key="Item.SelectedActive.Border" Color="DarkBlue"/>
+
+        <Style TargetType="Border" x:Key="ValidatorButton">
+            <Setter Property="BorderBrush" Value="Black"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="3"/>
+            <Setter Property="Padding" Value="8"/>
+            <Setter Property="Margin" Value="2"/>
+            <Setter Property="Background" Value="White"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="true">
+                    <Setter Property="Background" Value="Orange"/>
+                </Trigger>
+                <DataTrigger Binding="{Binding CurrentResult.IsValid}" Value="false">
+                    <Setter Property="Background">
+                        <Setter.Value>
+                            <SolidColorBrush Color="Red" Opacity="0.5"/>
+                        </Setter.Value>
+                    </Setter>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style TargetType="ListBoxItem" x:Key="ListBoxItemStyle">
+            <Setter Property="SnapsToDevicePixels" Value="True"/>
+            <Setter Property="HorizontalContentAlignment" Value="{Binding HorizontalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
+            <Setter Property="VerticalContentAlignment" Value="{Binding VerticalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
+            <Setter Property="Background" Value="White"/>   
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                        <Border x:Name="Bd"
+                                    BorderBrush="{TemplateBinding BorderBrush}" 
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    Background="{TemplateBinding Background}" 
+                                    Padding="{TemplateBinding Padding}" 
+                                    SnapsToDevicePixels="true"
+                                    CornerRadius="3">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsMouseOver" Value="True"/>
+                                </MultiTrigger.Conditions>
+                                <Setter Property="Background" TargetName="Bd" Value="{StaticResource Item.MouseOver.Background}"/>
+                                <Setter Property="BorderBrush" TargetName="Bd" Value="{StaticResource Item.MouseOver.Border}"/>
+                            </MultiTrigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="Selector.IsSelectionActive" Value="False"/>
+                                    <Condition Property="IsSelected" Value="True"/>
+                                </MultiTrigger.Conditions>
+                                <Setter Property="Background" TargetName="Bd" Value="{StaticResource Item.SelectedInactive.Background}"/>
+                                <Setter Property="BorderBrush" TargetName="Bd" Value="{StaticResource Item.SelectedInactive.Border}"/>
+                            </MultiTrigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="Selector.IsSelectionActive" Value="True"/>
+                                    <Condition Property="IsSelected" Value="True"/>
+                                </MultiTrigger.Conditions>
+                                <Setter Property="Background" TargetName="Bd" Value="{StaticResource Item.SelectedActive.Background}"/>
+                                <Setter Property="BorderBrush" TargetName="Bd" Value="{StaticResource Item.SelectedActive.Border}"/>
+                            </MultiTrigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="TextElement.Foreground" TargetName="Bd" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
+                            </Trigger>
+                            <DataTrigger Binding="{Binding BrowseOption}" Value="NonBrowsable">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
+    </UserControl.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" MinWidth="250"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <!--TreeView-->
+        <Border BorderBrush="Black" BorderThickness="1" CornerRadius="8 0 0 8 ">
+            <TreeView ItemsSource="{Binding Configs}" 
+                      x:Name="treeView"
+                      Background="Transparent"
+                      BorderBrush="Transparent"
+                      ap:TreeViewBehaviours.TreeViewSelectedItem="{Binding SelectedConfig, Mode=TwoWay}"
+                      Loaded="TreeView_Loaded">
+                <TreeView.ItemContainerStyle>
+                    <Style TargetType="TreeViewItem">
+                        <Setter Property="IsExpanded" Value="True"/>
+                    </Style>
+                </TreeView.ItemContainerStyle>
+                <TreeView.ItemTemplate>
+                    <HierarchicalDataTemplate DataType="{x:Type inf:IPropertyContainer}"
+                                              ItemsSource="{Binding Children}">
+                        <TextBlock Text="{Binding Name}" FontSize="12" FontWeight="DemiBold"/>
+                    </HierarchicalDataTemplate>
+                </TreeView.ItemTemplate>
+            </TreeView>
+        </Border>
+
+        <!--Editor/Viewer-->
+        <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0 1 1 1" 
+                CornerRadius="0 8 8 0"
+                Padding="5">
+            <DockPanel>
+                <Grid DockPanel.Dock="Top">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" MinWidth="133.5"/>
+                        <ColumnDefinition Width="*" MinWidth="133.5"/>
+                        <ColumnDefinition Width="*" MinWidth="133.5"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!--Name-->
+                    <Border Grid.Column="0" BorderBrush="{DynamicResource Theme.AccentBorder}" BorderThickness="2 2 0 2" CornerRadius="8 0 0 0">
+                        <Grid>
+                            <Border Background="{DynamicResource Theme.Accent}" CornerRadius="8 0 0 0"/>
+                            <TextBlock Text="Name" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource Theme.AccentForeground}"/>
+                        </Grid>
+                    </Border>
+
+                    <!--Value-->
+                    <Border Grid.Column="1" Padding="1" BorderBrush="{DynamicResource Theme.AccentBorder}" BorderThickness="0 2 0 2" Background="{DynamicResource Theme.Accent}">
+                        <TextBlock Text="Value" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource Theme.AccentForeground}"/>
+                    </Border>
+
+                    <!--Type-->
+                    <Border Grid.Column="2" Padding="10" BorderBrush="{DynamicResource Theme.AccentBorder}" BorderThickness="0 2 2 2" Background="{DynamicResource Theme.Accent}"
+                            CornerRadius="0 8 0 0">
+                        <Grid>
+                            <Border Background="{DynamicResource Theme.Accent}" CornerRadius="0 8 0 0"/>
+                            <TextBlock Text="Type" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource Theme.AccentForeground}"/>
+                        </Grid>
+                    </Border>
+
+                </Grid>
+
+                <Grid DockPanel.Dock="Bottom">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <ListBox ItemsSource="{Binding SelectedConfigClone.DataCollection}" HorizontalContentAlignment="Stretch"
+                             VerticalContentAlignment="Stretch"
+                             SelectedItem="{Binding SelectedData}"
+                             x:Name="listbox"
+                             Background="Transparent"
+                             ItemContainerStyle="{StaticResource ListBoxItemStyle}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <keiUI:DatumViewer Data="{Binding}"/>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <Border Grid.Row="1" DataContext="{Binding SelectedItem, ElementName=listbox}"
+                            Background="White" BorderBrush="Black" BorderThickness="1"
+                            Visibility="{Binding Converter={ObjectToVisibilityConverter}}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="4*"/>
+                                <ColumnDefinition Width="1*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Border Padding="10">
+                                <DockPanel>
+                                    <TextBlock Text="{Binding Name}" FontWeight="Light" 
+                                               FontSize="20"
+                                               DockPanel.Dock="Top"
+                                               Margin="0 0 0 10"/>
+                                    <TextBlock Text="{Binding Description}"
+                                               TextWrapping="Wrap"/>
+                                </DockPanel>
+                            </Border>
+
+                            <Border Grid.Column="1" Background="BlanchedAlmond" Padding="10 0"
+                                    BorderBrush="Black"
+                                    BorderThickness="1 0 0 0">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+
+                                    <Border>
+                                        <TextBlock FontWeight="Thin"
+                                                    Text="Validations"
+                                                    FontSize="15"
+                                                    HorizontalAlignment="Center">
+                                            <TextBlock.InputBindings>
+                                                <MouseBinding MouseAction="LeftClick" Command="{Binding DataContext.EditValidationGroup,
+                                                                                                RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}"/>
+                                            </TextBlock.InputBindings>
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Style.Triggers>
+                                                        <Trigger Property="IsMouseOver" Value="true">
+                                                            <Setter Property="Foreground" Value="blue"/>
+                                                            <Setter Property="TextDecorations" Value="Underline"/>
+                                                        </Trigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </Border>
+
+
+                                    <ItemsControl Grid.Row="1" ItemsSource="{Binding Validation.Rules}"
+                                          BorderBrush="Transparent">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Style="{StaticResource ValidatorButton}">
+                                                    <Border.InputBindings>
+                                                        <MouseBinding MouseAction="LeftClick" Command="{Binding DataContext.LaunchEditorCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}" 
+                                                                      CommandParameter="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Border}}"/>
+                                                    </Border.InputBindings>
+                                                    <TextBlock Text="{Binding StringRepresentation}"
+                                                               FontWeight="Bold"/>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <WrapPanel Orientation="Horizontal"/>
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                    </ItemsControl>
+                                    
+                                    
+                                </Grid>
+                            </Border>
+                            
+                        </Grid>
+                    </Border>
+                    
+                </Grid>
+            </DockPanel>
+        </Border>
+
+    </Grid>
+</UserControl>

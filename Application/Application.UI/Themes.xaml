@@ -1,0 +1,57 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <SolidColorBrush x:Key="ThemeViewer.Background" Color="#eeeeee"/>
+    <SolidColorBrush x:Key="ThemeViewer.Accent" Color="Silver"/>
+    <SolidColorBrush x:Key="ThemeViewer.Button" Color="#DDDDDD"/>
+    <SolidColorBrush x:Key="ThemeViewer.ButtonForeground" Color="Black"/>
+    <SolidColorBrush x:Key="ThemeViewer.ButtonSelected" Color="DarkSlateGray"/>
+    <SolidColorBrush x:Key="ThemeViewer.ButtonSelectedForeground" Color="White"/>
+    <SolidColorBrush x:Key="ThemeViewer.AccentForeground" Color="Black"/>
+    <LinearGradientBrush x:Key="ThemeViewer.AccentBackgroundGradient" EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
+        <GradientStop Color="#343d46"/>
+        <GradientStop Color="Silver" Offset="1"/>
+    </LinearGradientBrush>
+    <SolidColorBrush x:Key="ThemeViewer.AccentBorder" Color="White"/>
+    <SolidColorBrush x:Key="ThemeViewer.ButtonBorder" Color="Black"/>
+
+
+    <Style TargetType="ToggleButton" x:Key="ThemedToggleButton">
+        <Setter Property="Background" Value="{DynamicResource ThemeViewer.Button}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource ThemeViewer.ButtonBorder}"/>
+        <Setter Property="Foreground" Value="{DynamicResource ThemeViewer.ButtonForeground}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ToggleButton}">
+                    <Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{DynamicResource ThemeViewer.Button}" SnapsToDevicePixels="true">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="1" x:Name="contentPresenter" Focusable="False" 
+                                       HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}"
+                                       SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                       Text="{TemplateBinding Content}" TextWrapping="Wrap"/>
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="Button.IsDefaulted" Value="true">
+                            <Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="true">
+                            <Setter Property="Background" TargetName="border" Value="{DynamicResource ThemeViewer.ButtonSelected}"/>
+                            <Setter Property="BorderBrush" Value="DodgerBlue"/>
+                            <Setter Property="BorderThickness" Value="2"/>
+                            <Setter Property="Foreground" Value="{DynamicResource ThemeViewer.ButtonSelectedForeground}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>

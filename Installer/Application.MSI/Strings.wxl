@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WixLocalization Culture="en-us" xmlns="http://schemas.microsoft.com/wix/2006/localization">
+	<String Id="ProductName_x64">Application (64 bit)</String>
+  <String Id="ProductName_x86">Application (32 bit)</String>
+  <String Id="Manufacturer">Kimball Electronics India Pvt Ltd.s</String>
+  <String Id="Comments">Some comments</String>
+  <String Id="Description">This is a Description</String>
+  <String Id="Keywords">.NET Core, Installer, WiX</String>
+  <String Id="DowngradeError">A newer version of Application is already installed.</String>
+  <String Id="ProgramFilesFolder">GES</String>
+</WixLocalization>

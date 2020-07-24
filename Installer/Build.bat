@@ -1,0 +1,1 @@
+dotnet build "..\..\Solutions\Full.sln" -c %1 --no-incremental

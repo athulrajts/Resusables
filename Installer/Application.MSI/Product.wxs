@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  
+  <?if $(var.Platform) = x64 ?>
+  <?define ProductCode = "{D972D368-B394-4B14-AD19-15DED398439C}" ?>
+  <?else?>
+  <?define ProductCode = "{28A19FD5-A823-488D-87C9-B1DF31BF4BBD}"?>
+  <?endif?>
+
+  <?define UpgradeCode = "{E494C286-397A-4918-A91C-64DF7F5FFD81}"?>
+
+
+  <!--Define Product-->
+	<Product Id="$(var.ProductCode)"
+           Name="!(loc.ProductName_$(var.Platform))"
+           Language="1033"
+           Version="1.0.0.0" 
+           Manufacturer="!(loc.Manufacturer)"
+           UpgradeCode="$(var.UpgradeCode)">
+		
+    <!--Provide Package details-->
+    <Package InstallerVersion="200"
+             Compressed="yes" 
+             InstallScope="perMachine"
+             Platform="$(var.Platform)"
+             Manufacturer="!(loc.Manufacturer)"
+             Description="!(loc.Description)"
+             Keywords="!(loc.Keywords)"
+             Comments="!(loc.Comments)"/>
+
+    <!--Downgrade Error message-->
+		<MajorUpgrade DowngradeErrorMessage="!(loc.DowngradeError)" />
+		
+    <MediaTemplate EmbedCab="yes" />
+
+    <Icon Id="Icon.ico" SourceFile="$(var.ProjectDir)\kimball_icon.ico"/>
+
+    <!--Use Icon.ico as icon for installer in add remove programs-->
+    <Property Id="ARPPRODUCTICON" Value="Icon.ico"/>
+    
+    <!--Help/Support website shown in add remove programs-->
+    <Property Id="ARPINFOABOUT">https://www.gesinfotek.com/</Property>
+
+    <!--Create a basic UI for the installer-->
+    <UIRef Id="WixUI_Mondo"/>
+    
+    <!--Defines components, shortcuts, files etc... for installer-->
+		<Feature Id="ProductFeature" Title="Application" Level="1" ConfigurableDirectory="INSTALLFOLDER">
+      <ComponentGroupRef Id="PublishedComponents" />
+		</Feature>
+	</Product>
+  
+</Wix>

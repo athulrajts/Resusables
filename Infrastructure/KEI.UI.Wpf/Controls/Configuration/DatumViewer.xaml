@@ -1,0 +1,202 @@
+﻿<UserControl x:Class="KEI.UI.Wpf.Configuration.DatumViewer"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:KEI.UI.Wpf"
+             xmlns:config="clr-namespace:KEI.UI.Wpf.Configuration"
+             xmlns:fa="http://schemas.fontawesome.io/icons/"
+             xmlns:controls="clr-namespace:KEI.UI.Wpf.Controls"
+             xmlns:converters="clr-namespace:KEI.UI.Wpf.Converters"
+             mc:Ignorable="d" 
+             d:DesignHeight="35.509" d:DesignWidth="848.53">
+    <UserControl.Resources>
+       
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/KEI.UI.Wpf;component/Styles/CheckBoxes.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <local:BooleanToErrorBrushConverter x:Key="BooleanToErrorBrushConverter"/>
+            <config:DataTypeToEditorTypeConverter x:Key="DataTypeToEditorTypeConverter"/>
+
+            <ControlTemplate x:Key="ErrorTemplate">
+                <Border BorderBrush="Red" BorderThickness="1" IsHitTestVisible="False">
+                    <Border.Background>
+                        <SolidColorBrush Color="Red" Opacity="0.20"/>
+                    </Border.Background>
+                    <AdornedElementPlaceholder/>
+                </Border>
+            </ControlTemplate>
+
+            <!--For String and Numeric Types-->
+            <DataTemplate x:Key="StringAndNumericTemplate">
+                <TextBox DataContext="{Binding Path=DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContentControl}}"
+                         VerticalContentAlignment="Center"
+                         TextWrapping="Wrap"
+                         AcceptsReturn="True"
+                         Padding="5"
+                         Text="{Binding StringValue,
+                                        UpdateSourceTrigger=PropertyChanged,
+                                        ValidatesOnDataErrors=True}">
+                    <TextBox.Style>
+                        <Style TargetType="TextBox">
+                            <Style.Triggers>
+                                <Trigger Property="Validation.HasError" Value="true">
+                                    <Setter Property="Background">
+                                        <Setter.Value>
+                                            <SolidColorBrush Color="Red" Opacity="0.20"/>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self},Path=(Validation.Errors)[0].ErrorContent}"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBox.Style>
+                </TextBox>
+            </DataTemplate>
+
+            <!--For Boolean-->
+            <DataTemplate x:Key="BooleanTemplate">
+                <CheckBox DataContext="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContentControl}}" 
+                          IsChecked="{Binding StringValue, ValidatesOnDataErrors=True}"
+                          Style="{StaticResource SlideToggle}"
+                          VerticalAlignment="Center"
+                          HorizontalAlignment="Center"/>
+            </DataTemplate>
+
+            <!--For Enumerations-->
+            <DataTemplate x:Key="EnumTemplate">
+                <ComboBox DataContext="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContentControl}}" 
+                          ItemsSource="{Binding EnumSource}"
+                          SelectedValue="{Binding StringValue, ValidatesOnDataErrors=True}"
+                          VerticalContentAlignment="Center"/>
+            </DataTemplate>
+
+            <!--For Folder Path-->
+            <DataTemplate x:Key="FolderTemplate">
+                <controls:BrowseTextBox DataContext="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContentControl}}" 
+                                        Type="Folder"
+                                        Path="{Binding StringValue,
+                                                       Mode=TwoWay,
+                                                       ValidatesOnDataErrors=True, 
+                                                       UpdateSourceTrigger=PropertyChanged}"
+                                        Validation.ErrorTemplate="{StaticResource ErrorTemplate}">
+                    <controls:BrowseTextBox.Style>
+                        <Style TargetType="controls:BrowseTextBox">
+                            <Style.Triggers>
+                                <Trigger Property="Validation.HasError" Value="true">
+                                    <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self},Path=(Validation.Errors)[0].ErrorContent}"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </controls:BrowseTextBox.Style>
+                </controls:BrowseTextBox>
+            </DataTemplate>
+
+            <!--For File Path-->
+            <DataTemplate x:Key="FileTemplate">
+                <controls:BrowseTextBox DataContext="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContentControl}}" 
+                                        Type="File"
+                                        Path="{Binding StringValue,
+                                                       Mode=TwoWay,
+                                                       ValidatesOnDataErrors=True, 
+                                                       UpdateSourceTrigger=PropertyChanged}"
+                                        Validation.ErrorTemplate="{StaticResource ErrorTemplate}">
+                    <controls:BrowseTextBox.Style>
+                        <Style TargetType="controls:BrowseTextBox">
+                            <Style.Triggers>
+                                <Trigger Property="Validation.HasError" Value="true">
+                                    <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self},Path=(Validation.Errors)[0].ErrorContent}"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </controls:BrowseTextBox.Style>
+                </controls:BrowseTextBox>
+            </DataTemplate>
+
+            <!--For Objects-->
+            <DataTemplate x:Key="ObjectTemplate">
+                <TextBlock Text="View in Object Editor"
+                           TextWrapping="Wrap"
+                           VerticalAlignment="Center"
+                           Padding="5"
+                           MouseDown="TextBox_MouseDoubleClick">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="true">
+                                    <Setter Property="Cursor" Value="Hand"/>
+                                    <Setter Property="Foreground" Value="Blue"/>
+                                    <Setter Property="TextDecorations" Value="Underline"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+            </DataTemplate>
+            
+        </ResourceDictionary>
+        
+    </UserControl.Resources>
+    <Grid DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}" Background="Transparent">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" MinWidth="133.5"/>
+            <ColumnDefinition Width="*" MinWidth="133.5"/>
+            <ColumnDefinition Width="*" MinWidth="133.5"/>
+        </Grid.ColumnDefinitions>
+
+        <!--Name-->
+        <Border Grid.Column="0" Padding="10 0 0 0" BorderThickness="1.5" BorderBrush="Black"
+                CornerRadius="3 0 0 3">
+            <TextBlock Text="{Binding Data.Name}" 
+                       FontWeight="Bold" 
+                       TextWrapping="Wrap" 
+                       VerticalAlignment="Center"
+                       Background="Transparent">
+            </TextBlock>
+        </Border>
+
+        <!--Value-->
+        <Border Grid.Column="1"
+                BorderThickness="0 1.5 1.5 1.5" BorderBrush="Black">
+
+            <ContentControl Grid.Column="1" VerticalContentAlignment="Center">
+                <ContentControl.Style>
+                    <Style TargetType="ContentControl">
+                        <Setter Property="ContentTemplate" Value="{StaticResource StringAndNumericTemplate}"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Editor}" Value="Bool">
+                                <Setter Property="ContentTemplate" Value="{StaticResource BooleanTemplate}"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Editor}" Value="Enum">
+                                <Setter Property="ContentTemplate" Value="{StaticResource EnumTemplate}"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Editor}" Value="Folder">
+                                <Setter Property="ContentTemplate" Value="{StaticResource FolderTemplate}"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Editor}" Value="File">
+                                <Setter Property="ContentTemplate" Value="{StaticResource FileTemplate}"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Editor}" Value="Object">
+                                <Setter Property="ContentTemplate" Value="{StaticResource ObjectTemplate}"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Data.BrowseOption}" Value="NonEditable">
+                                <Setter Property="IsEnabled" Value="False"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ContentControl.Style>
+            </ContentControl>
+            
+        </Border>
+
+        <!--Type-->
+        <Border Grid.Column="2" Padding="10 0 0 0" BorderThickness="0 1.5 1.5 1.5" BorderBrush="Black"
+                CornerRadius="0 3 3 0">
+            <TextBlock Text="{Binding Data.Value, Converter={converters:ObjectToNameConverter}}" TextWrapping="Wrap"
+                       VerticalAlignment="Center"
+                       Background="Transparent"/>
+        </Border>
+        
+    </Grid>
+</UserControl>

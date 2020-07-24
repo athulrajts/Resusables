@@ -1,0 +1,303 @@
+﻿<UserControl x:Class="KEI.UI.Wpf.Controls.Configuration.PropertyGrid"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:KEI.UI.Wpf.Configuration"
+             xmlns:wc="clr-namespace:KEI.UI.Wpf.Controls"
+             xmlns:converters="clr-namespace:KEI.UI.Wpf.Converters"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/KEI.UI.Wpf;component/Styles/CheckBoxes.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <local:DataTypeToEditorTypeConverter x:Key="DataTypeToEditorTypeConverter"/>
+
+            <ControlTemplate x:Key="ErrorTemplate">
+                <Border BorderBrush="Red" BorderThickness="1" IsHitTestVisible="False">
+                    <Border.Background>
+                        <SolidColorBrush Color="Red" Opacity="0.20"/>
+                    </Border.Background>
+                    <AdornedElementPlaceholder/>
+                </Border>
+            </ControlTemplate>
+
+            <!--For String and Numeric Types-->
+            <DataTemplate x:Key="StringAndNumericTemplate">
+                <TextBox DataContext="{Binding Path=DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContentControl}}"
+                         VerticalContentAlignment="Center"
+                         TextWrapping="Wrap"
+                         AcceptsReturn="True"
+                         Text="{Binding PropertyValue,
+                                        UpdateSourceTrigger=PropertyChanged,
+                                        ValidatesOnDataErrors=True}">
+                    <TextBox.Style>
+                        <Style TargetType="TextBox">
+                            <Style.Triggers>
+                                <Trigger Property="Validation.HasError" Value="true">
+                                    <Setter Property="Background">
+                                        <Setter.Value>
+                                            <SolidColorBrush Color="Red" Opacity="0.20"/>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self},Path=(Validation.Errors)[0].ErrorContent}"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBox.Style>
+                </TextBox>
+            </DataTemplate>
+
+            <!--For Boolean-->
+            <DataTemplate x:Key="BooleanTemplate">
+                <CheckBox DataContext="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContentControl}}" 
+                          IsChecked="{Binding PropertyValue, ValidatesOnDataErrors=True}"
+                          Style="{StaticResource SlideToggle}"
+                          VerticalAlignment="Center"
+                          HorizontalAlignment="Left"/>
+            </DataTemplate>
+
+            <!--For Enumerations-->
+            <DataTemplate x:Key="EnumTemplate">
+                <ComboBox DataContext="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContentControl}}" 
+                          ItemsSource="{Binding EnumSource}"
+                          SelectedValue="{Binding PropertyValue, ValidatesOnDataErrors=True}"
+                          VerticalContentAlignment="Center"/>
+            </DataTemplate>
+            
+            <!--For Objects-->
+            <DataTemplate x:Key="ObjectTemplate">
+                <TextBlock DataContext="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContentControl}}" 
+                           Text="View in Object Editor"
+                           TextWrapping="Wrap"
+                           VerticalAlignment="Center"
+                           Padding="5">
+                    <TextBlock.InputBindings>
+                        <MouseBinding MouseAction="LeftClick" Command="{Binding OpenEditorCommand}"/>
+                    </TextBlock.InputBindings>
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="true">
+                                    <Setter Property="Cursor" Value="Hand"/>
+                                    <Setter Property="Foreground" Value="Blue"/>
+                                    <Setter Property="TextDecorations" Value="Underline"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+            </DataTemplate>
+
+            <!--For Folder Path-->
+            <DataTemplate x:Key="FolderTemplate">
+                <wc:BrowseTextBox DataContext="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContentControl}}" 
+                                        Type="Folder"
+                                        Path="{Binding PropertyValue,
+                                                       Mode=TwoWay,
+                                                       ValidatesOnDataErrors=True, 
+                                                       UpdateSourceTrigger=PropertyChanged}"
+                                        Validation.ErrorTemplate="{StaticResource ErrorTemplate}">
+                    <wc:BrowseTextBox.Style>
+                        <Style TargetType="wc:BrowseTextBox">
+                            <Style.Triggers>
+                                <Trigger Property="Validation.HasError" Value="true">
+                                    <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self},Path=(Validation.Errors)[0].ErrorContent}"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </wc:BrowseTextBox.Style>
+                </wc:BrowseTextBox>
+            </DataTemplate>
+
+            <!--For File Path-->
+            <DataTemplate x:Key="FileTemplate">
+                <wc:BrowseTextBox DataContext="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContentControl}}" 
+                                        Type="File"
+                                        Path="{Binding PropertyValue,
+                                                       Mode=TwoWay,
+                                                       ValidatesOnDataErrors=True, 
+                                                       UpdateSourceTrigger=PropertyChanged}"
+                                        Validation.ErrorTemplate="{StaticResource ErrorTemplate}">
+                    <wc:BrowseTextBox.Style>
+                        <Style TargetType="wc:BrowseTextBox">
+                            <Style.Triggers>
+                                <Trigger Property="Validation.HasError" Value="true">
+                                    <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self},Path=(Validation.Errors)[0].ErrorContent}"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </wc:BrowseTextBox.Style>
+                </wc:BrowseTextBox>
+            </DataTemplate>
+
+            <SolidColorBrush x:Key="Item.MouseOver.Background" Color="Blue" Opacity="0.2"/>
+            <SolidColorBrush x:Key="Item.MouseOver.Border" Color="Black"/>
+            <SolidColorBrush x:Key="Item.SelectedInactive.Background" Color="Blue" Opacity="0.2"/>
+            <SolidColorBrush x:Key="Item.SelectedInactive.Border" Color="DarkBlue"/>
+            <SolidColorBrush x:Key="Item.SelectedActive.Background" Color="Blue" Opacity="0.2"/>
+            <SolidColorBrush x:Key="Item.SelectedActive.Border" Color="DarkBlue"/>
+
+            <Style TargetType="ListBoxItem">
+                <Setter Property="SnapsToDevicePixels" Value="True"/>
+                <Setter Property="HorizontalContentAlignment" Value="{Binding HorizontalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
+                <Setter Property="VerticalContentAlignment" Value="{Binding VerticalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="BorderBrush" Value="Black"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="Margin" Value="2"/>
+                <Setter Property="Height" Value="40"/>
+                <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                            <Border x:Name="Bd"
+                                    BorderBrush="{TemplateBinding BorderBrush}" 
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    Background="{TemplateBinding Background}" 
+                                    Padding="{TemplateBinding Padding}" 
+                                    SnapsToDevicePixels="true"
+                                    CornerRadius="3">
+                                <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <MultiTrigger>
+                                    <MultiTrigger.Conditions>
+                                        <Condition Property="IsMouseOver" Value="True"/>
+                                    </MultiTrigger.Conditions>
+                                    <Setter Property="Background" TargetName="Bd" Value="{StaticResource Item.MouseOver.Background}"/>
+                                    <Setter Property="BorderBrush" TargetName="Bd" Value="{StaticResource Item.MouseOver.Border}"/>
+                                </MultiTrigger>
+                                <MultiTrigger>
+                                    <MultiTrigger.Conditions>
+                                        <Condition Property="Selector.IsSelectionActive" Value="False"/>
+                                        <Condition Property="IsSelected" Value="True"/>
+                                    </MultiTrigger.Conditions>
+                                    <Setter Property="Background" TargetName="Bd" Value="{StaticResource Item.SelectedInactive.Background}"/>
+                                    <Setter Property="BorderBrush" TargetName="Bd" Value="{StaticResource Item.SelectedInactive.Border}"/>
+                                </MultiTrigger>
+                                <MultiTrigger>
+                                    <MultiTrigger.Conditions>
+                                        <Condition Property="Selector.IsSelectionActive" Value="True"/>
+                                        <Condition Property="IsSelected" Value="True"/>
+                                    </MultiTrigger.Conditions>
+                                    <Setter Property="Background" TargetName="Bd" Value="{StaticResource Item.SelectedActive.Background}"/>
+                                    <Setter Property="BorderBrush" TargetName="Bd" Value="{StaticResource Item.SelectedActive.Border}"/>
+                                </MultiTrigger>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="TextElement.Foreground" TargetName="Bd" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
+                                </Trigger>
+                                <DataTrigger Binding="{Binding BrowseOption}" Value="NonBrowsable">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <!--Properties of Object-->
+        <Border Grid.Row="1" Padding="10"
+                BorderBrush="Black"
+                BorderThickness="1 0 1 0"
+                Background="FloralWhite" >
+            <ListBox x:Name="itemsControl" Background="{Binding Background, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}"
+                     HorizontalContentAlignment="Stretch"
+                     VerticalContentAlignment="Stretch"
+                     BorderBrush="Transparent">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Grid.Column="0"
+                                        Text="{Binding PropertyName}"
+                                        FontWeight="Bold"
+                                        VerticalAlignment="Center"/>
+
+                            <ContentControl Grid.Column="1"
+                                            Content="{Binding PropertyValue}"
+                                            VerticalContentAlignment="Center">
+                                <ContentControl.Style>
+                                    <Style TargetType="ContentControl">
+                                        <Setter Property="ContentTemplate" Value="{StaticResource StringAndNumericTemplate}"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding PropertyEditor}" Value="Bool">
+                                                <Setter Property="ContentTemplate" Value="{StaticResource BooleanTemplate}"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding PropertyEditor}" Value="Enum">
+                                                <Setter Property="ContentTemplate" Value="{StaticResource EnumTemplate}"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding PropertyEditor}" Value="Object">
+                                                <Setter Property="ContentTemplate" Value="{StaticResource ObjectTemplate}"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding BrowseOption}" Value="NonEditable">
+                                                <Setter Property="IsEnabled" Value="False"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding PropertyEditor}" Value="Folder">
+                                                <Setter Property="ContentTemplate" Value="{StaticResource FolderTemplate}"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding PropertyEditor}" Value="File">
+                                                <Setter Property="ContentTemplate" Value="{StaticResource FileTemplate}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ContentControl.Style>
+                            </ContentControl>
+                                
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Border>
+
+        <!--Object Name-->
+        <Border Grid.Row="0"
+                BorderBrush="Black" BorderThickness="1"
+                Padding="10"
+                Background="Gray">
+            <TextBlock x:Name="objectNameTxt"
+                       TextWrapping="Wrap"
+                       FontWeight="Thin"
+                       FontSize="25"/>
+        </Border>
+
+
+        <Border Grid.Row="2"
+                BorderBrush="Black" BorderThickness="1"
+                Padding="10 0 10 10"
+                Background="Gray">
+            <TextBlock x:Name="descriptionText"
+                       DataContext="{Binding SelectedItem, ElementName=itemsControl}"
+                       TextWrapping="Wrap">
+                <Run Text="{Binding PropertyName}" FontWeight="Thin"
+                     FontSize="18" TextDecorations="Underline"/>
+                <LineBreak/><LineBreak/>
+                <Run Text="{Binding PropertyDescription}"
+                     FontSize="13"
+                     FontWeight="Regular"/>
+                <LineBreak/><LineBreak/>
+                <Run Text="Type : " FontSize="10" FontWeight="DemiBold"/>
+                <Run Text="{Binding PropertyType, Mode=OneWay, Converter={converters:TypeToNameConverter}}"
+                     Foreground="Blue"
+                     FontWeight="DemiBold"
+                     FontSize="10"/>
+            </TextBlock>
+        </Border>
+
+    </Grid>
+</UserControl>

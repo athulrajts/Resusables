@@ -1,0 +1,23 @@
+Machine
+Version
+User
+View Serivce
+Info
+Warn
+Error
+Yes No
+Okay Cancel
+Ignore Retry
+Set Busy
+Appearance
+Theme
+Language
+Validation
+Text
+Binding
+Config Viewer
+Demos
+Configs
+Manage Screens
+Update
+Save

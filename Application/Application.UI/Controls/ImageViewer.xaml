@@ -1,0 +1,124 @@
+﻿<UserControl x:Class="Application.UI.Controls.DrawingBoard"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:converters="clr-namespace:KEI.UI.Wpf.Converters;assembly=KEI.UI.Wpf"
+             xmlns:converters1="clr-namespace:Application.UI.Converters"
+             xmlns:ap="clr-namespace:KEI.UI.Wpf.AttachedProperties;assembly=KEI.UI.Wpf"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <SolidColorBrush x:Key="ShapeFill" Color="LightSeaGreen" Opacity="0.15"/>
+    </UserControl.Resources>
+    <Grid DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}"
+          Height="Auto">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+
+        <Border Grid.Column="0" 
+                Background="White" 
+                CornerRadius="5"
+                BorderBrush="Black"
+                BorderThickness="0.8"
+                Padding="10"
+                Visibility="{Binding ShowToolBar, Converter={converters:BooleanToVisibilityConverter}}">
+            <StackPanel>
+                <RadioButton x:Name="mousePointerBtn"
+                             Style="{StaticResource {x:Type ToggleButton}}"
+                             Checked="MousePointer_Checked"
+                             Height="40"
+                             Margin="0 0 0 2"
+                             IsChecked="True"
+                             ap:IconManager.Icon="MoveGlyph16x"/>
+
+                <RadioButton ToolTip="Rectangle"
+                         x:Name="rectangleBtn"
+                         Style="{StaticResource {x:Type ToggleButton}}"
+                         Checked="Rectangle_Checked"
+                         Margin="0 2">
+                    <RadioButton.Content>
+                        <Border Padding="10">
+                            <Rectangle Fill="Red" 
+                                   Stroke="Black" 
+                                   StrokeThickness="2"
+                                   Height="20"
+                                   Width="25"/>
+                        </Border>
+                    </RadioButton.Content>
+                </RadioButton>
+                <RadioButton ToolTip="Closed Polygon"
+                         x:Name="polygonBtn"
+                         Style="{StaticResource {x:Type ToggleButton}}"
+                         Checked="Polygon_Checked"
+                         Margin="0 2">
+                    <RadioButton.Content>
+                        <Border Padding="10">
+                            <Path Data="M258,211.5 L275.5,190 258.5,162 319.5,164 316.5,214 z" 
+                              Fill="Orange"
+                              Height="20"
+                              Width="30"
+                              Stretch="Fill"
+                              Stroke="Black"
+                              StrokeThickness="2"/>
+                        </Border>
+                    </RadioButton.Content>
+
+                </RadioButton>
+
+            </StackPanel>
+        </Border>
+
+
+        <Border Grid.Column="1" Padding="50 0 0 0">
+            <Canvas x:Name="imageViewer"
+                    ClipToBounds="True"
+                    Background="{Binding BoardBackground}"
+                    MouseLeftButtonDown="ImageViewer_MouseLeftButtonDown"
+                    MouseLeftButtonUp="ImageViewer_MouseLeftButtonUp"
+                    MouseMove="ImageViewer_MouseMove"
+                    MouseLeave="ImageViewer_MouseLeave">
+                <Rectangle x:Name="rectangleOverlay"
+                           Stroke="Green"
+                           StrokeThickness="3"
+                           StrokeDashArray="1 1"
+                           Fill="{StaticResource ShapeFill}"
+                           Visibility="Collapsed">
+                </Rectangle>
+                <Polyline Stroke="Green"
+                          x:Name="polylineOverlay"
+                          StrokeThickness="3"
+                          StrokeDashArray="1 1"
+                          Fill="{StaticResource ShapeFill}"
+                          Visibility="Collapsed"
+                          StrokeLineJoin="Round"
+                          StrokeEndLineCap="Round"
+                          StrokeStartLineCap="Round"/>
+                <ItemsControl ItemsSource="{Binding Vertices}" Panel.ZIndex="100">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Ellipse Height="10"
+                                     Width="10"
+                                     Fill="Red"
+                                     Stroke="Green" 
+                                     StrokeThickness="2">
+                                <Ellipse.RenderTransform>
+                                    <TranslateTransform X="{Binding X, Converter={converters1:TranslateConverter}, ConverterParameter=-5}"
+                                                        Y="{Binding Y, Converter={converters1:TranslateConverter}, ConverterParameter=-5}"/>
+                                </Ellipse.RenderTransform>
+                            </Ellipse>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <Canvas/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
+            </Canvas>
+        </Border>
+
+    </Grid>
+</UserControl>

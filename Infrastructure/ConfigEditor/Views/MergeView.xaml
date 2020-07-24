@@ -1,0 +1,206 @@
+﻿<UserControl x:Class="ConfigEditor.Views.MergeView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ConfigEditor.Views"
+             xmlns:prism="http://prismlibrary.com/"
+             xmlns:model="clr-namespace:ConfigEditor.Models"
+             xmlns:wpf="clr-namespace:KEI.UI.Wpf;assembly=KEI.UI.Wpf"
+             xmlns:ap="clr-namespace:KEI.UI.Wpf.AttachedProperties;assembly=KEI.UI.Wpf"
+             xmlns:controls="clr-namespace:KEI.UI.Wpf.Controls;assembly=KEI.UI.Wpf"
+             xmlns:converters="clr-namespace:KEI.UI.Wpf.Converters;assembly=KEI.UI.Wpf"
+             prism:ViewModelLocator.AutoWireViewModel="True"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <local:DataContainerToDictionaryConverter x:Key="DataContainerToDictionaryConverter"/>
+
+        <Style TargetType="DataGridColumnHeader" x:Key="BaseHeader">
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="Black"/>
+        </Style>
+
+        <Style TargetType="DataGridColumnHeader" x:Key="LeftHeader" BasedOn="{StaticResource BaseHeader}">
+            <Setter Property="Background" Value="Blue"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+
+        <Style TargetType="DataGridColumnHeader" x:Key="RightHeader" BasedOn="{StaticResource BaseHeader}">
+            <Setter Property="Background" Value="Green"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+
+    </UserControl.Resources>
+
+    <Grid>
+
+        <Grid Margin="3">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            
+            <Border BorderBrush="Black" BorderThickness="1" Padding="4">
+                <WrapPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <WrapPanel.Resources>
+                        <Style TargetType="Separator" BasedOn="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}">
+                            <Setter Property="Background" Value="Black"/>
+                            <Setter Property="Margin" Value="5 0"/>
+                        </Style>
+                    </WrapPanel.Resources>
+                    <CheckBox Content="Show Changes Only"
+                              VerticalAlignment="Center"
+                              IsChecked="{Binding ShowDifferentItems}"/>
+
+                    <Separator Background="Black"/>
+
+                    <Label Content="Shape" VerticalAlignment="Center"/>
+                    <ComboBox SelectedItem="{Binding MergedShape}"
+                              ItemsSource="{wpf:EnumBindingSource EnumType=model:MergeOption}"
+                              VerticalContentAlignment="Center"
+                              Width="100"
+                              Height="20"/>
+
+                    <Separator/>
+
+                    <Button Height="20"
+                            Width="70"
+                            Content="Swap"
+                            ToolTip="Swap Left and Right"
+                            Command="{Binding SwapLeftRightCommand}"/>
+
+                    <Separator/>
+
+                    <Button Height="20"
+                            Width="70"
+                            Content="Save"
+                            ToolTip="Save Merged"
+                            Command="{Binding MergeCommand}"/>
+
+                </WrapPanel>
+
+
+            </Border>
+
+            <Border Padding="10" BorderBrush="Black" BorderThickness="1 0 1 1" Grid.Row="1">
+                <Grid Height="40">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="40"/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+
+                    <controls:BrowseTextBox Path="{Binding LeftPath, Mode=TwoWay}"
+                                            Type="File"
+                                            Filter="*.xcfg,*.rcp" 
+                                            FilterDescription="DataContainer Files"
+                                            Margin="10 0"/>
+
+                    <controls:BrowseTextBox Path="{Binding RightPath, Mode=TwoWay}"
+                                            Type="File"
+                                            Filter="*.xcfg,*.rcp"
+                                            FilterDescription="DataContainer Files"
+                                            Margin="10 0" Grid.Column="2"/>
+
+                    <Button ap:IconManager.Icon="Merge16x" 
+                            Grid.Column="1"
+                            Command="{Binding RefreshMergeCommand}"/>
+                </Grid>
+            </Border>
+
+            <DataGrid ItemsSource="{Binding Merge.MergedModel}"
+                      BorderBrush="Black"
+                      BorderThickness="1 0 1 1"
+                      AutoGenerateColumns="False"
+                      Grid.Row="2"
+                      Visibility="{Binding Merge, Converter={ObjectToVisibilityConverter}}"
+                      LoadingRow="DataGrid_LoadingRow">
+                <DataGrid.Columns>
+                    <DataGridTextColumn  Header="Key" Binding="{Binding Key}" IsReadOnly="True" Width="*"
+                                         HeaderStyle="{StaticResource BaseHeader}"/>
+
+                    <DataGridTextColumn  Header="Left" Binding="{Binding Left.ValueString, Mode=OneWay, FallbackValue='Not Present'}"
+                                         IsReadOnly="True" Width="*"
+                                         HeaderStyle="{StaticResource LeftHeader}">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="TextWrapping" Value="Wrap"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Left}" Value="{x:Null}">
+                                        <Setter Property="Background" Value="Red"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    
+                    <DataGridTextColumn  Header="Right" Binding="{Binding Right.ValueString, Mode=OneWay, FallbackValue='Not Present'}" 
+                                         IsReadOnly="True" Width="*"
+                                         HeaderStyle="{StaticResource RightHeader}">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="TextWrapping" Value="Wrap"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Right}" Value="{x:Null}">
+                                            <Setter Property="Background" Value="Red"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+
+                    <DataGridTemplateColumn Header="Merged" Width="*"
+                                            HeaderStyle="{StaticResource BaseHeader}">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock TextWrapping="Wrap">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Text" Value="{Binding Left.ValueString}"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Option}" Value="Right">
+                                                    <Setter Property="Text" Value="{Binding Right.ValueString}"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                        <DataGridTemplateColumn.CellEditingTemplate>
+                            <DataTemplate>
+                                <ComboBox SelectedItem="{Binding Option}"
+                                          ItemsSource="{wpf:EnumBindingSource EnumType=model:MergeOption}"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellEditingTemplate>
+                        <DataGridTemplateColumn.CellStyle>
+                            <Style TargetType="DataGridCell">
+                                <Setter Property="Background">
+                                    <Setter.Value>
+                                        <SolidColorBrush Color="Blue" Opacity="0.25"/>
+                                    </Setter.Value>
+                                </Setter>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Option}" Value="Right">
+                                        <Setter Property="Background">
+                                            <Setter.Value>
+                                                <SolidColorBrush Color="Green" Opacity="0.25"/>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGridTemplateColumn.CellStyle>
+                    </DataGridTemplateColumn>
+
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+
+    </Grid>
+</UserControl>

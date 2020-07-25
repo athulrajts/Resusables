@@ -13,32 +13,38 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
 
-        <TreeView ItemsSource="{Binding Projects}" Padding="0 0 10 0">
+        <TreeView ItemsSource="{Binding Projects}" Padding="0 0 10 0"
+                  BorderBrush="Black"
+                  BorderThickness="0 0 1 0">
             <TreeView.Resources>
                 <HierarchicalDataTemplate DataType="{x:Type core:Project}"
                                   ItemsSource="{Binding TranslationFiles}">
-                    <TextBlock Text="{Binding ProjectName}"
-                               FontWeight="Bold"
-                               FontSize="13"
-                               Tag="{Binding DataContext,RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=TreeView}}">
-                        <TextBlock.ContextMenu>
-                            <ContextMenu>
-                                <MenuItem Header="Add Translation" Command="{Binding AddTranslationCommand}"/>
-                            </ContextMenu>
-                        </TextBlock.ContextMenu>
-                    </TextBlock>
-                    <HierarchicalDataTemplate.ItemTemplate>
-                        <DataTemplate DataType="{x:Type core:TranslationFile}">
-                            <TextBlock Text="{Binding Name}"
-                                       FontSize="12">
-                                <TextBlock.InputBindings>
-                                    <MouseBinding MouseAction="LeftDoubleClick" Command="{Binding DataContext.ViewTranslationFileCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=TreeView}}"
-                                                  CommandParameter="{Binding}"/>
-                                </TextBlock.InputBindings>
-                            </TextBlock>
-                        </DataTemplate>
-                    </HierarchicalDataTemplate.ItemTemplate>
+                    <StackPanel Orientation="Horizontal" Margin="0 3">
+                        <ContentControl IconManager.Icon="XMLProject16x"
+                                        Margin="0 0 5 0" Height="16" Width="16"/>
+                        <TextBlock Text="{Binding ProjectName}" FontSize="13">
+                            <TextBlock.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="Add Localization" Command="{Binding AddTranslationCommand}"/>
+                                </ContextMenu>
+                            </TextBlock.ContextMenu>
+                        </TextBlock>
+                    </StackPanel>
                 </HierarchicalDataTemplate>
+
+                <DataTemplate DataType="{x:Type core:TranslationFile}">
+                    <StackPanel Orientation="Horizontal">
+                        <ContentControl IconManager.Icon="TranslateDocument16x"
+                                        Margin="0 0 5 0" Height="16" Width="16"/>
+                        <TextBlock Text="{Binding Name}" FontSize="13">
+                            <TextBlock.InputBindings>
+                                <MouseBinding MouseAction="LeftDoubleClick" Command="{Binding DataContext.ViewTranslationFileCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=TreeView}}"
+                                                  CommandParameter="{Binding}"/>
+                            </TextBlock.InputBindings>
+                        </TextBlock>
+                    </StackPanel>
+                </DataTemplate>
+                
             </TreeView.Resources>
         </TreeView>
 

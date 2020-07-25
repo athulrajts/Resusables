@@ -57,8 +57,8 @@ namespace Localizer.Core
         }
 
         private DelegateCommand<Project> addTranslation;
-        public DelegateCommand<Project> AddTranslationCommand =>
-            addTranslation ?? (addTranslation = new DelegateCommand<Project>(ExecuteAddTranslationCommand));
+        public DelegateCommand<Project> AddTranslationCommand 
+            => addTranslation ??= new DelegateCommand<Project>(ExecuteAddTranslationCommand);
 
         public void ExecuteAddTranslationCommand(Project param)
         {

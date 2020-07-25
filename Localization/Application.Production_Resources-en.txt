@@ -21,3 +21,4 @@ Configs
 Manage Screens
 Update
 Save
+Alarms

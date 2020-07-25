@@ -6,7 +6,6 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/KEI.UI.Wpf;component/Styles/TextBoxes.xaml"/>
-                <ResourceDictionary Source="Icons.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/KEI.Resources;component/VisualStudioIcons/Icons.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>

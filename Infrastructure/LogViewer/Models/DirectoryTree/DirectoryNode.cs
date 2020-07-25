@@ -39,6 +39,24 @@ namespace LogViewer.Models.DirectoryTree
             set { SetProperty(ref hasChildren, value); }
         }
 
+        public bool HasLeafNodes
+        {
+            get
+            {
+                return HasFiles(Dir);
+            }
+        }
+
+        private bool HasFiles(DirectoryInfo inf)
+        {
+            if(inf.EnumerateFiles(_pattern).Count() > 0)
+            {
+                return true;
+            }
+
+            return inf.EnumerateDirectories().Any(x => HasFiles(x) == true);
+        }
+
         private void OnExpandedChanged()
         {
             if(IsExpanded)

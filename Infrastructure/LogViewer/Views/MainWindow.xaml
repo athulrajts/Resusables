@@ -11,10 +11,10 @@
         xmlns:w="clr-namespace:KEI.UI.Wpf;assembly=KEI.UI.Wpf"
         mc:Ignorable="d"
         prism:ViewModelLocator.AutoWireViewModel="True"
-        Title="LogViewer" Height="450" Width="800"
+        Title="LogViewer" Height="650" Width="1000"
         d:DataContext="{d:DesignInstance Type=vm:LogViewerWindowViewModel}">
     <Window.Resources>
-        
+
         <Style x:Key="CenteredContent"
                TargetType="{x:Type DataGridCell}">
             <Setter Property="Template">
@@ -53,6 +53,7 @@
         </Style>
 
     </Window.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -64,6 +65,7 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
 
+        <!--Menu/Commands-->
         <Border Grid.ColumnSpan="2" BorderThickness="0 0 0 2" BorderBrush="Black">
             <Border.Background>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
@@ -81,6 +83,8 @@
                         <Setter Property="Width" Value="80"/>
                     </Style>
                 </StackPanel.Resources>
+
+                <!--Browse Folder-->
                 <Button Command="{Binding BrowseFolderCommand}">
                     <StackPanel>
                         <ContentControl IconManager.Icon="FolderOpen16x"
@@ -88,6 +92,8 @@
                         <TextBlock Text="Open Folder"/>
                     </StackPanel>
                 </Button>
+
+                <!--Browse File-->
                 <Button Command="{Binding BrowseFileCommand}">
                     <StackPanel>
                         <ContentControl IconManager.Icon="TextFile16x"
@@ -95,9 +101,11 @@
                         <TextBlock Text="Open File"/>
                     </StackPanel>
                 </Button>
+
             </StackPanel>
         </Border>
 
+        <!--Directory structure-->
         <Border Grid.Column="0" Grid.Row="1"
                 Width="250">
 
@@ -121,12 +129,27 @@
                                     <Style TargetType="ContentControl">
                                         <Setter Property="IconManager.Icon" Value="Folder16x"/>
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding IsExpanded}" Value="true">
-                                                <Setter Property="IconManager.Icon" Value="FolderOpen16x"/>
-                                            </DataTrigger>
-                                            <DataTrigger Binding="{Binding HasChildren}" Value="false">
+                                            <DataTrigger Binding="{Binding HasLeafNodes}" Value="false">
                                                 <Setter Property="IconManager.Icon" Value="Foldergrey16x"/>
                                             </DataTrigger>
+                                            <MultiDataTrigger>
+                                                <MultiDataTrigger.Conditions>
+                                                    <Condition Binding="{Binding IsExpanded}" Value="true"/>
+                                                    <Condition Binding="{Binding HasLeafNodes}" Value="true"/>
+                                                </MultiDataTrigger.Conditions>
+                                                <MultiDataTrigger.Setters>
+                                                    <Setter Property="IconManager.Icon" Value="FolderOpen16x"/>
+                                                </MultiDataTrigger.Setters>
+                                            </MultiDataTrigger>
+                                            <MultiDataTrigger>
+                                                <MultiDataTrigger.Conditions>
+                                                    <Condition Binding="{Binding IsExpanded}" Value="true"/>
+                                                    <Condition Binding="{Binding HasLeafNodes}" Value="false"/>
+                                                </MultiDataTrigger.Conditions>
+                                                <MultiDataTrigger.Setters>
+                                                    <Setter Property="IconManager.Icon" Value="FolderOpengrey16x"/>
+                                                </MultiDataTrigger.Setters>
+                                            </MultiDataTrigger>
                                         </Style.Triggers>
                                     </Style>
                                 </ContentControl.Style>
@@ -156,7 +179,7 @@
                       Color="Transparent" />
                     <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}"
                       Color="Black" />
-                    
+
                 </TreeView.Resources>
                 <TreeView.ItemContainerStyle>
                     <Style TargetType="TreeViewItem">
@@ -167,8 +190,8 @@
             </TreeView>
 
         </Border>
-        
 
+        <!--Log Viewer-->
         <Grid Grid.Row="1" Grid.Column="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -177,42 +200,100 @@
             </Grid.RowDefinitions>
 
             <Grid>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                    <StackPanel.Resources>
-                        <Style TargetType="Border">
-                            <Setter Property="BorderBrush" Value="Black"/>
-                            <Setter Property="BorderThickness" Value="1"/>
-                            <Setter Property="CornerRadius" Value="5"/>
-                            <Setter Property="Padding" Value="5"/>
-                            <Setter Property="Margin" Value="5"/>
-                            <Setter Property="Height" Value="40"/>
-                            <Setter Property="Width" Value="75"/>
-                        </Style>
-                        <Style TargetType="CheckBox">
-                            <Setter Property="VerticalAlignment" Value="Center"/>
-                            <Setter Property="FontWeight" Value="DemiBold"/>
-                            <Setter Property="HorizontalAlignment" Value="Center"/>
-                        </Style>
-                    </StackPanel.Resources>
-                    <Border Background="White">
-                        <CheckBox Content="Debug" IsChecked="{Binding ViewDebug}"/>
-                    </Border>
-                    <Border Background="LightGreen">
-                        <CheckBox Content="Info" IsChecked="{Binding ViewInfo}"/>
-                    </Border>
-                    <Border Background="Yellow">
-                        <CheckBox Content="Warn" IsChecked="{Binding ViewWarn}"/>
-                    </Border>
-                    <Border Background="OrangeRed">
-                        <CheckBox Content="Error" IsChecked="{Binding ViewError}"/>
-                    </Border>
-                    <Border Background="Red">
-                        <CheckBox Content="Fatal" IsChecked="{Binding ViewFatal}"/>
-                    </Border>
-                </StackPanel>
-            </Grid>
-            
 
+                <!--Log level filters-->
+                <Border Padding="8">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <StackPanel.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="BorderBrush" Value="Black"/>
+                                <Setter Property="BorderThickness" Value="1"/>
+                                <Setter Property="CornerRadius" Value="5"/>
+                                <Setter Property="Padding" Value="5"/>
+                                <Setter Property="Margin" Value="5 0"/>
+                                <Setter Property="Height" Value="40"/>
+                                <Setter Property="Width" Value="75"/>
+                            </Style>
+                            <Style TargetType="CheckBox">
+                                <Setter Property="VerticalAlignment" Value="Center"/>
+                                <Setter Property="FontWeight" Value="DemiBold"/>
+                                <Setter Property="HorizontalAlignment" Value="Center"/>
+                            </Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="TextWrapping" Value="Wrap"/>
+                                <Setter Property="FontSize" Value="10"/>
+                            </Style>
+                        </StackPanel.Resources>
+                        <StackPanel>
+                            <Border Background="White">
+                                <CheckBox Content="Debug" IsChecked="{Binding ViewDebug}"/>
+                            </Border>
+                                <TextBlock HorizontalAlignment="Center">
+                                <Run Text="["/>
+                                <Run Text="{Binding LogCount[Debug]}"/>
+                                <Run Text="/"/>
+                                <Run Text="{Binding TotalLogCount}"/>
+                                <Run Text="]"/>
+                            </TextBlock>
+                        </StackPanel>
+
+                        <StackPanel>
+                            <Border Background="LightGreen">
+                                <CheckBox Content="Info" IsChecked="{Binding ViewInfo}"/>
+                            </Border>
+                            <TextBlock HorizontalAlignment="Center">
+                                <Run Text="["/>
+                                <Run Text="{Binding LogCount[Info]}"/>
+                                <Run Text="/"/>
+                                <Run Text="{Binding TotalLogCount}"/>
+                                <Run Text="]"/>
+                            </TextBlock>
+                        </StackPanel>
+
+                        <StackPanel>
+                            <Border Background="Yellow">
+                                <CheckBox Content="Warn" IsChecked="{Binding ViewWarn}"/>
+                            </Border>
+                            <TextBlock HorizontalAlignment="Center">
+                                <Run Text="["/>
+                                <Run Text="{Binding LogCount[Warn]}"/>
+                                <Run Text="/"/>
+                                <Run Text="{Binding TotalLogCount}"/>
+                                <Run Text="]"/>
+                            </TextBlock>
+                        </StackPanel>
+
+                        <StackPanel>
+                            <Border Background="OrangeRed">
+                                <CheckBox Content="Error" IsChecked="{Binding ViewError}"/>
+                            </Border>
+                            <TextBlock HorizontalAlignment="Center">
+                                <Run Text="["/>
+                                <Run Text="{Binding LogCount[Error]}"/>
+                                <Run Text="/"/>
+                                <Run Text="{Binding TotalLogCount}"/>
+                                <Run Text="]"/>
+                            </TextBlock>
+                        </StackPanel>
+
+                        <StackPanel>
+                            <Border Background="Red">
+                                <CheckBox Content="Fatal" IsChecked="{Binding ViewFatal}"/>
+                            </Border>
+                            <TextBlock HorizontalAlignment="Center">
+                                <Run Text="["/>
+                                <Run Text="{Binding LogCount[Fatal]}"/>
+                                <Run Text="/"/>
+                                <Run Text="{Binding TotalLogCount}"/>
+                                <Run Text="]"/>
+                            </TextBlock>
+                        </StackPanel>
+
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!--Filter Textboxes-->
             <StackPanel Orientation="Horizontal" Grid.Row="1">
                 <StackPanel.Resources>
                     <Style TargetType="WatermarkTextBox" BasedOn="{StaticResource {x:Type WatermarkTextBox}}">
@@ -228,7 +309,7 @@
                     <Style TargetType="Border">
                         <Setter Property="Padding" Value="0 3"/>
                     </Style>
-                    
+
                 </StackPanel.Resources>
 
                 <Border Width="{Binding ActualWidth, ElementName=levelCol}"
@@ -269,6 +350,7 @@
 
             </StackPanel>
 
+            <!--Log Grid-->
             <DataGrid Grid.Row="2"
                       x:Name="logGrid"
                       AutoGenerateColumns="False"
@@ -307,6 +389,7 @@
                     </ContextMenu>
                 </DataGrid.ContextMenu>
                 <DataGrid.Columns>
+
                     <DataGridTextColumn x:Name="levelCol"
                                         Header="Level"
                                         Binding="{Binding Level}" 
@@ -324,13 +407,13 @@
                                         CanUserResize="False"
                                         CellStyle="{StaticResource CenteredContent}"
                                         Visibility="{Binding Data, Converter={c:BooleanToVisibilityConverter}, Source={StaticResource DateTimeChecked}}"/>
-                    
+
                     <DataGridTextColumn x:Name="fileCol"
                                         Header="File"
                                         Binding="{Binding FileName}"
                                         IsReadOnly="True"
                                         Visibility="{Binding Data, Converter={c:BooleanToVisibilityConverter}, Source={StaticResource FileNameChecked}}"/>
-                    
+
                     <DataGridTextColumn x:Name="lineCol"
                                         Header="Line"
                                         Binding="{Binding LineNumber}"
@@ -338,13 +421,13 @@
                                         MinWidth="50"
                                         CellStyle="{StaticResource CenteredContent}"
                                         Visibility="{Binding Data, Converter={c:BooleanToVisibilityConverter}, Source={StaticResource LineNumberChecked}}"/>
-                    
+
                     <DataGridTextColumn x:Name="methodCol"
                                         Header="Method"
                                         Binding="{Binding MethodName}"
                                         IsReadOnly="True"
                                         Visibility="{Binding Data, Converter={c:BooleanToVisibilityConverter}, Source={StaticResource MethodNameChecked}}"/>
-                    
+
                     <DataGridTextColumn x:Name="messageCol"
                                         Header="Message"
                                         Binding="{Binding Message}"
@@ -355,23 +438,83 @@
             </DataGrid>
         </Grid>
 
+        <!--Selected Log Details-->
         <Border Grid.Row="2" BorderBrush="Black" BorderThickness="0 2 0 0"
-                Grid.ColumnSpan="2">
+                Grid.ColumnSpan="2" MinHeight="200"
+                Visibility="{Binding SelectedLog, Converter={c:ObjectToVisibilityConverter}}">
+            <Border.Resources>
+                <Style TargetType="Label">
+                    <Setter Property="BorderBrush" Value="Black"/>
+                    <Setter Property="BorderThickness" Value="1"/>
+                    <Setter Property="FontWeight" Value="Bold"/>
+                    <Setter Property="Background">
+                        <Setter.Value>
+                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                <GradientStop Color="Gray" Offset="0"/>
+                                <GradientStop Color="DarkGray" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </Border.Resources>
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
-
-                <Border Padding="5" Height="200">
+                <Grid.Resources>
+                    <Style x:Key="TitleText" TargetType="Run">
+                        <Setter Property="FontWeight" Value="Bold"/>
+                    </Style>
+                </Grid.Resources>
+                <Border Padding="5">
                     <StackPanel>
-                        <TextBlock Text="{Binding SelectedLog.Level}"/>
-                        <TextBlock Text="{Binding SelectedLog.FileName}"/>
-                        <TextBlock Text="{Binding SelectedLog.MethodName}"/>
-                        <TextBlock Text="{Binding SelectedLog.Message}"/>
+                        <Label Content="Log Details"/>
+                        <TextBlock>
+                            <Run Text="Log Level : " Style="{StaticResource TitleText}"/>
+                            <Run Text="{Binding SelectedLog.Level}"/>
+                        </TextBlock>
+                        <TextBlock>
+                            <Run Text="Time : " Style="{StaticResource TitleText}"/>
+                            <Run Text="{Binding SelectedLog.Time}"/>
+                        </TextBlock>
+                        <TextBlock>
+                            <Run Text="File Name : " Style="{StaticResource TitleText}"/>
+                            <Run Text="{Binding SelectedLog.FileName}"/>
+                        </TextBlock>
+                        <TextBlock>
+                            <Run Text="Method Name : " Style="{StaticResource TitleText}"/>
+                            <Run Text="{Binding SelectedLog.MethodName}"/>
+                        </TextBlock>
+                        <TextBlock>
+                            <Run Text="Line Number : " Style="{StaticResource TitleText}"/>
+                            <Run Text="{Binding SelectedLog.LineNumber}"/>
+                        </TextBlock>
+                        <TextBlock TextWrapping="Wrap">
+                            <Run Text="Message : " Style="{StaticResource TitleText}"/>
+                            <Run Text="{Binding SelectedLog.Message}"/>
+                        </TextBlock>
                     </StackPanel>
                 </Border>
-            
+
+                <Border Padding="5" Grid.Column="1" BorderBrush="Black"
+                        BorderThickness="1 0 0 0">
+                    <StackPanel>
+                        <Label Content="Throwables"/>
+                        <TextBlock TextWrapping="Wrap" Visibility="{Binding SelectedLog.Exception, Converter={c:ObjectToVisibilityConverter}}">
+                            <Run Text="Exception" TextDecorations="Underline" Style="{StaticResource TitleText}"/>
+                            <LineBreak/>
+                            <Run Text="{Binding SelectedLog.Exception}" FontWeight="Normal"/>
+                        </TextBlock>
+                        <Separator Height="3"/>
+                        <TextBlock TextWrapping="Wrap" Visibility="{Binding SelectedLog.StackTrace, Converter={c:ObjectToVisibilityConverter}}">
+                            <Run Text="StackTrace" TextDecorations="Underline" Style="{StaticResource TitleText}"/>
+                            <LineBreak/>
+                            <Run Text="{Binding SelectedLog.StackTrace}" FontWeight="Normal"/>
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+
             </Grid>
         </Border>
 

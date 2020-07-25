@@ -26,10 +26,14 @@ namespace KEI.Infrastructure.Logging
                                                         $@"${TokenConstants.LINE} ${TokenConstants.MESSAGE}";
         public const char DELIMITER = '\u180e';
         public const char LINE_BREAK = '\u200b';
+        public const char EXECEPTION_SEPARATOR = '\u200c';
         public const string DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss,ffff";
         public const string LINE_NUMBER_PREFIX = "LN-";
+        public const string EXCEPTION_STRING = "Exception : ";
+        public const string STACKTRACE_STRING = "StackTrace : ";
 
         public static readonly Regex TokenRegex = new Regex(@"\$(\w+)");
+  
         private readonly List<LogToken> _logStructure = new List<LogToken>();
 
         public PatternAppender()
@@ -80,7 +84,13 @@ namespace KEI.Infrastructure.Logging
                 switch (token)
                 {
                     case LogToken.Message:
-                        logString.Add(logEvent.Message.Trim());
+                        string msg = logEvent.Message.Trim();
+                        if(string.IsNullOrEmpty(logEvent.Exception) == false)
+                        {
+                            msg = $"{msg}\t{EXECEPTION_SEPARATOR}{EXCEPTION_STRING}{logEvent.Exception}" +
+                                  $"{EXECEPTION_SEPARATOR}{STACKTRACE_STRING}{logEvent.StackTrace}";
+                        }
+                        logString.Add(msg);
                         break;
                     case LogToken.DateTime:
                         logString.Add($"{logEvent.Time.ToString(DATE_TIME_FORMAT)} ");

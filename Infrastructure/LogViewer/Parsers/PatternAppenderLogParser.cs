@@ -21,7 +21,7 @@ namespace LogViewer.Parsers
         public string Pattern
         {
             get { return pattern; }
-            set 
+            set
             {
                 if (pattern == value)
                     return;
@@ -51,19 +51,19 @@ namespace LogViewer.Parsers
         {
             var result = new List<LogEvent>();
 
-            if(File.Exists(fileName) == false)
+            if (File.Exists(fileName) == false)
             {
                 return result;
             }
 
             var logs = File.ReadAllText(fileName).Split(PatternAppender.LINE_BREAK);
 
-            if(logs.Count() < 2)
+            if (logs.Count() < 2)
             {
                 return result;
             }
 
-            if(logs[0].StartsWith(PatternAppender.DELIMITER))
+            if (logs[0].StartsWith(PatternAppender.DELIMITER))
             {
                 Pattern = logs[0].Replace(PatternAppender.DELIMITER.ToString(), " ").Trim();
                 logs = logs.Skip(1).ToArray();
@@ -82,10 +82,16 @@ namespace LogViewer.Parsers
 
                 for (int i = 0; i < tokens.Length; i++)
                 {
-                    switch(_logStructure[i])
+                    switch (_logStructure[i])
                     {
                         case LogToken.Message:
-                            logEvt.Message = tokens[i].Trim();
+                            var components = tokens[i].Split(PatternAppender.EXECEPTION_SEPARATOR);
+                            logEvt.Message = components[0].Trim();
+                            if (components.Length == 3)
+                            {
+                                logEvt.Exception = components[1].Replace(PatternAppender.EXCEPTION_STRING, string.Empty).Trim();
+                                logEvt.StackTrace = components[2].Replace(PatternAppender.STACKTRACE_STRING, string.Empty).Trim();
+                            }
                             break;
                         case LogToken.Level:
                             logEvt.Level = GetLogLevelFromString(tokens[i].Trim());
@@ -94,7 +100,7 @@ namespace LogViewer.Parsers
                             logEvt.Time = DateTime.ParseExact(tokens[i].Trim(), PatternAppender.DATE_TIME_FORMAT, CultureInfo.InvariantCulture);
                             break;
                         case LogToken.LineNumber:
-                            logEvt.LineNumber = int.Parse(tokens[i].Trim().Replace(PatternAppender.LINE_NUMBER_PREFIX, "").Trim());
+                            logEvt.LineNumber = int.Parse(tokens[i].Trim().Replace(PatternAppender.LINE_NUMBER_PREFIX, string.Empty).Trim());
                             break;
                         case LogToken.FileName:
                             logEvt.FileName = tokens[i].Trim();
@@ -113,7 +119,7 @@ namespace LogViewer.Parsers
 
         public static LogLevel GetLogLevelFromString(string token)
         {
-            var values = new List<int>((int [])Enum.GetValues(typeof(LogLevel)));
+            var values = new List<int>((int[])Enum.GetValues(typeof(LogLevel)));
 
             return (LogLevel)values.FirstOrDefault(x => token.Contains(((LogLevel)x).GetEnumDescription()));
         }

@@ -26,6 +26,12 @@ namespace LogViewer.ViewModels
         {
             _viewService = viewService;
 
+            LogCount.Add(LogLevel.Debug, 0);
+            LogCount.Add(LogLevel.Info, 0);
+            LogCount.Add(LogLevel.Warn, 0);
+            LogCount.Add(LogLevel.Error, 0);
+            LogCount.Add(LogLevel.Fatal, 0);
+
             Directory = new ObservableCollection<DirectoryNode>();
 
             ViewDebug = ViewInfo = ViewWarn = ViewError = ViewFatal = true;
@@ -158,7 +164,7 @@ namespace LogViewer.ViewModels
         {
             if (SetProperty(ref storage, value, property))
             {
-                Filter = value ? Filter | level : Filter ^ level;
+                Filter ^= level;
                 Logs.Filter = e => Filter.HasFlag((e as LogEvent).Level);
             }
         }
@@ -211,6 +217,19 @@ namespace LogViewer.ViewModels
 
         #endregion
 
+        #region Log Count
+
+        public Dictionary<LogLevel, int> LogCount { get; set; } = new Dictionary<LogLevel, int>();
+
+        private int totalLogCount;
+        public int TotalLogCount
+        {
+            get { return totalLogCount; }
+            set { SetProperty(ref totalLogCount, value); }
+        }
+
+        #endregion
+
         #endregion
 
         #region Open File Command
@@ -222,7 +241,20 @@ namespace LogViewer.ViewModels
         void ExecuteOpenFileCommand(string parameter)
         {
             var prevFilter = Logs.Filter;
-            Logs = new ListCollectionView(ReadFile(parameter))
+
+            var logItems = ReadFile(parameter);
+
+            TotalLogCount = 0;
+
+            foreach (var item in (int [])Enum.GetValues(typeof(LogLevel)))
+            {
+                LogCount[(LogLevel)item] = logItems.Where(x => (int)x.Level == item).Count();
+                TotalLogCount += LogCount[(LogLevel)item];
+            }
+
+            RaisePropertyChanged(nameof(LogCount));
+
+            Logs = new ListCollectionView(logItems)
             {
                 Filter = prevFilter
             };

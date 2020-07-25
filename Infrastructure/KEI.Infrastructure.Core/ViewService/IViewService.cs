@@ -73,6 +73,8 @@ namespace KEI.Infrastructure
         /// <returns></returns>
         string BrowseFile(string description = "", string filters = "");
 
+        string BrowseFolder();
+
         void SaveFile(Action<string> saveAction, string filters = "");
 
     }

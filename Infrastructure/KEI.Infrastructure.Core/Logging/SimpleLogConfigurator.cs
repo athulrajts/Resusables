@@ -9,8 +9,11 @@ namespace KEI.Infrastructure.Logging
 
         public static ILogManager ConfigureConsoleLogger() => Configure().WriteToConsole().Finish();
         
-        public static ILogManager ConfigureFileLogger(string file, string pattern = PatternAppender.DEFAULT_PATTERN)
+        public static ILogManager ConfigureFileLogger(string file, string pattern)
             => Configure().WriteToFile(file, pattern).Create().Finish();
+
+        public static ILogManager ConfigureFileLogger(string file)
+            => Configure().WriteToFile(file).Create().Finish();
 
         public static ILogManager ConfigureXMLLogger(string file)
             => Configure().WriteToXml(file).Create().Finish();
@@ -63,9 +66,15 @@ namespace KEI.Infrastructure.Logging
             return this;
         }
 
-        public IFileAppenderConfigurator WriteToFile(string fileName, string pattern = PatternAppender.DEFAULT_PATTERN)
+        public IFileAppenderConfigurator WriteToFile(string fileName, string pattern)
         {
             logAppender = new PatternAppender { FilePath = fileName, LayoutPattern = pattern };
+            return this;
+        }
+
+        public IFileAppenderConfigurator WriteToFile(string fileName)
+        {
+            logAppender = new PatternAppender { FilePath = fileName };
             return this;
         }
 
@@ -91,7 +100,8 @@ namespace KEI.Infrastructure.Logging
 
     public interface ISimpleLogConfigurator
     {
-        public IFileAppenderConfigurator WriteToFile(string fileName, string pattern = PatternAppender.DEFAULT_PATTERN);
+        public IFileAppenderConfigurator WriteToFile(string fileName, string pattern);
+        public IFileAppenderConfigurator WriteToFile(string fileName);
         public ISimpleLogConfigurator WriteToConsole();
         public IFileAppenderConfigurator WriteToXml(string fileName);
         public ILogManager Finish();

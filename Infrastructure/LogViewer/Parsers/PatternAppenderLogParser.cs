@@ -14,10 +14,10 @@ namespace LogViewer.Parsers
     {
         public PatternAppenderLogParser()
         {
-            LoadLayoutTokens();
+            Pattern = PatternAppender.DEFAULT_PATTERN;
         }
 
-        private string pattern = PatternAppender.DEFAULT_PATTERN;
+        private string pattern;
         public string Pattern
         {
             get { return pattern; }
@@ -28,13 +28,13 @@ namespace LogViewer.Parsers
 
                 pattern = value;
 
-                LoadLayoutTokens();
+                LoadStructure();
             }
         }
 
         private List<LogToken> _logStructure = new List<LogToken>();
 
-        private void LoadLayoutTokens()
+        private void LoadStructure()
         {
             _logStructure.Clear();
             if (PatternAppender.TokenRegex.Matches(Pattern) is MatchCollection m)
@@ -57,6 +57,18 @@ namespace LogViewer.Parsers
             }
 
             var logs = File.ReadAllText(fileName).Split(PatternAppender.LINE_BREAK);
+
+            if(logs.Count() < 2)
+            {
+                return result;
+            }
+
+            if(logs[0].StartsWith(PatternAppender.DELIMITER))
+            {
+                Pattern = logs[0].Replace(PatternAppender.DELIMITER.ToString(), " ").Trim();
+                logs = logs.Skip(1).ToArray();
+            }
+
 
             foreach (var log in logs)
             {

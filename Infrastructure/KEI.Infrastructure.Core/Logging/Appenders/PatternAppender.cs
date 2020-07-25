@@ -6,20 +6,35 @@ using System.Text.RegularExpressions;
 
 namespace KEI.Infrastructure.Logging
 {
+
+    public static class TokenConstants
+    {
+        public const string MESSAGE = "msg";
+        public const string DATE_TIME = "dt";
+        public const string FILE = "f";
+        public const string METHOD = "m";
+        public const string LINE = "ln";
+        public const string LEVEL = "l";
+        public const string MACHINE = "mn";
+        public const string LOGGER_NAME = "n";
+    }
+
     public class PatternAppender : RollingFileAppender
     {
-        public const string DEFAULT_PATTERN = @"$(l) $(dt) $(f) $(m) $(ln) $(msg)";
+        public static readonly string DEFAULT_PATTERN = $@"${TokenConstants.LEVEL} ${TokenConstants.DATE_TIME} " +
+                                                        $@"${TokenConstants.FILE} ${TokenConstants.METHOD} " + 
+                                                        $@"${TokenConstants.LINE} ${TokenConstants.MESSAGE}";
         public const char DELIMITER = '\u180e';
         public const char LINE_BREAK = '\u200b';
         public const string DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss,ffff";
         public const string LINE_NUMBER_PREFIX = "LN-";
 
-        public static readonly Regex TokenRegex = new Regex(@"\$\((\w+)\)");
+        public static readonly Regex TokenRegex = new Regex(@"\$(\w+)");
         private readonly List<LogToken> _logStructure = new List<LogToken>();
 
         public PatternAppender()
         {
-            LoadLayoutTokens();
+            LoadStructure();
         }
 
         private string layoutPattern = DEFAULT_PATTERN;
@@ -35,7 +50,7 @@ namespace KEI.Infrastructure.Logging
 
                 layoutPattern = value;
 
-                LoadLayoutTokens();
+                LoadStructure();
             }
         }
 
@@ -49,6 +64,11 @@ namespace KEI.Infrastructure.Logging
                 }
             }
             catch (Exception) { }
+        }
+
+        protected override void WriteMetaDataInternal(StreamWriter writer)
+        {
+            writer.WriteLine($"{DELIMITER}{LayoutPattern}{LINE_BREAK}");
         }
 
         private string GetLogString(LogEvent logEvent)
@@ -87,18 +107,19 @@ namespace KEI.Infrastructure.Logging
         {
             return token switch
             {
-                "msg" => LogToken.Message,
-                "m" => LogToken.MethodName,
-                "ln" => LogToken.LineNumber,
-                "dt" => LogToken.DateTime,
-                "l" => LogToken.Level,
-                "sn" => LogToken.MachineName,
-                "f" => LogToken.FileName,
+                TokenConstants.MESSAGE => LogToken.Message,
+                TokenConstants.METHOD => LogToken.MethodName,
+                TokenConstants.LINE => LogToken.LineNumber,
+                TokenConstants.DATE_TIME => LogToken.DateTime,
+                TokenConstants.LEVEL => LogToken.Level,
+                TokenConstants.MACHINE => LogToken.MachineName,
+                TokenConstants.FILE => LogToken.FileName,
+                TokenConstants.LOGGER_NAME => LogToken.LoggerName,
                 _ => LogToken.Invalid
             };
         }
 
-        private void LoadLayoutTokens()
+        private void LoadStructure()
         {
             _logStructure.Clear();
             if (TokenRegex.Matches(LayoutPattern) is MatchCollection m)

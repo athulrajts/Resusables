@@ -19,17 +19,22 @@ namespace LogViewer.ViewModels
 {
     public class LogViewerWindowViewModel : BindableBase
     {
+        private readonly IViewService _viewService;
         public ILogParser Parser = new PatternAppenderLogParser();
 
-        public LogViewerWindowViewModel()
+        public LogViewerWindowViewModel(IViewService viewService)
         {
+            _viewService = viewService;
+
+            Directory = new ObservableCollection<DirectoryNode>();
 
             ViewDebug = ViewInfo = ViewWarn = ViewError = ViewFatal = true;
 
-            Directory.Add(new DirectoryNode(new DirectoryInfo(@"C:\Users\AmalRaj\Desktop\Framework Test\Build\Debug\"), "*.slog"));
+            Directory.Add(new DirectoryNode(new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory), "*.slog") { IsExpanded = true });
 
         }
 
+        #region Properties
 
         private ListCollectionView logs = new ListCollectionView(new List<LogEvent>());
         public ListCollectionView Logs
@@ -45,8 +50,7 @@ namespace LogViewer.ViewModels
             set { SetProperty(ref selectedLog, value); }
         }
 
-        public ObservableCollection<DirectoryNode> Directory { get; set; } = new ObservableCollection<DirectoryNode>();
-
+        public ObservableCollection<DirectoryNode> Directory { get; set; }
 
         #region Text Filters
 
@@ -161,28 +165,58 @@ namespace LogViewer.ViewModels
 
         #endregion
 
-        private List<LogEvent> ReadFile(string path)
+        #region Column Filters
+
+        private bool viewLineNumber = true;
+        public bool ViewLineNumber
         {
-            var list = new List<LogEvent>();
-
-            if (File.Exists(path) == false)
-                return list;
-
-            //var settings = new XmlReaderSettings { ConformanceLevel = ConformanceLevel.Fragment };
-            //using var reader = XmlReader.Create(path, settings);
-
-            //while (reader.ReadToFollowing(nameof(LogEvent)))
-            //{
-            //    list.Add(reader.ReadObjectXML<LogEvent>());
-            //}
-
-            //return list;
-
-            return Parser.Parse(path).ToList();
+            get { return viewLineNumber; }
+            set { SetProperty(ref viewLineNumber, value); }
         }
 
+        private bool viewLogLevel = true;
+        public bool ViewLogLevel
+        {
+            get { return viewLogLevel; }
+            set { SetProperty(ref viewLogLevel, value); }
+        }
+
+        private bool viewDateTime = true;
+        public bool ViewDateTime
+        {
+            get { return viewDateTime; }
+            set { SetProperty(ref viewDateTime, value); }
+        }
+
+        private bool viewFileName = true;
+        public bool ViewFileName
+        {
+            get { return viewFileName; }
+            set { SetProperty(ref viewFileName, value); }
+        }
+
+        private bool viewMessage = true;
+        public bool ViewMessage
+        {
+            get { return viewMessage; }
+            set { SetProperty(ref viewMessage, value); }
+        }
+
+        private bool viewMethod = true;
+        public bool ViewMethod
+        {
+            get { return viewMethod; }
+            set { SetProperty(ref viewMethod, value); }
+        }
+
+        #endregion
+
+        #endregion
+
+        #region Open File Command
+
         private DelegateCommand<string> openFileCommand;
-        public DelegateCommand<string> OpenFileCommand 
+        public DelegateCommand<string> OpenFileCommand
             => openFileCommand ??= new DelegateCommand<string>(ExecuteOpenFileCommand);
 
         void ExecuteOpenFileCommand(string parameter)
@@ -193,5 +227,60 @@ namespace LogViewer.ViewModels
                 Filter = prevFilter
             };
         }
+
+        private List<LogEvent> ReadFile(string path)
+        {
+            var list = new List<LogEvent>();
+
+            if (File.Exists(path) == false)
+                return list;
+
+            return Parser.Parse(path).ToList();
+        }
+
+        #endregion
+
+        #region Browse Folder Command
+
+        private DelegateCommand browseFolderCommand;
+        public DelegateCommand BrowseFolderCommand
+            => browseFolderCommand ??= new DelegateCommand(ExecuteBrowseFolderCommand);
+
+        void ExecuteBrowseFolderCommand()
+        {
+            var folderPath = _viewService.BrowseFolder();
+
+            if (string.IsNullOrEmpty(folderPath) ||
+               System.IO.Directory.Exists(folderPath) == false)
+            {
+                return;
+            }
+
+            Directory.Clear();
+            Directory.Add(new DirectoryNode(new DirectoryInfo(folderPath), "*.slog") { IsExpanded = true });
+        }
+
+        #endregion
+
+        #region Browse File Command
+
+        private DelegateCommand browseFileCommand;
+        public DelegateCommand BrowseFileCommand 
+            => browseFileCommand ??= new DelegateCommand(ExecuteBrowseFileCommand);
+
+        void ExecuteBrowseFileCommand()
+        {
+            var filePath = _viewService.BrowseFile("Log files", "slog");
+
+            if (string.IsNullOrEmpty(filePath) || 
+                File.Exists(filePath) == false)
+            {
+                return;
+            }
+
+            ExecuteOpenFileCommand(filePath);
+        }
+
+        #endregion
     }
 }

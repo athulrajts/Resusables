@@ -118,6 +118,29 @@ namespace KEI.UI.Wpf.ViewService
             return string.Empty;
         }
 
+        public string BrowseFolder()
+        {
+            var dlg = new CommonOpenFileDialog();
+            dlg.AddToMostRecentlyUsedList = false;
+            dlg.AllowNonFileSystemItems = false;
+            dlg.EnsureFileExists = true;
+            dlg.EnsurePathExists = true;
+            dlg.EnsureReadOnly = false;
+            dlg.EnsureValidNames = true;
+            dlg.Multiselect = false;
+            dlg.ShowPlacesList = true;
+            dlg.IsFolderPicker = true;
+            dlg.DefaultDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            dlg.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory;
+
+            if (dlg.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                return dlg.FileName;
+            }
+
+            return string.Empty;
+        }
+
         public void SaveFile(Action<string> saveAction, string filters = "")
         {
             var sfd = new SaveFileDialog();

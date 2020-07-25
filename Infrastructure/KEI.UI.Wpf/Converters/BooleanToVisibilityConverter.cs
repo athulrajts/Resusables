@@ -24,5 +24,6 @@ namespace KEI.UI.Wpf.Converters
 
             return Visibility.Collapsed;
         }
+
     }
 }

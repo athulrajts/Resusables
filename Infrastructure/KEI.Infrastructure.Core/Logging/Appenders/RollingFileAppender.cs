@@ -30,7 +30,7 @@ namespace KEI.Infrastructure.Logging
                 fileInfo = new FileInfo(value);
                 if (fileInfo.Exists == false)
                 {
-                    fileInfo.Create().Close();
+                    WriteMetaData(fileInfo.Create());
                     fileInfo.Refresh();
                 }
 
@@ -169,7 +169,7 @@ namespace KEI.Infrastructure.Logging
 
             /// Create our base file again
             fileInfo = new FileInfo(FilePath);
-            fileInfo.Create().Close();
+            WriteMetaData(fileInfo.Create());
             fileInfo.Refresh();
         }
 
@@ -182,6 +182,14 @@ namespace KEI.Infrastructure.Logging
             fileInfo.Refresh();
             return fileInfo.Length / BYTE_TO_MB_FACTOR > RollingSize;
         }
+
+        private void WriteMetaData(FileStream stream)
+        {
+            using var writer = new StreamWriter(stream);
+            WriteMetaDataInternal(writer);
+        }
+
+        protected virtual void WriteMetaDataInternal(StreamWriter writter) { }
     }
 
     public enum RollingMode

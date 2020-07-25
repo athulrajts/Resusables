@@ -21,5 +21,13 @@ namespace LogViewer.Models.DirectoryTree
             get { return info; }
             set { SetProperty(ref info, value); }
         }
+
+        private bool isSelected;
+        public bool IsSelected
+        {
+            get { return isSelected; }
+            set { SetProperty(ref isSelected, value); }
+        }
+
     }
 }

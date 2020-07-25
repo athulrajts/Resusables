@@ -8,12 +8,13 @@
         xmlns:c="clr-namespace:KEI.UI.Wpf.Converters;assembly=KEI.UI.Wpf"
         xmlns:lc="clr-namespace:LogViewer.Converters"
         xmlns:dt="clr-namespace:LogViewer.Models.DirectoryTree"
+        xmlns:w="clr-namespace:KEI.UI.Wpf;assembly=KEI.UI.Wpf"
         mc:Ignorable="d"
         prism:ViewModelLocator.AutoWireViewModel="True"
         Title="LogViewer" Height="450" Width="800"
         d:DataContext="{d:DesignInstance Type=vm:LogViewerWindowViewModel}">
     <Window.Resources>
-
+        
         <Style x:Key="CenteredContent"
                TargetType="{x:Type DataGridCell}">
             <Setter Property="Template">
@@ -63,22 +64,80 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
 
+        <Border Grid.ColumnSpan="2" BorderThickness="0 0 0 2" BorderBrush="Black">
+            <Border.Background>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="LightBlue" Offset="0"/>
+                    <GradientStop Color="White" Offset="1"/>
+                </LinearGradientBrush>
+            </Border.Background>
+            <StackPanel Orientation="Horizontal" Margin="10 0">
+                <StackPanel.Resources>
+                    <Style TargetType="Button">
+                        <Setter Property="Background" Value="Transparent"/>
+                        <Setter Property="BorderBrush" Value="Transparent"/>
+                        <Setter Property="Padding" Value="5"/>
+                        <Setter Property="Margin" Value="3"/>
+                        <Setter Property="Width" Value="80"/>
+                    </Style>
+                </StackPanel.Resources>
+                <Button Command="{Binding BrowseFolderCommand}">
+                    <StackPanel>
+                        <ContentControl IconManager.Icon="FolderOpen16x"
+                                        Height="40"/>
+                        <TextBlock Text="Open Folder"/>
+                    </StackPanel>
+                </Button>
+                <Button Command="{Binding BrowseFileCommand}">
+                    <StackPanel>
+                        <ContentControl IconManager.Icon="TextFile16x"
+                                        Height="40"/>
+                        <TextBlock Text="Open File"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Border>
+
         <Border Grid.Column="0" Grid.Row="1"
                 Width="250">
 
-            <TreeView ItemsSource="{Binding Directory}">
+            <TreeView ItemsSource="{Binding Directory}"
+                      BorderBrush="Black"
+                      BorderThickness="0 0 2 0">
                 <TreeView.Resources>
+                    <Style TargetType="Label">
+                        <Setter Property="FontWeight" Value="Normal"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsSelected}" Value="true">
+                                <Setter Property="FontWeight" Value="Bold"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
                     <HierarchicalDataTemplate DataType="{x:Type dt:DirectoryNode}"
                                               ItemsSource="{Binding ChildNodes}">
                         <StackPanel Orientation="Horizontal">
-                            <Image Source="/Resources/folder.png" Height="14" Width="14"/>
+                            <ContentControl Height="14" Width="14">
+                                <ContentControl.Style>
+                                    <Style TargetType="ContentControl">
+                                        <Setter Property="IconManager.Icon" Value="Folder16x"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsExpanded}" Value="true">
+                                                <Setter Property="IconManager.Icon" Value="FolderOpen16x"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding HasChildren}" Value="false">
+                                                <Setter Property="IconManager.Icon" Value="Foldergrey16x"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ContentControl.Style>
+                            </ContentControl>
                             <Label Content="{Binding Info.Name}"/>
                         </StackPanel>
                     </HierarchicalDataTemplate>
 
                     <DataTemplate DataType="{x:Type dt:FileNode}">
                         <StackPanel Orientation="Horizontal">
-                            <Image Source="/Resources/file.png" Height="14" Width="14"/>
+                            <ContentControl IconManager.Icon="TextFile16x"/>
                             <Label Content="{Binding Info.Name}">
                                 <Label.InputBindings>
                                     <MouseBinding MouseAction="LeftDoubleClick"
@@ -88,10 +147,21 @@
                             </Label>
                         </StackPanel>
                     </DataTemplate>
+
+                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}"
+                      Color="LightYellow" />
+                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}"
+                      Color="Black" />
+                    <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}"
+                      Color="Transparent" />
+                    <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}"
+                      Color="Black" />
+                    
                 </TreeView.Resources>
                 <TreeView.ItemContainerStyle>
                     <Style TargetType="TreeViewItem">
                         <Setter Property="IsExpanded" Value="{Binding IsExpanded,Mode=TwoWay}"/>
+                        <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"/>
                     </Style>
                 </TreeView.ItemContainerStyle>
             </TreeView>
@@ -111,10 +181,17 @@
                     <StackPanel.Resources>
                         <Style TargetType="Border">
                             <Setter Property="BorderBrush" Value="Black"/>
-                            <Setter Property="BorderThickness" Value="1.5"/>
+                            <Setter Property="BorderThickness" Value="1"/>
                             <Setter Property="CornerRadius" Value="5"/>
                             <Setter Property="Padding" Value="5"/>
                             <Setter Property="Margin" Value="5"/>
+                            <Setter Property="Height" Value="40"/>
+                            <Setter Property="Width" Value="75"/>
+                        </Style>
+                        <Style TargetType="CheckBox">
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                            <Setter Property="FontWeight" Value="DemiBold"/>
+                            <Setter Property="HorizontalAlignment" Value="Center"/>
                         </Style>
                     </StackPanel.Resources>
                     <Border Background="White">
@@ -149,42 +226,43 @@
                         <Setter Property="CornerRadius" Value="3"/>
                     </Style>
                     <Style TargetType="Border">
-                        <Setter Property="Padding" Value="3"/>
+                        <Setter Property="Padding" Value="0 3"/>
                     </Style>
                     
                 </StackPanel.Resources>
 
-                <Border Width="{Binding ActualWidth, ElementName=levelCol}">
+                <Border Width="{Binding ActualWidth, ElementName=levelCol}"
+                        Visibility="{Binding Visibility, ElementName=levelCol}">
                     <WatermarkTextBox Text="{Binding LevelFilter, UpdateSourceTrigger=PropertyChanged}"
                                       Watermark="Level"/>
                 </Border>
 
                 <Border Width="{Binding ActualWidth, ElementName=timeCol}"
-                        Padding="3">
+                        Visibility="{Binding Visibility, ElementName=timeCol}">
                     <WatermarkTextBox Text="{Binding TimeFilter, UpdateSourceTrigger=PropertyChanged}"
                                       Watermark="Time"/>
                 </Border>
 
                 <Border Width="{Binding ActualWidth, ElementName=fileCol}"
-                        Padding="3">
+                        Visibility="{Binding Visibility, ElementName=fileCol}">
                     <WatermarkTextBox Text="{Binding FileFilter, UpdateSourceTrigger=PropertyChanged}"
                                       Watermark="File"/>
                 </Border>
 
                 <Border Width="{Binding ActualWidth, ElementName=lineCol}"
-                        Padding="3">
+                        Visibility="{Binding Visibility, ElementName=lineCol}">
                     <WatermarkTextBox Text="{Binding LineFilter, UpdateSourceTrigger=PropertyChanged}"
                                       Watermark="Line"/>
                 </Border>
 
                 <Border Width="{Binding ActualWidth, ElementName=methodCol}"
-                        Padding="3">
+                        Visibility="{Binding Visibility, ElementName=methodCol}">
                     <WatermarkTextBox Text="{Binding MethodFilter, UpdateSourceTrigger=PropertyChanged}"
                                       Watermark="Method"/>
                 </Border>
 
                 <Border Width="{Binding ActualWidth, ElementName=messageCol}"
-                        Padding="3">
+                        Visibility="{Binding Visibility, ElementName=messageCol}">
                     <WatermarkTextBox Text="{Binding MessageFilter, UpdateSourceTrigger=PropertyChanged}"
                                       Watermark="Message"/>
                 </Border>
@@ -192,6 +270,7 @@
             </StackPanel>
 
             <DataGrid Grid.Row="2"
+                      x:Name="logGrid"
                       AutoGenerateColumns="False"
                       CanUserAddRows="False"
                       CanUserDeleteRows="False"
@@ -203,6 +282,30 @@
                       CellStyle="{StaticResource CellStyle}"
                       ColumnHeaderStyle="{StaticResource ColumnHeaderStyle}"
                       RowStyle="{StaticResource RowStyle}">
+                <DataGrid.Resources>
+                    <w:BindingProxy x:Key="LineNumberChecked" Data="{Binding ViewLineNumber}"/>
+                    <w:BindingProxy x:Key="LogLevelChecked" Data="{Binding ViewLogLevel}"/>
+                    <w:BindingProxy x:Key="DateTimeChecked" Data="{Binding ViewDateTime}"/>
+                    <w:BindingProxy x:Key="FileNameChecked" Data="{Binding ViewFileName}"/>
+                    <w:BindingProxy x:Key="MethodNameChecked" Data="{Binding ViewMethod}"/>
+                    <w:BindingProxy x:Key="MessageChecked" Data="{Binding ViewMessage}"/>
+                </DataGrid.Resources>
+                <DataGrid.ContextMenu>
+                    <ContextMenu>
+                        <ContextMenu.Resources>
+                            <Style TargetType="MenuItem">
+                                <Setter Property="IsCheckable" Value="True"/>
+                                <Setter Property="StaysOpenOnClick" Value="True"/>
+                            </Style>
+                        </ContextMenu.Resources>
+                        <MenuItem IsChecked="{Binding ViewLogLevel}" Header="Log Level"/>
+                        <MenuItem IsChecked="{Binding ViewDateTime}" Header="Time"/>
+                        <MenuItem IsChecked="{Binding ViewFileName}" Header="Filename"/>
+                        <MenuItem IsChecked="{Binding ViewMethod}" Header="Method Name"/>
+                        <MenuItem IsChecked="{Binding ViewLineNumber}" Header="Line Number"/>
+                        <MenuItem IsChecked="{Binding ViewMessage}" Header="Message" IsEnabled="False"/>
+                    </ContextMenu>
+                </DataGrid.ContextMenu>
                 <DataGrid.Columns>
                     <DataGridTextColumn x:Name="levelCol"
                                         Header="Level"
@@ -210,58 +313,67 @@
                                         IsReadOnly="True"
                                         Width="50"
                                         CanUserResize="False"
-                                        CellStyle="{StaticResource CenteredContent}"/>
-                    
+                                        CellStyle="{StaticResource CenteredContent}"
+                                        Visibility="{Binding Data, Converter={c:BooleanToVisibilityConverter}, Source={StaticResource LogLevelChecked}}"/>
+
                     <DataGridTextColumn x:Name="timeCol" 
                                         Header="Time"
                                         Binding="{Binding Time}"
                                         IsReadOnly="True"
                                         Width="140"
                                         CanUserResize="False"
-                                        CellStyle="{StaticResource CenteredContent}"/>
+                                        CellStyle="{StaticResource CenteredContent}"
+                                        Visibility="{Binding Data, Converter={c:BooleanToVisibilityConverter}, Source={StaticResource DateTimeChecked}}"/>
                     
                     <DataGridTextColumn x:Name="fileCol"
                                         Header="File"
                                         Binding="{Binding FileName}"
-                                        IsReadOnly="True"/>
+                                        IsReadOnly="True"
+                                        Visibility="{Binding Data, Converter={c:BooleanToVisibilityConverter}, Source={StaticResource FileNameChecked}}"/>
                     
                     <DataGridTextColumn x:Name="lineCol"
                                         Header="Line"
                                         Binding="{Binding LineNumber}"
                                         IsReadOnly="True"
                                         MinWidth="50"
-                                        CellStyle="{StaticResource CenteredContent}"/>
+                                        CellStyle="{StaticResource CenteredContent}"
+                                        Visibility="{Binding Data, Converter={c:BooleanToVisibilityConverter}, Source={StaticResource LineNumberChecked}}"/>
                     
                     <DataGridTextColumn x:Name="methodCol"
                                         Header="Method"
                                         Binding="{Binding MethodName}"
-                                        IsReadOnly="True"/>
+                                        IsReadOnly="True"
+                                        Visibility="{Binding Data, Converter={c:BooleanToVisibilityConverter}, Source={StaticResource MethodNameChecked}}"/>
                     
                     <DataGridTextColumn x:Name="messageCol"
                                         Header="Message"
                                         Binding="{Binding Message}"
                                         IsReadOnly="True"
-                                        Width="*"/>
+                                        Width="*"
+                                        Visibility="{Binding Data, Converter={c:BooleanToVisibilityConverter}, Source={StaticResource MessageChecked}}"/>
                 </DataGrid.Columns>
             </DataGrid>
         </Grid>
 
-        <Grid Grid.Row="2">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition/>
-            </Grid.ColumnDefinitions>
+        <Border Grid.Row="2" BorderBrush="Black" BorderThickness="0 2 0 0"
+                Grid.ColumnSpan="2">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
 
-            <Border Padding="5" Height="200">
-                <StackPanel>
-                    <TextBlock Text="{Binding SelectedLog.Level}"/>
-                    <TextBlock Text="{Binding SelectedLog.FileName}"/>
-                    <TextBlock Text="{Binding SelectedLog.MethodName}"/>
-                    <TextBlock Text="{Binding SelectedLog.Message}"/>
-                </StackPanel>
-            </Border>
+                <Border Padding="5" Height="200">
+                    <StackPanel>
+                        <TextBlock Text="{Binding SelectedLog.Level}"/>
+                        <TextBlock Text="{Binding SelectedLog.FileName}"/>
+                        <TextBlock Text="{Binding SelectedLog.MethodName}"/>
+                        <TextBlock Text="{Binding SelectedLog.Message}"/>
+                    </StackPanel>
+                </Border>
             
-        </Grid>
+            </Grid>
+        </Border>
 
     </Grid>
 </Window>

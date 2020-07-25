@@ -12,7 +12,8 @@ namespace KEI.Infrastructure.Logging
         DateTime,
         Level,
         MachineName,
-        FileName
+        FileName,
+        LoggerName
     }
 
     [Flags]

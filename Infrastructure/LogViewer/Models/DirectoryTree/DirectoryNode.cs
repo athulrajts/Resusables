@@ -1,10 +1,6 @@
-﻿using Prism.Mvvm;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace LogViewer.Models.DirectoryTree
 {
@@ -14,16 +10,15 @@ namespace LogViewer.Models.DirectoryTree
 
         private static readonly FileNode dummyFile = new FileNode(new FileInfo("Loading.."));
         private readonly string _pattern;
-        private readonly bool hasChildren;
 
         public DirectoryNode(DirectoryInfo info, string pattern = "*.*")
         {
             Info = info;
             _pattern = pattern;
 
-            hasChildren = info.EnumerateFileSystemInfos().Where(x => pattern.Contains(x.Extension)).Count() > 0;
+            HasChildren = info.EnumerateFileSystemInfos().Where(x => pattern.Contains(x.Extension)).Count() > 0;
 
-            if (hasChildren)
+            if (HasChildren)
             {
                 ChildNodes.Add(dummyFile);
             }
@@ -35,6 +30,13 @@ namespace LogViewer.Models.DirectoryTree
         {
             get { return isExpanded; }
             set { SetProperty(ref isExpanded, value, OnExpandedChanged); }
+        }
+
+        private bool hasChildren;
+        public bool HasChildren
+        {
+            get { return hasChildren; }
+            set { SetProperty(ref hasChildren, value); }
         }
 
         private void OnExpandedChanged()

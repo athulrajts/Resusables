@@ -28,9 +28,14 @@ namespace KEI.Infrastructure.Logging
             return registry;
         }
 
-        public static IContainerRegistry RegisterLogger(this IContainerRegistry registry,string file, string pattern = PatternAppender.DEFAULT_PATTERN)
+        public static IContainerRegistry RegisterLogger(this IContainerRegistry registry,string file, string pattern)
         {
             return registry.RegisterInstance(SimpleLogConfigurator.Configure().WriteToFile(file, pattern).Create().Finish());
+        }
+
+        public static IContainerRegistry RegisterLogger(this IContainerRegistry registry, string file)
+        {
+            return registry.RegisterInstance(SimpleLogConfigurator.Configure().WriteToFile(file).Create().Finish());
         }
 
         public static IContainerRegistry RegisterConsoleLogger(this IContainerRegistry registry)

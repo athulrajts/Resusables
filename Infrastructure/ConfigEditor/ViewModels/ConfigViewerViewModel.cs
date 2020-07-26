@@ -48,15 +48,15 @@ namespace ConfigEditor.ViewModels
         {
             Tree = new ObservableCollection<TreeNodeModel>();
             openedDataContainer = rootNode;
-            Tree.Add(rootNode.ToTreeNode());
+            Tree.Add(new TreeNodeModel(rootNode));
             FullName = name;
             Name = Path.GetFileName(name);
             _viewService = viewService;
         }
 
         private DelegateCommand saveFileCommand;
-        public DelegateCommand SaveFileCommand =>
-            saveFileCommand ?? (saveFileCommand = new DelegateCommand(ExecuteSaveFileCommand, () => openedDataContainer is IPropertyContainer));
+        public DelegateCommand SaveFileCommand 
+            => saveFileCommand ??= (saveFileCommand = new DelegateCommand(ExecuteSaveFileCommand, () => openedDataContainer is IPropertyContainer));
 
         void ExecuteSaveFileCommand() => _viewService.SaveFile((path) => openedDataContainer.Store(path));
     }

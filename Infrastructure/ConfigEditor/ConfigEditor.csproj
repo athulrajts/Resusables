@@ -8,10 +8,9 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>..\..\Build\Debug\</OutputPath>
-    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <LangVersion>7.2</LangVersion>
+    <OutputPath>..\..\Build\Release\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <OutputPath>..\..\Build\x64\Debug\</OutputPath>
@@ -19,11 +18,12 @@
     <NoWarn>true</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
-    <OutputPath>..\..\Build\Release\</OutputPath>
+    <OutputPath>..\..\Build\x64\Release\</OutputPath>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>diagram-43_24474.ico</ApplicationIcon>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <OutputPath>..\..\Build\x86\Debug\</OutputPath>
@@ -38,12 +38,6 @@
   <ItemGroup>
     <Reference Include="KEI.Resources">
       <HintPath>..\..\Build\Debug\KEI.Resources.dll</HintPath>
-    </Reference>
-    <Reference Include="Prism">
-      <HintPath>..\..\3rdParty\Prism.7.2.0.1422\Prism.dll</HintPath>
-    </Reference>
-    <Reference Include="Prism.Wpf">
-      <HintPath>..\..\3rdParty\Prism.7.2.0.1422\Prism.Wpf.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

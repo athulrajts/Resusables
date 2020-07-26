@@ -1,5 +1,5 @@
-﻿using ConfigEditor.Events;
-using ConfigEditor.Models;
+﻿using ConfigEditor.Dialogs;
+using ConfigEditor.Events;
 using KEI.Infrastructure;
 using KEI.Infrastructure.Configuration;
 using Prism.Commands;
@@ -7,17 +7,16 @@ using Prism.Events;
 using Prism.Mvvm;
 using Prism.Regions;
 using System;
-using System.Collections.ObjectModel;
 
 namespace ConfigEditor
 {
     public class ConfigEditorViewModel : BindableBase
     {
-        private readonly IViewService _viewService;
+        private readonly IConfigEditorViewService _viewService;
         private readonly IEventAggregator _eventAggregator;
         private readonly IRegionManager _regionManager;
         private IPropertyContainer openedDataContainer;
-        public ConfigEditorViewModel(IViewService viewService, IEventAggregator ea, IRegionManager regionManager)
+        public ConfigEditorViewModel(IConfigEditorViewService viewService, IEventAggregator ea, IRegionManager regionManager)
         {
             _viewService = viewService;
             _eventAggregator = ea;
@@ -26,8 +25,8 @@ namespace ConfigEditor
 
 
         private DelegateCommand openFileCommand;
-        public DelegateCommand OpenFileCommand =>
-            openFileCommand ?? (openFileCommand = new DelegateCommand(ExecuteOpenFileCommand));
+        public DelegateCommand OpenFileCommand 
+            => openFileCommand ??= new DelegateCommand(ExecuteOpenFileCommand);
 
         void ExecuteOpenFileCommand()
         {
@@ -57,12 +56,24 @@ namespace ConfigEditor
         }
 
         private DelegateCommand<string> navigateCommand;
-        public DelegateCommand<string> NavigateCommand =>
-            navigateCommand ?? (navigateCommand = new DelegateCommand<string>(ExecuteNavigateCommand));
+        public DelegateCommand<string> NavigateCommand 
+            => navigateCommand ??= new DelegateCommand<string>(ExecuteNavigateCommand);
 
         void ExecuteNavigateCommand(string parameter)
         {
             _regionManager.RequestNavigate("MainContent", parameter);
+        }
+
+        private DelegateCommand openFileSelectorWindow;
+        public DelegateCommand OpenFileSelectorWindow 
+            => openFileSelectorWindow ??= (openFileSelectorWindow = new DelegateCommand(ExecuteOpenFileSelectorWindow));
+
+        void ExecuteOpenFileSelectorWindow()
+        {
+            (string left, string right) = _viewService.BrowseCompairFiles();
+
+            _eventAggregator.GetEvent<ConfigCompareRequest>().Publish((left, right));
+            
         }
     }
 }

@@ -173,10 +173,10 @@ namespace KEI.Infrastructure.Configuration
                 {
                     dc.Put(item.Name, GetDataContainer(cpc));
                 }
-                //else
-                //{
-                //    dc.Data.Add(item);
-                //}
+                else
+                {
+                    dc.Data.Add(item);
+                }
             }
 
             return dc;

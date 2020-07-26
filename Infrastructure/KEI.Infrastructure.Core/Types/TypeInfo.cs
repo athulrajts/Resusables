@@ -50,7 +50,7 @@ namespace KEI.Infrastructure.Types
 
         public Type GetUnderlyingType()
         {
-            var assembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(x => x.GetName().Name == Assembly);
+            var assembly = ImplementationsProvider.Instance.GetAssemblies().FirstOrDefault(x => x.GetName().Name == Assembly);
 
             if (assembly == null)
                 return null;

@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Collections.Generic;
 using KEI.Infrastructure.Validation;
+using System.IO;
 
 namespace KEI.Infrastructure.Types
 {
@@ -9,22 +10,36 @@ namespace KEI.Infrastructure.Types
     {
         private readonly Dictionary<Type, List<Type>> _implementations = new Dictionary<Type, List<Type>>();
         private readonly Dictionary<Type, List<Type>> _services = new Dictionary<Type, List<Type>>();
+        private readonly List<Assembly> assemblies = new List<Assembly>();
+
+        private static ImplementationsProvider instance;
+        public static ImplementationsProvider Instance => instance ??= new ImplementationsProvider();
 
         public ImplementationsProvider()
         {
+            var path = Assembly.GetEntryAssembly().Location;
+
+            foreach (var file in Directory.GetFiles(Path.GetDirectoryName(path), "*.dll"))
+            {
+                try
+                {
+                    assemblies.Add(Assembly.LoadFrom(file));
+                }
+                catch (Exception) { }
+            }
+
             GetImplementations(typeof(ValidationRule));
-            //GetImplementations(typeof(PeriodicTasks.PeriodicTask));
+            GetImplementations(typeof(PeriodicTasks.PeriodicTask));
         }
+
+        public IEnumerable<Assembly> GetAssemblies() => assemblies;
 
         public List<Type> GetImplementations(Type t)
         {
             if (_implementations.ContainsKey(t) == false)
             {
-                var results = AppDomain.CurrentDomain.GetAssemblies();
-
-
                 var implementationsTypes = new List<Type>();
-                foreach (var assembly in results)
+                foreach (var assembly in assemblies)
                 {
                     if (assembly.IsDynamic == false)
                     {
@@ -50,11 +65,9 @@ namespace KEI.Infrastructure.Types
 
         public List<Service.Service> GetServices()
         {
-            var results = AppDomain.CurrentDomain.GetAssemblies();
-
             var services = new List<Service.Service>();
 
-            foreach (var assembly in results)
+            foreach (var assembly in assemblies)
             {
                 if (assembly.IsDynamic == false)
                 {

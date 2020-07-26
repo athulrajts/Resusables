@@ -4,13 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ConfigEditor.Views"
-             xmlns:prism="http://prismlibrary.com/"
              xmlns:model="clr-namespace:ConfigEditor.Models"
              xmlns:wpf="clr-namespace:KEI.UI.Wpf;assembly=KEI.UI.Wpf"
-             xmlns:ap="clr-namespace:KEI.UI.Wpf.AttachedProperties;assembly=KEI.UI.Wpf"
-             xmlns:controls="clr-namespace:KEI.UI.Wpf.Controls;assembly=KEI.UI.Wpf"
-             xmlns:converters="clr-namespace:KEI.UI.Wpf.Converters;assembly=KEI.UI.Wpf"
-             prism:ViewModelLocator.AutoWireViewModel="True"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -22,16 +17,39 @@
             <Setter Property="Foreground" Value="Black"/>
         </Style>
 
+        <Style TargetType="DataGridColumnHeader" x:Key="MergedHeader" BasedOn="{StaticResource BaseHeader}">
+            <Setter Property="Background">
+                <Setter.Value>
+                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                        <GradientStop Color="SkyBlue" Offset="0"/>
+                        <GradientStop Color="LightGreen" Offset="1"/>
+                    </LinearGradientBrush>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <Style TargetType="DataGridColumnHeader" x:Key="LeftHeader" BasedOn="{StaticResource BaseHeader}">
-            <Setter Property="Background" Value="Blue"/>
+            <Setter Property="Background">
+                <Setter.Value>
+                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                        <GradientStop Color="Blue" Offset="0"/>
+                        <GradientStop Color="LightBlue" Offset="1"/>
+                    </LinearGradientBrush>
+                </Setter.Value>
+            </Setter>
             <Setter Property="Height" Value="40"/>
-            <Setter Property="Foreground" Value="White"/>
         </Style>
 
         <Style TargetType="DataGridColumnHeader" x:Key="RightHeader" BasedOn="{StaticResource BaseHeader}">
-            <Setter Property="Background" Value="Green"/>
+            <Setter Property="Background">
+                <Setter.Value>
+                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                        <GradientStop Color="Green" Offset="0"/>
+                        <GradientStop Color="LightGreen" Offset="1"/>
+                    </LinearGradientBrush>
+                </Setter.Value>
+            </Setter>
             <Setter Property="Height" Value="40"/>
-            <Setter Property="Foreground" Value="White"/>
         </Style>
 
     </UserControl.Resources>
@@ -44,7 +62,7 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            
+
             <Border BorderBrush="Black" BorderThickness="1" Padding="4">
                 <WrapPanel Orientation="Horizontal" HorizontalAlignment="Center">
                     <WrapPanel.Resources>
@@ -64,7 +82,7 @@
                               ItemsSource="{wpf:EnumBindingSource EnumType=model:MergeOption}"
                               VerticalContentAlignment="Center"
                               Width="100"
-                              Height="20"/>
+                              Height="25"/>
 
                     <Separator/>
 
@@ -87,32 +105,6 @@
 
             </Border>
 
-            <Border Padding="10" BorderBrush="Black" BorderThickness="1 0 1 1" Grid.Row="1">
-                <Grid Height="40">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition/>
-                        <ColumnDefinition Width="40"/>
-                        <ColumnDefinition/>
-                    </Grid.ColumnDefinitions>
-
-                    <controls:BrowseTextBox Path="{Binding LeftPath, Mode=TwoWay}"
-                                            Type="File"
-                                            Filter="*.xcfg,*.rcp" 
-                                            FilterDescription="DataContainer Files"
-                                            Margin="10 0"/>
-
-                    <controls:BrowseTextBox Path="{Binding RightPath, Mode=TwoWay}"
-                                            Type="File"
-                                            Filter="*.xcfg,*.rcp"
-                                            FilterDescription="DataContainer Files"
-                                            Margin="10 0" Grid.Column="2"/>
-
-                    <Button ap:IconManager.Icon="Merge16x" 
-                            Grid.Column="1"
-                            Command="{Binding RefreshMergeCommand}"/>
-                </Grid>
-            </Border>
-
             <DataGrid ItemsSource="{Binding Merge.MergedModel}"
                       BorderBrush="Black"
                       BorderThickness="1 0 1 1"
@@ -122,7 +114,14 @@
                       LoadingRow="DataGrid_LoadingRow">
                 <DataGrid.Columns>
                     <DataGridTextColumn  Header="Key" Binding="{Binding Key}" IsReadOnly="True" Width="*"
-                                         HeaderStyle="{StaticResource BaseHeader}"/>
+                                         HeaderStyle="{StaticResource BaseHeader}">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                                <Setter Property="ToolTip" Value="{Binding Key}"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
 
                     <DataGridTextColumn  Header="Left" Binding="{Binding Left.ValueString, Mode=OneWay, FallbackValue='Not Present'}"
                                          IsReadOnly="True" Width="*"
@@ -155,7 +154,7 @@
                     </DataGridTextColumn>
 
                     <DataGridTemplateColumn Header="Merged" Width="*"
-                                            HeaderStyle="{StaticResource BaseHeader}">
+                                            HeaderStyle="{StaticResource MergedHeader}">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock TextWrapping="Wrap">

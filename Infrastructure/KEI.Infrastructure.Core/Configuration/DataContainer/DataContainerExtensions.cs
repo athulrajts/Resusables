@@ -20,7 +20,7 @@ namespace KEI.Infrastructure.Configuration
             {
                 return EditorType.Bool;
             }
-            else if (t.IsEnum)
+            else if (t.IsEnum || t == typeof(Selector) )
             {
                 return EditorType.Enum;
             }

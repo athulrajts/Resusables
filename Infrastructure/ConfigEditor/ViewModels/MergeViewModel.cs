@@ -5,7 +5,9 @@ using Prism.Commands;
 using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace ConfigEditor.ViewModels
 {
@@ -46,10 +48,33 @@ namespace ConfigEditor.ViewModels
             set { SetProperty(ref rightPath, value); }
         }
 
+        public string Name => $"{Path.GetFileNameWithoutExtension(LeftPath)} - {Path.GetFileNameWithoutExtension(RightPath)}";
+
+        public string FullName => Name;
+
+
         private readonly IViewService _viewService;
-        public MergeViewModel(IViewService viewService)
+        public MergeViewModel(IViewService viewService, string left, string right)
         {
             _viewService = viewService;
+            LeftPath = left;
+            RightPath = right;
+
+            if(CanExecuteRefreshMergeCommand())
+            {
+                _viewService.SetBusy();
+
+                Task.Run(() =>
+                {
+                    ExecuteRefreshMergeCommand();
+                    _viewService.SetAvailable();
+                });
+
+            }
+
+            RaisePropertyChanged(nameof(Name));
+            RaisePropertyChanged(nameof(FullName));
+
             MergedShape = MergeOption.Right;
         }
 
@@ -81,8 +106,8 @@ namespace ConfigEditor.ViewModels
 
         void ExecuteRefreshMergeCommand()
         {
-            var left = PropertyContainerBuilder.FromFile(LeftPath);
-            var right = PropertyContainerBuilder.FromFile(RightPath);
+            var left = PropertyContainerBuilder.FromFile(LeftPath) ?? DataContainer.FromFile(LeftPath).ToPropertyContainer();
+            var right = PropertyContainerBuilder.FromFile(RightPath) ?? DataContainer.FromFile(RightPath).ToPropertyContainer();
 
             if(left == null || right == null)
             {
@@ -90,7 +115,7 @@ namespace ConfigEditor.ViewModels
                 return;
             }
 
-            Merge = new DataContainerMerger(PropertyContainerBuilder.FromFile(LeftPath), PropertyContainerBuilder.FromFile(RightPath));
+            Merge = new DataContainerMerger(left, right);
         }
     }
 }

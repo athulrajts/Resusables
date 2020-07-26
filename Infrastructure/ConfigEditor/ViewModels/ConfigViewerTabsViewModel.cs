@@ -3,6 +3,7 @@ using KEI.Infrastructure;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
+using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 
@@ -10,10 +11,10 @@ namespace ConfigEditor.ViewModels
 {
     public class ConfigViewerTabsViewModel : BindableBase
     {
-        public ObservableCollection<ConfigViewerViewModel> Tabs { get; set; } = new ObservableCollection<ConfigViewerViewModel>();
+        public ObservableCollection<object> Tabs { get; set; } = new ObservableCollection<object>();
 
-        private ConfigViewerViewModel selectedTab;
-        public ConfigViewerViewModel SelectedTab
+        private object selectedTab;
+        public object SelectedTab
         {
             get { return selectedTab; }
             set { SetProperty(ref selectedTab, value); }
@@ -27,7 +28,8 @@ namespace ConfigEditor.ViewModels
             {
                 var newTab = new ConfigViewerViewModel(dc.Item2, dc.Item1, _viewService);
 
-                if (Tabs.FirstOrDefault(x => x.FullName == dc.Item1) is ConfigViewerViewModel tab)
+                if (Tabs.Where(x => x is ConfigViewerViewModel)
+                        .FirstOrDefault(x => (x as ConfigViewerViewModel).FullName == dc.Item1) is ConfigViewerViewModel tab)
                 {
                     var index = Tabs.IndexOf(tab);
                     Tabs.Remove(tab);
@@ -40,13 +42,25 @@ namespace ConfigEditor.ViewModels
 
                 SelectedTab = newTab;
             });
+
+            eventAggregator.GetEvent<ConfigCompareRequest>().Subscribe(c => 
+            {
+                (string left, string right) = c;
+
+                var newTab = new MergeViewModel(_viewService, left , right);
+
+                Tabs.Add(newTab);
+
+                SelectedTab = newTab;
+
+            });
         }
 
-        private DelegateCommand<ConfigViewerViewModel> closeTabCommand;
-        public DelegateCommand<ConfigViewerViewModel> CloseTabCommand =>
-            closeTabCommand ?? (closeTabCommand = new DelegateCommand<ConfigViewerViewModel>(ExecuteCloseTabCommand));
+        private DelegateCommand<object> closeTabCommand;
+        public DelegateCommand<object> CloseTabCommand 
+            => closeTabCommand ??= new DelegateCommand<object>(ExecuteCloseTabCommand);
 
-        void ExecuteCloseTabCommand(ConfigViewerViewModel parameter)
+        void ExecuteCloseTabCommand(object parameter)
         {
             Tabs.Remove(parameter);
         }

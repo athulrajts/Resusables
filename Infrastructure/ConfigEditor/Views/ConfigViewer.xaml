@@ -31,8 +31,21 @@
             <ComboBox DataContext="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContentControl}}" 
                           ItemsSource="{Binding Value.Option}"
                           SelectedValue="{Binding ValueString}"
-                          VerticalContentAlignment="Center"/>
+                          VerticalContentAlignment="Center">
+                <ComboBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel VirtualizingStackPanel.IsVirtualizing="True"
+                                                VirtualizingStackPanel.VirtualizationMode="Recycling"/>
+                    </ItemsPanelTemplate>
+                </ComboBox.ItemsPanel>
+            </ComboBox>
         </DataTemplate>
+
+        <LinearGradientBrush x:Key="AlternatingRowBrush" EndPoint="1,0.5" StartPoint="0,0.5">
+            <GradientStop Color="LightBlue" Offset="0"/>
+            <GradientStop Color="White" Offset="1"/>
+        </LinearGradientBrush>
+
     </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -57,8 +70,10 @@
                   ItemsSource="{Binding Tree}"
                   ap:TreeViewBehaviours.TreeViewSelectedItem="{Binding SelectedNode, Mode=TwoWay}"
                   MinWidth="200"
-                  Padding="1 0 10 0"
+                  Padding="1 10 10 0"
                   Loaded="TreeView_Loaded"
+                  BorderBrush="Black"
+                  BorderThickness="0 0 1 0"
                   x:Name="treeView">
             <TreeView.Resources>
                 <HierarchicalDataTemplate DataType="{x:Type model:TreeNodeModel}"
@@ -79,8 +94,9 @@
         <Border Grid.Column="1" Grid.Row="1">
             <DataGrid CanUserAddRows="False"
                       AutoGenerateColumns="False"
-                      AlternatingRowBackground="Aqua"
-                      ItemsSource="{Binding SelectedNode.DataItems}">
+                      AlternatingRowBackground="{StaticResource AlternatingRowBrush}"
+                      ItemsSource="{Binding SelectedNode.DataItems}"
+                      BorderBrush="Transparent">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Name" Binding="{Binding Name}" IsReadOnly="True" Width="*"/>
                     <DataGridTemplateColumn Header="Value" Width="*">

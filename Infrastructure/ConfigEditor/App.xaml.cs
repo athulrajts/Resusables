@@ -6,6 +6,7 @@ using KEI.UI.Wpf.ViewService;
 using KEI.Infrastructure.Logging;
 using ConfigEditor.Views;
 using ConfigEditor.ViewModels;
+using ConfigEditor.Dialogs;
 
 #pragma warning disable 3277
 
@@ -27,13 +28,12 @@ namespace ConfigEditor
         {
             containerRegistry.RegisterConsoleLogger();
             containerRegistry.RegisterUIServices();
+            containerRegistry.RegisterSingleton<IConfigEditorViewService, ConfigEditorViewService>();
 
             containerRegistry.RegisterSingleton<ConfigEditorViewModel>();
             containerRegistry.RegisterSingleton<ConfigViewerTabsViewModel>();
-            containerRegistry.RegisterSingleton<MergeViewModel>();
 
             containerRegistry.RegisterForNavigation<ConfigViewerTabs>();
-            containerRegistry.RegisterForNavigation<MergeView>();
         }
 
         protected override void OnInitialized()
@@ -45,14 +45,6 @@ namespace ConfigEditor
             if(CommandLineArgsCount == 1)
             {
                 Container.Resolve<ConfigEditorViewModel>().OpenFile(LeftPath);
-            }
-            else if(CommandLineArgsCount == 2)
-            {
-                var vm = Container.Resolve<MergeViewModel>();
-                vm.LeftPath = LeftPath;
-                vm.RightPath = RightPath;
-                vm.RefreshMergeCommand.Execute();
-                regionManager.RequestNavigate("MainContent", nameof(MergeView));
             }
 
             base.OnInitialized();

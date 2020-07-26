@@ -93,6 +93,15 @@ namespace KEI.Infrastructure.Configuration
                         Value = value,
                     });
                 }
+                else if(dc is PropertyContainer p)
+                {
+                    p.AddProperty(new PropertyObject
+                    {
+                        Name = key,
+                        Value = value,
+                        Editor = value.GetType().GetEditorType(),
+                    });
+                }
             }
         }
 

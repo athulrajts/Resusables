@@ -402,7 +402,7 @@ namespace KEI.Infrastructure.Configuration
         /// <param name="name">Name of the result <see cref="PropertyContainer"/></param>
         /// <param name="list"><see cref="IEnumerable{T}"/> that is used as reference to build <see cref="PropertyContainer"/></param>
         /// <returns><see cref="PropertyContainer"/> built using <see cref="IEnumerable{T}"/> as reference</returns>
-        internal static IPropertyContainer CreateList<T>(string name, IEnumerable<T> list)
+        public static IPropertyContainer CreateList<T>(string name, IEnumerable<T> list)
             where T : class
         {
             if (list is null)
@@ -424,7 +424,7 @@ namespace KEI.Infrastructure.Configuration
         /// <param name="name">Name of the result <see cref="PropertyContainer"/></param>
         /// <param name="value"><see cref="object"/> that is used a reference to build <see cref="PropertyContainer"/></param>
         /// <returns><see cref="PropertyContainer"/> built using <see cref="object"/> as reference</returns>
-        internal static IPropertyContainer CreateObject<T>(string name, T value)
+        public static IPropertyContainer CreateObject<T>(string name, T value)
             where T : class
         {
             if (value is null)

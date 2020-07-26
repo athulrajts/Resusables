@@ -37,7 +37,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConfigEditor", "..\Infrastr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KEI.Infrastructure.Logging.Log4Net", "..\Infrastructure\KEI.Infrastructure.Logging.Log4Net\KEI.Infrastructure.Logging.Log4Net.csproj", "{39CC72C9-4401-478A-9BE2-2FFF99F0D91C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogViewer", "..\Infrastructure\LogViewer\LogViewer.csproj", "{D80E03BE-A6B6-49D2-9829-3F28CEDC7599}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LogViewer", "..\Infrastructure\LogViewer\LogViewer.csproj", "{D80E03BE-A6B6-49D2-9829-3F28CEDC7599}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KEI.Infrastructure.Core.Tests", "..\Tests\KEI.Infrastructure.Core.Tests\KEI.Infrastructure.Core.Tests.csproj", "{7CA008D2-5658-4B42-A6D3-5D5A923F2498}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -93,6 +95,10 @@ Global
 		{D80E03BE-A6B6-49D2-9829-3F28CEDC7599}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D80E03BE-A6B6-49D2-9829-3F28CEDC7599}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D80E03BE-A6B6-49D2-9829-3F28CEDC7599}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7CA008D2-5658-4B42-A6D3-5D5A923F2498}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7CA008D2-5658-4B42-A6D3-5D5A923F2498}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7CA008D2-5658-4B42-A6D3-5D5A923F2498}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7CA008D2-5658-4B42-A6D3-5D5A923F2498}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

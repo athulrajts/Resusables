@@ -31,7 +31,6 @@ namespace KEI.Infrastructure.Logging
         public const string LINE_NUMBER_PREFIX = "LN-";
         public const string EXCEPTION_STRING = "Exception : ";
         public const string STACKTRACE_STRING = "StackTrace : ";
-
         public static readonly Regex TokenRegex = new Regex(@"\$(\w+)");
   
         private readonly List<LogToken> _logStructure = new List<LogToken>();
@@ -41,6 +40,11 @@ namespace KEI.Infrastructure.Logging
             LoadStructure();
         }
 
+        /// <summary>
+        /// Decides the format in which log is written in to a file
+        /// The pattern is only used to decided the order of things and
+        /// not the spacing or indentation between item.
+        /// </summary>
         private string layoutPattern = DEFAULT_PATTERN;
         public string LayoutPattern
         {
@@ -58,23 +62,39 @@ namespace KEI.Infrastructure.Logging
             }
         }
 
+        /// <summary>
+        /// Append to file as plain text
+        /// </summary>
+        /// <param name="msg"></param>
         protected override void WriteToFile(LogEvent msg)
         {
             try
             {
                 using (var writer = fileInfo.AppendText())
                 {
+                    /// We're adding an Invisible characters <see cref="LINE_BREAK"/>
+                    /// so that a parser can know end of a single log.
                     writer.WriteLine($"{GetLogString(msg)}{LINE_BREAK}");
                 }
             }
             catch (Exception) { }
         }
 
+
+        /// <summary>
+        /// Write data to start of each file to identify ourself.
+        /// </summary>
+        /// <param name="writer"></param>
         protected override void WriteMetaDataInternal(StreamWriter writer)
         {
             writer.WriteLine($"{DELIMITER}{LayoutPattern}{LINE_BREAK}");
         }
 
+        /// <summary>
+        /// Convert <see cref="LogEvent"/> object to the formate we want.
+        /// </summary>
+        /// <param name="logEvent"></param>
+        /// <returns></returns>
         private string GetLogString(LogEvent logEvent)
         {
             var logString = new List<string>();
@@ -110,9 +130,17 @@ namespace KEI.Infrastructure.Logging
                 }
             }
 
+            /// We're also adding an invisible character <see cref="DELIMITER"/>
+            /// to separate each component in log so that a parser can correctly
+            /// recreate <see cref="LogEvent"/> object given <see cref="LayoutPattern"/>
             return string.Join($"\t{DELIMITER}", logString);
         }
 
+        /// <summary>
+        /// Converted string patter to a enum one so it's easier to use
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
         public static LogToken GetLogToken(string token)
         {
             return token switch

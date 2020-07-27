@@ -4,6 +4,7 @@ using System.IO;
 
 namespace KEI.Infrastructure.Logging
 {
+    //TODO : Add pattern logging
     public class ConsoleAppender : BaseAppender
     {
         protected override void ProcessLogInternal(LogEvent msg)

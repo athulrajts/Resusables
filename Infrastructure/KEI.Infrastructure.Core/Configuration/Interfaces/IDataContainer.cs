@@ -21,5 +21,10 @@ namespace KEI.Infrastructure.Configuration
         bool Store(string path);
         IEnumerator<DataObject> GetEnumerator();
         IEnumerable<string> GetKeys();
+
+        bool Merge(IDataContainer data);
+        
+        void AddItem(DataObject obj);
+        void RemoveItem(DataObject obj);
     }
 }

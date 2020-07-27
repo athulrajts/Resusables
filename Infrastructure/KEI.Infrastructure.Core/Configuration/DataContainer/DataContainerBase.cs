@@ -373,5 +373,62 @@ namespace KEI.Infrastructure.Configuration
         }
 
         #endregion
+
+        public bool Merge(IDataContainer right)
+        {
+            List<Action> actions = new List<Action>();
+
+            AddNewItems(this, right, ref actions);
+
+            RemoveOldItems(this , right, ref actions);
+
+            // Store updated config if changes were made.
+            if (actions.Count > 0)
+            {
+                actions.ForEach(action => action());
+
+                return true;
+            }
+
+            return false;
+        }
+
+        private void AddNewItems(IDataContainer workingCopy, IDataContainer workingBase, ref List<Action> addActions)
+        {
+            foreach (var item in workingBase)
+            {
+                if (workingCopy.ContainsProperty(item.Name) == false)
+                {
+                    addActions.Add(() => workingCopy.AddItem(item));
+
+                    Logging.Logger.Info($"Added new property {item.Name} = {item.ValueString}");
+                }
+                else if (item.Value is IDataContainer baseChild)
+                {
+                    AddNewItems(workingCopy.Get<IDataContainer>(item.Name), baseChild, ref addActions);
+                }
+
+            }
+        }
+
+        private void RemoveOldItems(IDataContainer workingCopy, IDataContainer workingBase, ref List<Action> removeActions)
+        {
+            foreach (var prop in workingCopy)
+            {
+                if (workingBase.ContainsProperty(prop.Name) == false)
+                {
+                    removeActions.Add(() => workingCopy.RemoveItem(prop));
+
+                    Logging.Logger.Info($"Removed property {prop.Name} = {prop.ValueString}");
+                }
+                else if (prop.Value is IDataContainer baseChild)
+                {
+                    RemoveOldItems(workingCopy.Get<PropertyContainer>(prop.Name), baseChild, ref removeActions);
+                }
+            }
+        }
+
+        public abstract void AddItem(DataObject obj);
+        public abstract void RemoveItem(DataObject name);
     }
 }

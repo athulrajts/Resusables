@@ -80,7 +80,7 @@ namespace KEI.Infrastructure.Logging
             }
         }
 
-        public RollingMode Mode { get; set; }
+        public RollingMode Mode { get; set; } = RollingMode.Time;
 
         protected override void ProcessLogInternal(LogEvent msg)
         {
@@ -165,7 +165,7 @@ namespace KEI.Infrastructure.Logging
             }
 
             /// Rename current file
-            fileInfo.MoveTo(newFileName);
+            fileInfo.MoveTo(Path.Combine(fileInfo.DirectoryName, newFileName));
 
             /// Create our base file again
             fileInfo = new FileInfo(FilePath);

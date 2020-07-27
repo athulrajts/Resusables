@@ -5,8 +5,8 @@ namespace KEI.Infrastructure.Configuration
 {
     public interface IPropertyContainer : IDataContainer, ICloneable
     {
-        bool RemoveBinding<T>(string propertyKey, Expression<Func<T>> expression);
-        bool SetBinding<T>(string propertyKey, Expression<Func<T>> expression, BindingMode mode = BindingMode.TwoWay);
-        bool SetBrowseOptions(string property, BrowseOptions option);
+        public bool RemoveBinding<T>(string propertyKey, Expression<Func<T>> expression);
+        public bool SetBinding<T>(string propertyKey, Expression<Func<T>> expression, BindingMode mode = BindingMode.TwoWay);
+        public bool SetBrowseOptions(string property, BrowseOptions option);
     }
 }

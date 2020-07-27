@@ -39,63 +39,67 @@ namespace KEI.Infrastructure.Configuration
             }
             else
             {
-                CheckIntegrity();
+                //CheckIntegrity();
+                if(Config.Merge(DefineConfigShape().Build()) == true)
+                {
+                    Config.Store();
+                }
             }
 
            _eventAggregator.GetEvent<ConfigLoadedEvent>().Publish(Config as PropertyContainer);
         }
 
-        private void CheckIntegrity()
-        {
-            var shape = DefineConfigShape().Build() as PropertyContainer;
-            List<Action> actions = new List<Action>();
+        //private void CheckIntegrity()
+        //{
+        //    var shape = DefineConfigShape().Build() as PropertyContainer;
+        //    List<Action> actions = new List<Action>();
 
-            AddNewProperties(Config as PropertyContainer, shape, ref actions);
+        //    AddNewProperties(Config as PropertyContainer, shape, ref actions);
 
-            RemoveObsoleteProperties(Config as PropertyContainer, shape, ref actions);
+        //    RemoveObsoleteProperties(Config as PropertyContainer, shape, ref actions);
 
-            // Store updated config if changes were made.
-            if(actions.Count > 0)
-            {
-                actions.ForEach(action => action());
-                Config.Store();
-            }
+        //    // Store updated config if changes were made.
+        //    if(actions.Count > 0)
+        //    {
+        //        actions.ForEach(action => action());
+        //        Config.Store();
+        //    }
 
-        }
-        private void AddNewProperties(PropertyContainer workingCopy, PropertyContainer workingBase, ref List<Action> addActions)
-        {
-            foreach (PropertyObject prop in workingBase)
-            {
-                if (workingCopy.ContainsProperty(prop.Name) == false)
-                {
-                    addActions.Add(() => workingCopy.AddProperty(prop));
+        //}
+        //private void AddNewProperties(PropertyContainer workingCopy, PropertyContainer workingBase, ref List<Action> addActions)
+        //{
+        //    foreach (PropertyObject prop in workingBase)
+        //    {
+        //        if (workingCopy.ContainsProperty(prop.Name) == false)
+        //        {
+        //            addActions.Add(() => workingCopy.AddProperty(prop));
 
-                    _logger.Info($"Added new property {prop.Name} = {prop.ValueString}");
-                }
-                else if (prop.Value is PropertyContainer p)
-                {
-                    AddNewProperties(workingCopy.Get<PropertyContainer>(prop.Name), p, ref addActions);
-                }
+        //            _logger.Info($"Added new property {prop.Name} = {prop.ValueString}");
+        //        }
+        //        else if (prop.Value is PropertyContainer p)
+        //        {
+        //            AddNewProperties(workingCopy.Get<PropertyContainer>(prop.Name), p, ref addActions);
+        //        }
 
-            }
-        }
+        //    }
+        //}
 
-        private void RemoveObsoleteProperties(PropertyContainer workingCopy, PropertyContainer workingBase, ref List<Action> removeActions)
-        {
-            foreach (PropertyObject prop in workingCopy)
-            {
-                if (workingBase.ContainsProperty(prop.Name) == false)
-                {
-                    removeActions.Add(() => workingCopy.RemoveProperty(prop));
+        //private void RemoveObsoleteProperties(PropertyContainer workingCopy, PropertyContainer workingBase, ref List<Action> removeActions)
+        //{
+        //    foreach (PropertyObject prop in workingCopy)
+        //    {
+        //        if (workingBase.ContainsProperty(prop.Name) == false)
+        //        {
+        //            removeActions.Add(() => workingCopy.RemoveProperty(prop));
 
-                    _logger.Info($"Removed property {prop.Name} = {prop.ValueString}");
-                }
-                else if (prop.Value is PropertyContainer p)
-                {
-                    RemoveObsoleteProperties(workingCopy.Get<PropertyContainer>(prop.Name), p, ref removeActions);
-                }
-            }
-        }
+        //            _logger.Info($"Removed property {prop.Name} = {prop.ValueString}");
+        //        }
+        //        else if (prop.Value is PropertyContainer p)
+        //        {
+        //            RemoveObsoleteProperties(workingCopy.Get<PropertyContainer>(prop.Name), p, ref removeActions);
+        //        }
+        //    }
+        //}
 
         public void RemoveBinding<T>(string propertyKey, Expression<Func<T>> expression) => Config.RemoveBinding(propertyKey, expression);
         public void SetBinding<T>(string propertyKey, Expression<Func<T>> expression, BindingMode mode = BindingMode.TwoWay) => Config.SetBinding(propertyKey, expression);

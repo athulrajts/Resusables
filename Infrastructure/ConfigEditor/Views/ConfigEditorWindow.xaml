@@ -1,0 +1,94 @@
+﻿<Window x:Class="ConfigEditor.ConfigEditorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:prism="http://prismlibrary.com/"
+        xmlns:ap="clr-namespace:KEI.UI.Wpf.AttachedProperties;assembly=KEI.UI.Wpf"
+        mc:Ignorable="d"
+        WindowStartupLocation="CenterScreen"
+        Title="Config Editor" Height="600" Width="900">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        
+        <!--Tool Bar-->
+        <Border Grid.ColumnSpan="3" Padding="10" BorderBrush="Black"
+                BorderThickness="0 0 0 0.5" Margin="0 0 0 5">
+            <Border.Background>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="LightBlue" Offset="0"/>
+                    <GradientStop Color="White" Offset="1"/>
+                </LinearGradientBrush>
+            </Border.Background>
+            <StackPanel Orientation="Horizontal">
+                <StackPanel.Resources>
+                    <Style TargetType="Button">
+                        <Setter Property="Background" Value="Transparent"/>
+                        <Setter Property="BorderBrush" Value="Transparent"/>
+                        <Setter Property="Padding" Value="5"/>
+                        <Setter Property="Margin" Value="3"/>
+                        <Setter Property="Width" Value="80"/>
+                    </Style>
+                </StackPanel.Resources>
+
+                <!--Browse File-->
+                <Button Command="{Binding OpenFileCommand}"
+                        ToolTip="{Localize Value='Open File'}">
+                    <StackPanel>
+                        <ContentControl IconManager.Icon="OpenFile16x"
+                                        Height="40"/>
+                        <TextBlock Text="Open File"/>
+                    </StackPanel>
+                </Button>
+
+                <!--Compare Files-->
+                <Button Command="{Binding OpenFileSelectorWindow}"
+                        ToolTip="{Localize Value='Compare File'}">
+                    <StackPanel>
+                        <ContentControl IconManager.Icon="Compare16x"
+                                        Height="40"/>
+                        <TextBlock Text="Copmare"/>
+                    </StackPanel>
+                </Button>
+
+            </StackPanel>
+        </Border>
+
+        <ContentControl Grid.Row="1" Grid.Column="1"
+                        prism:RegionManager.RegionName="MainContent"/>
+
+        <!--Navigation-->
+        <Border Grid.Row="1" Padding="10" BorderBrush="Black" BorderThickness="0 0 2 0"
+                Visibility="Collapsed"
+                Background="CadetBlue">
+            <StackPanel>
+                <StackPanel.Resources>
+                    <Style TargetType="Button">
+                        <Setter Property="Height" Value="40"/>
+                        <Setter Property="Width" Value="40"/>
+                        <Setter Property="Margin" Value="0 0 0 5"/>
+                    </Style>
+                </StackPanel.Resources>
+                
+                <Button Command="{Binding NavigateCommand}"
+                        CommandParameter="ConfigViewerTabs"
+                        ToolTip="View Opened Config"
+                        ap:IconManager.Icon="ViewFull16x"/>
+                
+                <Button Command="{Binding NavigateCommand}"
+                        CommandParameter="MergeView"
+                        ToolTip="Merge"
+                        ap:IconManager.Icon="TXMergeJoin16x"/>
+
+            </StackPanel>
+        </Border>
+
+    </Grid>
+</Window>

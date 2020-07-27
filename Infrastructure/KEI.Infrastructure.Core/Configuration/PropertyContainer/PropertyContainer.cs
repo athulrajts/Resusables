@@ -147,6 +147,29 @@ namespace KEI.Infrastructure.Configuration
             return true;
         }
 
+        public override void AddItem(DataObject obj)
+        {
+            if (obj is PropertyObject p)
+            {
+                AddProperty(p);
+            }
+            else
+            {
+                var editor = obj.Type == null ? EditorType.String : obj.Type.GetType().GetEditorType();
+                AddProperty(new PropertyObject
+                {
+                    Name = obj.Name,
+                    Value = obj.Value,
+                    Editor = editor
+                });
+            }
+        }
+
+        public override void RemoveItem(DataObject obj)
+        {
+            RemoveProperty(obj.Name);
+        }
+
         #endregion
 
         #region Implicit Type Conversions

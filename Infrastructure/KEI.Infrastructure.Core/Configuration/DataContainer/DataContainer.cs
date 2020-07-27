@@ -74,6 +74,18 @@ namespace KEI.Infrastructure.Configuration
         public DataContainer Clone()
             => XmlHelper.DeserializeFromString<DataContainer>(XmlHelper.Serialize(this));
 
+        public override void AddItem(DataObject obj)
+        {
+            Data.Add(obj);
+        }
+
+        public override void RemoveItem(DataObject obj)
+        {
+            Data.Remove(obj);
+        }
+
+
+        #region IXMLSerializable Members
 
         public XmlSchema GetSchema() => null;
 
@@ -343,5 +355,7 @@ namespace KEI.Infrastructure.Configuration
 
             }
         }
+
+        #endregion
     }
 }

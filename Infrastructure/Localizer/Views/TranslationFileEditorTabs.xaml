@@ -22,31 +22,65 @@
                     SelectedItem="{Binding SelectedTab}">
             <TabControl.ItemTemplate>
                 <DataTemplate>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition/>
-                            <ColumnDefinition Width="20"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Text="{Binding File.Name}" TextWrapping="Wrap" ToolTip="{Binding File.FilePath}"/>
-                        <TextBlock Text="X" Grid.Column="1" HorizontalAlignment="Right"
-                                   FontWeight="Bold">
-                            <TextBlock.Style>
-                                <Style TargetType="TextBlock">
-                                    <Style.Triggers>
-                                        <Trigger Property="IsMouseOver" Value="true">
-                                            <Setter Property="Cursor" Value="Hand"/>
-                                        </Trigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBlock.Style>
-                            <TextBlock.InputBindings>
-                                <MouseBinding MouseAction="LeftClick" Command="{Binding DataContext.CloseTabCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}"
-                                              CommandParameter="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=TabItem}}"/>
-                            </TextBlock.InputBindings>
-                        </TextBlock>
-                    </Grid>
+                    <TextBlock Text="{Binding File.Name}" TextWrapping="Wrap" ToolTip="{Binding File.FilePath}"
+                               Foreground="Black" FontWeight="Medium"
+                               VerticalAlignment="Center"/>
                 </DataTemplate>
             </TabControl.ItemTemplate>
+            <TabControl.Resources>
+                <Style TargetType="TabItem">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="TabItem">
+                                <Border Name="Border" BorderThickness="1" BorderBrush="Black" CornerRadius="4,4,0,0" Margin="2,0">
+                                    <DockPanel LastChildFill="True">
+                                        <Label Content="X" DockPanel.Dock="Right"
+                                                   VerticalAlignment="Center"
+                                                   FontWeight="Bold">
+                                            <Label.Style>
+                                                <Style TargetType="Label">
+                                                    <Style.Triggers>
+                                                        <Trigger Property="IsMouseOver" Value="true">
+                                                            <Setter Property="Cursor" Value="Hand"/>
+                                                        </Trigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Label.Style>
+                                            <Label.InputBindings>
+                                                <MouseBinding MouseAction="LeftClick" Command="{Binding DataContext.CloseTabCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=TabControl}}"
+                                                              CommandParameter="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Label}}"/>
+                                            </Label.InputBindings>
+                                        </Label>
+                                        <ContentPresenter x:Name="ContentSite"
+                                                      VerticalAlignment="Center"
+                                                      HorizontalAlignment="Center"
+                                                      ContentSource="Header"
+                                                      Height="30"
+                                                      MinWidth="150"
+                                                      Margin="10,2"/>
+                                    </DockPanel>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter TargetName="Border" Property="Background" Value="LightSkyBlue" />
+                                        <Setter TargetName="Border" Property="BorderThickness" Value="1 1 1 0"/>
+                                    </Trigger>
+                                    <Trigger Property="IsSelected" Value="False">
+                                        <Setter TargetName="Border" Property="Background">
+                                            <Setter.Value>
+                                                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                                    <GradientStop Color="LightSkyBlue" Offset="0"/>
+                                                    <GradientStop Color="White" Offset="1"/>
+                                                </LinearGradientBrush>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </TabControl.Resources>
         </TabControl>
     </Grid>
 </UserControl>

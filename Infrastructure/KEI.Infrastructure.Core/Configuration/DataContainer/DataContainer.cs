@@ -74,12 +74,12 @@ namespace KEI.Infrastructure.Configuration
         public DataContainer Clone()
             => XmlHelper.DeserializeFromString<DataContainer>(XmlHelper.Serialize(this));
 
-        public override void AddItem(DataObject obj)
+        public override void Add(DataObject obj)
         {
             Data.Add(obj);
         }
 
-        public override void RemoveItem(DataObject obj)
+        public override void Remove(DataObject obj)
         {
             Data.Remove(obj);
         }

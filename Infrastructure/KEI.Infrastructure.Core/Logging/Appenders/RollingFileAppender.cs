@@ -165,7 +165,8 @@ namespace KEI.Infrastructure.Logging
 
             /// Create our base file again
             fileInfo = new FileInfo(FilePath);
-            WriteMetaData(fileInfo.Create());
+            WriteMetaData(fileInfo.Create()); 
+            File.SetCreationTime(FilePath, DateTime.Now);
             fileInfo.Refresh();
         }
 

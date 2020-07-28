@@ -24,7 +24,7 @@ namespace KEI.Infrastructure.Configuration
 
         bool Merge(IDataContainer data);
         
-        void AddItem(DataObject obj);
-        void RemoveItem(DataObject obj);
+        void Add(DataObject obj);
+        void Remove(DataObject obj);
     }
 }

@@ -147,7 +147,7 @@ namespace KEI.Infrastructure.Configuration
             return true;
         }
 
-        public override void AddItem(DataObject obj)
+        public override void Add(DataObject obj)
         {
             if (obj is PropertyObject p)
             {
@@ -165,7 +165,7 @@ namespace KEI.Infrastructure.Configuration
             }
         }
 
-        public override void RemoveItem(DataObject obj)
+        public override void Remove(DataObject obj)
         {
             RemoveProperty(obj.Name);
         }

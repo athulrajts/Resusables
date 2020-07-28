@@ -25,12 +25,8 @@
                     BorderBrush="Transparent">
             <TabControl.ItemTemplate>
                 <DataTemplate>
-                    <DockPanel VerticalAlignment="Center" LastChildFill="True">
-
-                        <TextBlock Text="{Binding Name}" TextWrapping="Wrap" ToolTip="{Binding FullName}"
-                                   Foreground="Black" FontWeight="Medium"/>
-                        
-                    </DockPanel>
+                    <TextBlock Text="{Binding Name}" TextWrapping="Wrap" ToolTip="{Binding FullName}"
+                                Foreground="Black" FontWeight="Medium"/>
                 </DataTemplate>
             </TabControl.ItemTemplate>
             <TabControl.Resources>
@@ -40,7 +36,6 @@
                             <ControlTemplate TargetType="TabItem">
                                 <Border Name="Border" BorderThickness="1" BorderBrush="Black" CornerRadius="4,4,0,0" Margin="2,0">
                                     <DockPanel LastChildFill="True">
-
                                         <Label Content="X" DockPanel.Dock="Right"
                                                    VerticalAlignment="Center"
                                                    FontWeight="Bold">
@@ -58,7 +53,6 @@
                                                               CommandParameter="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Label}}"/>
                                             </Label.InputBindings>
                                         </Label>
-
                                         <ContentPresenter x:Name="ContentSite"
                                                       VerticalAlignment="Center"
                                                       HorizontalAlignment="Center"

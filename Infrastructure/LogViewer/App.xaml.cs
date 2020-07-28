@@ -16,7 +16,7 @@ namespace LogViewer
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
-            containerRegistry.RegisterLogger("MongolianTest.txt");
+            containerRegistry.RegisterConsoleLogger();
             containerRegistry.RegisterUIServices();
 
             Logger.Debug("Let there be light !");

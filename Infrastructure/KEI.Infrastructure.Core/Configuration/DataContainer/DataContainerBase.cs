@@ -399,7 +399,7 @@ namespace KEI.Infrastructure.Configuration
             {
                 if (workingCopy.ContainsProperty(item.Name) == false)
                 {
-                    addActions.Add(() => workingCopy.AddItem(item));
+                    addActions.Add(() => workingCopy.Add(item));
 
                     Logging.Logger.Info($"Added new property {item.Name} = {item.ValueString}");
                 }
@@ -417,7 +417,7 @@ namespace KEI.Infrastructure.Configuration
             {
                 if (workingBase.ContainsProperty(prop.Name) == false)
                 {
-                    removeActions.Add(() => workingCopy.RemoveItem(prop));
+                    removeActions.Add(() => workingCopy.Remove(prop));
 
                     Logging.Logger.Info($"Removed property {prop.Name} = {prop.ValueString}");
                 }
@@ -428,7 +428,7 @@ namespace KEI.Infrastructure.Configuration
             }
         }
 
-        public abstract void AddItem(DataObject obj);
-        public abstract void RemoveItem(DataObject name);
+        public abstract void Add(DataObject obj);
+        public abstract void Remove(DataObject name);
     }
 }

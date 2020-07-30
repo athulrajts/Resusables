@@ -23,7 +23,7 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>724package_100522.ico</ApplicationIcon>
+    <ApplicationIcon>iconfinder_package_games_logic_24230.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <OutputPath>bin\x86\Debug\</OutputPath>
@@ -35,9 +35,6 @@
     <LangVersion>7.2</LangVersion>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
-  <ItemGroup>
-    <Resource Include="package_106363.ico" />
-  </ItemGroup>
   <ItemGroup>
     <Resource Include="724package_100522.ico" />
   </ItemGroup>

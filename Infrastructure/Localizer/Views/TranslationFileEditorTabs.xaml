@@ -19,7 +19,8 @@
 
     <Grid>
         <TabControl ItemsSource="{Binding Tabs}"
-                    SelectedItem="{Binding SelectedTab}">
+                    SelectedItem="{Binding SelectedTab}"
+                    BorderBrush="Transparent">
             <TabControl.ItemTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding File.Name}" TextWrapping="Wrap" ToolTip="{Binding File.FilePath}"

@@ -17,7 +17,7 @@ namespace Localizer.Core
     {
         public string ResourceDirectory { get; set; }
         public string ProjectName => Path.GetFileName(Path.GetDirectoryName(ResourceDirectory));
-        public ObservableCollection<TranslationFile> TranslationFiles { get; set; } = new ObservableCollection<TranslationFile>();
+        public ObservableCollection<ResXLocalizationFile> TranslationFiles { get; set; } = new ObservableCollection<ResXLocalizationFile>();
 
         private List<string> stringKeys = new List<string>();
 
@@ -48,7 +48,7 @@ namespace Localizer.Core
                     var split = Path.GetFileNameWithoutExtension(file).Split('-');
                     if (split.Length == 2)
                     {
-                        var resxFile = new TranslationFile(file, split[1]);
+                        var resxFile = new ResXLocalizationFile(file, split[1]);
                         stringKeys.ForEach(key => resxFile.AddResource(key, string.Empty));
                         TranslationFiles.Add(resxFile);
                     }
@@ -73,7 +73,7 @@ namespace Localizer.Core
                     return;
                 }
 
-                var file = new TranslationFile($@"{ResourceDirectory}\Resources-{twoLetterCode}.resx", twoLetterCode);
+                var file = new ResXLocalizationFile($@"{ResourceDirectory}\Resources-{twoLetterCode}.resx", twoLetterCode);
 
                 stringKeys.ForEach(key => file.AddResource(key, string.Empty));
 

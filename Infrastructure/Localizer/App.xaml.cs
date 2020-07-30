@@ -33,6 +33,8 @@ namespace Localizer
             containerRegistry.RegisterInfrastructureServices();
             containerRegistry.RegisterUIServices();
 
+            containerRegistry.RegisterSingleton<ILocalizerViewSerivce, LocalizerViewService>();
+
             containerRegistry.RegisterSingleton<TranslationFileEditorTabsViewModel>();
 
             containerRegistry.RegisterForNavigation<TranslationFileEditorTabs>();

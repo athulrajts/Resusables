@@ -1,16 +1,11 @@
 ﻿using Prism.Mvvm;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Localizer.Core
 {
     public class Translation : BindableBase
     {
         public string Key { get; set; }
-        public string EnglishText => Key.Replace("_", " ");
+        public string EnglishText { get; set; }
 
         private string translatedText;
         public string TranslatedText
@@ -19,4 +14,5 @@ namespace Localizer.Core
             set { SetProperty(ref translatedText, value); }
         }
     }
+
 }

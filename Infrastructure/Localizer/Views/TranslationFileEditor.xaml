@@ -2,10 +2,8 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:Localizer.Views"
-             xmlns:core="clr-namespace:Localizer.Core"
-             xmlns:prism="http://prismlibrary.com/"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:c="clr-namespace:Localizer.Converters"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
@@ -24,13 +22,14 @@
                 </StackPanel.Resources>
                 <Button Content="Translate"
                         Height="40"
-                        Width="100"
+                        Width="80"
                         Command="{Binding TranslateCommand}" />
-                <Button Content="Translate Selected"
-                        Height="40"
-                        Width="100"
+                <Button Height="40"
+                        Width="80"
                         Command="{Binding TranslateSelected}"
-                        CommandParameter="{Binding SelectedItems, ElementName=dataGrid}"/>
+                        CommandParameter="{Binding SelectedItems, ElementName=dataGrid}">
+                    <TextBlock Text="Translate Selected" TextWrapping="Wrap" TextAlignment="Center"/>
+                </Button>
             </StackPanel>
         </Border>
 
@@ -39,10 +38,15 @@
                   CanUserDeleteRows="False"
                   CanUserAddRows="False"
                   Grid.Row="1"
+                  AlternatingRowBackground="{StaticResource AlternatingRowBrush}"
                   x:Name="dataGrid">
+            <DataGrid.Resources>
+                <BindingProxy x:Key="Lang" Data="{Binding File.Lang}"/>
+            </DataGrid.Resources>
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Key" Binding="{Binding Key, Mode=OneWay}" Width="*"/>
-                <DataGridTextColumn Header="Value" Binding="{Binding TranslatedText}" Width="*"/>
+                <DataGridTextColumn Header="English" Binding="{Binding Key,Mode=OneWay, Converter={c:ResourceKeyToValueConverter}}" Width="*"/>
+                <DataGridTextColumn Header="{Binding Data, Source={StaticResource Lang}}"
+                                    Binding="{Binding TranslatedText}" Width="*"/>
             </DataGrid.Columns>
         </DataGrid>
 

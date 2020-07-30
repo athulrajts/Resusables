@@ -40,18 +40,20 @@
                   CanUserAddRows="False"
                   CanUserDeleteRows="False"
                   CanUserResizeRows="False"
+                  HeadersVisibility="Column"
                   Grid.Column="1">
+            <DataGrid.Resources>
+                <Style x:Key="ElementStyle" TargetType="TextBlock">
+                    <Setter Property="VerticalAlignment" Value="Center"/>
+                    <Setter Property="Padding" Value="5 0"/>
+                </Style>
+            </DataGrid.Resources>
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Service" 
                                     Binding="{Binding Name, Mode=OneWay}"
                                     IsReadOnly="True"
-                                    Width="*">
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="VerticalAlignment" Value="Center"/>
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
+                                    Width="*"
+                                    ElementStyle="{StaticResource ElementStyle}"/>
 
                 <DataGridTemplateColumn Header="Implementation"
                                         Width="*">
@@ -62,7 +64,12 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                
+
+                <DataGridTextColumn Header="Implementing Package"
+                                    Width="*"
+                                    Binding="{Binding ImplementationType.Assembly}"
+                                    ElementStyle="{StaticResource ElementStyle}"/>
+
             </DataGrid.Columns>
             
         </DataGrid>

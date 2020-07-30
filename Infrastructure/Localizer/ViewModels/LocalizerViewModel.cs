@@ -14,8 +14,12 @@ namespace Localizer.ViewModels
 {
     public class LocalizerViewModel : BindableBase
     {
-        public LocalizerViewModel()
+        private readonly ILocalizerViewSerivce _viewService;
+
+        public LocalizerViewModel(ILocalizerViewSerivce viewSerivce)
         {
+            _viewService = viewSerivce;
+
             LoadSolution(@"C:\Users\AmalRaj\Desktop\Framework Test");
         }
 
@@ -23,6 +27,8 @@ namespace Localizer.ViewModels
 
         public void LoadSolution(string solutionDirectory)
         {
+            Projects.Clear();
+
             var dir = Directory.GetDirectories(solutionDirectory, "Properties", SearchOption.AllDirectories);
             foreach (var item in dir)
             {
@@ -30,17 +36,42 @@ namespace Localizer.ViewModels
             }
         }
 
-        private DelegateCommand<TranslationFile> viewTranslationFile ;
-        public DelegateCommand<TranslationFile> ViewTranslationFileCommand =>
-            viewTranslationFile ?? (viewTranslationFile = new DelegateCommand<TranslationFile>(ExecuteAddViewTranslationFileCommand));
+        private DelegateCommand<ResXLocalizationFile> viewTranslationFile ;
+        public DelegateCommand<ResXLocalizationFile> ViewTranslationFileCommand 
+            => viewTranslationFile ??= viewTranslationFile = new DelegateCommand<ResXLocalizationFile>(ExecuteAddViewTranslationFileCommand);
 
-        void ExecuteAddViewTranslationFileCommand(TranslationFile param)
+        void ExecuteAddViewTranslationFileCommand(ResXLocalizationFile param)
         {
             CommonServiceLocator.ServiceLocator.Current.GetInstance<IEventAggregator>()
                 .GetEvent<ViewTranslationFileEvent>()
                 .Publish(param);
         }
+
+        private DelegateCommand openResXGenerator;
+        public DelegateCommand OpenResXGeneratorCommand =>
+            openResXGenerator ??= openResXGenerator = new DelegateCommand(ExecuteOpenResXGenerator);
+
+        void ExecuteOpenResXGenerator()
+        {
+            _viewService.ShowTranslateResXDialog();
+        }
+
+        private DelegateCommand openSolutionFolderCommand;
+        public DelegateCommand OpenSolutionFolderCommand =>
+            openSolutionFolderCommand ??= openSolutionFolderCommand = new DelegateCommand(ExecuteOpenSolutionFolderCommand);
+
+        void ExecuteOpenSolutionFolderCommand()
+        {
+            var solutionDirectory = _viewService.BrowseFolder();
+
+            if(string.IsNullOrEmpty(solutionDirectory))
+            {
+                return;
+            }
+
+            LoadSolution(solutionDirectory);
+        }
     }
 
-    public class ViewTranslationFileEvent : PubSubEvent<TranslationFile> { }
+    public class ViewTranslationFileEvent : PubSubEvent<ResXLocalizationFile> { }
 }

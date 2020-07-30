@@ -22,8 +22,8 @@ namespace Localizer.ViewModels
         public ObservableCollection<TranslationFileEditorViewModel> Tabs { get; set; } = new ObservableCollection<TranslationFileEditorViewModel>();
 
         private readonly IEventAggregator _eventAggregator;
-        private readonly IViewService _viewService;
-        public TranslationFileEditorTabsViewModel(IEventAggregator eventAggregator, IViewService viewService)
+        private readonly ILocalizerViewSerivce _viewService;
+        public TranslationFileEditorTabsViewModel(IEventAggregator eventAggregator, ILocalizerViewSerivce viewService)
         {
             _eventAggregator = eventAggregator;
             _viewService = viewService;

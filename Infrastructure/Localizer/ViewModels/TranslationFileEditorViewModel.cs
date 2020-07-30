@@ -14,16 +14,16 @@ namespace Localizer.ViewModels
 {
     public class TranslationFileEditorViewModel : BindableBase
     {
-        private TranslationFile file;
-        public TranslationFile File
+        private ResXLocalizationFile file;
+        public ResXLocalizationFile File
         {
             get { return file; }
             set { SetProperty(ref file, value); }
         }
 
         private Translator Translator = new Translator();
-        private readonly IViewService _viewService;
-        public TranslationFileEditorViewModel(IEventAggregator eventAggregator, IViewService viewService)
+        private readonly ILocalizerViewSerivce _viewService;
+        public TranslationFileEditorViewModel(IEventAggregator eventAggregator, ILocalizerViewSerivce viewService)
         {
             _viewService = viewService;
         }

@@ -52,6 +52,7 @@
             <Setter Property="Background" Value="{Binding Level, Converter={lc:LogLevelToBackgroundBrushConverter}}"/>
         </Style>
 
+
     </Window.Resources>
 
     <Grid>
@@ -359,6 +360,7 @@
                       SelectionUnit="FullRow"
                       SelectionMode="Single"
                       BorderBrush="Transparent"
+                      HeadersVisibility="Column"
                       LoadingRow="logGrid_LoadingRow"
                       SelectedItem="{Binding SelectedLog}"
                       ItemsSource="{Binding Logs}"

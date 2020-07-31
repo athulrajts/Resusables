@@ -1,9 +1,16 @@
-﻿<Application x:Class="ServiceEditor.App"
+﻿<prism:PrismApplication x:Class="ServiceEditor.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:ServiceEditor"
-             StartupUri="ServiceEditor.xaml">
-    <Application.Resources>
-         
-    </Application.Resources>
-</Application>
+             xmlns:prism="http://prismlibrary.com/">
+    <prism:PrismApplication.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/KEI.Resources;component/VisualStudioIcons/Icons.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <LinearGradientBrush x:Key="AlternatingRowBrush" EndPoint="1,0.5" StartPoint="0,0.5">
+                <GradientStop Color="LightBlue" Offset="0"/>
+                <GradientStop Color="White" Offset="1"/>
+            </LinearGradientBrush>
+        </ResourceDictionary>
+    </prism:PrismApplication.Resources>
+</prism:PrismApplication>

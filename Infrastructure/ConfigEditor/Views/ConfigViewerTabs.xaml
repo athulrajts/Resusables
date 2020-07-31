@@ -26,7 +26,8 @@
             <TabControl.ItemTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding Name}" TextWrapping="Wrap" ToolTip="{Binding FullName}"
-                                Foreground="Black" FontWeight="Medium"/>
+                               Foreground="Black" FontWeight="Medium"
+                               VerticalAlignment="Center"/>
                 </DataTemplate>
             </TabControl.ItemTemplate>
             <TabControl.Resources>

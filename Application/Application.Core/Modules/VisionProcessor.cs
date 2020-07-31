@@ -29,11 +29,11 @@ namespace Application.Core.Modules
 
         private IPropertyContainer _recipe;
         #region Constructor
+        
         public VisionProcessor(IEssentialServices essentialServices) : base(essentialServices)
         {
             _eventAggregator.GetEvent<RecipeLoadedEvent>().Subscribe(recipe => _recipe = recipe);
         }
-
 
         #endregion
 

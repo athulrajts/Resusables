@@ -4,11 +4,12 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:service="clr-namespace:KEI.Infrastructure.Service;assembly=KEI.Infrastructure"
-        xmlns:local="clr-namespace:ServiceEditor"
+        xmlns:c="clr-namespace:ServiceEditor.Converters"
         mc:Ignorable="d"
-        Title="Service Editor" Height="650" Width="800">
+        Title="Service Editor" Height="550" Width="850">
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
@@ -17,8 +18,57 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
 
+        <Border Grid.ColumnSpan="2"
+                BorderBrush="Black"
+                BorderThickness="0 0 0 1">
+            <Border.Background>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="LightBlue" Offset="0"/>
+                    <GradientStop Color="White" Offset="1"/>
+                </LinearGradientBrush>
+            </Border.Background>
+            
+            <StackPanel Orientation="Horizontal" Margin="10 0">
+                <StackPanel.Resources>
+                    <Style TargetType="Button">
+                        <Setter Property="Background" Value="Transparent"/>
+                        <Setter Property="BorderBrush" Value="Transparent"/>
+                        <Setter Property="Padding" Value="5"/>
+                        <Setter Property="Margin" Value="3"/>
+                        <Setter Property="Width" Value="85"/>
+                    </Style>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="TextWrapping" Value="Wrap"/>
+                        <Setter Property="TextAlignment" Value="Center"/>
+                    </Style>
+                </StackPanel.Resources>
+
+                <!--Browse Folder-->
+                <Button Command="{Binding OpenConfigFileCommand}">
+                    <StackPanel>
+                        <ContentControl IconManager.Icon="ConnectedServiceReferenceFolderOpen16x"
+                                        Height="40"/>
+                        <TextBlock Text="Open Configuration"/>
+                    </StackPanel>
+                </Button>
+
+                <!--Browse File-->
+                <Button Command="{Binding SaveConfigFileCommand}">
+                    <StackPanel>
+                        <ContentControl IconManager.Icon="StoreVirtualMachine16x"
+                                        Height="40"/>
+                        <TextBlock Text="Save Configuration"/>
+                    </StackPanel>
+                </Button>
+
+            </StackPanel>
+        </Border>
+
         <!--Available Services-->
-        <TreeView ItemsSource="{Binding Services}" MinWidth="200">
+        <TreeView ItemsSource="{Binding Services}" MinWidth="200"
+                  Grid.Row="1"
+                  BorderBrush="Black"
+                  BorderThickness="0 0 1 0">
             <TreeView.Resources>
                 <HierarchicalDataTemplate DataType="{x:Type service:Service}"
                                   ItemsSource="{Binding AvailableImplementations}">
@@ -33,21 +83,34 @@
                 </Style>
             </TreeView.ItemContainerStyle>
         </TreeView>
-        
+
         <!--Services Grid-->
         <DataGrid AutoGenerateColumns="False"
+                  BorderBrush="Transparent"
                   ItemsSource="{Binding SelectedServices}"
                   CanUserAddRows="False"
                   CanUserDeleteRows="False"
                   CanUserResizeRows="False"
                   HeadersVisibility="Column"
-                  Grid.Column="1">
+                  Grid.Column="1"
+                  Grid.Row="1">
             <DataGrid.Resources>
                 <Style x:Key="ElementStyle" TargetType="TextBlock">
                     <Setter Property="VerticalAlignment" Value="Center"/>
                     <Setter Property="Padding" Value="5 0"/>
                 </Style>
+                <ContextMenu x:Key="ContextMenu">
+                    <MenuItem Header="Configure Service"
+                              Command="{Binding DataContext.ConfigureServiceCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}}"
+                              CommandParameter="{Binding DataContext, RelativeSource={RelativeSource Self}}"
+                              IsEnabled="{Binding DataContext, RelativeSource={RelativeSource Self}, Converter={c:ServiceToHasConfigConverter}}"/>
+                </ContextMenu>
             </DataGrid.Resources>
+            <DataGrid.RowStyle>
+                <Style TargetType="DataGridRow">
+                    <Setter Property="ContextMenu" Value="{StaticResource ContextMenu}"/>
+                </Style>
+            </DataGrid.RowStyle>
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Service" 
                                     Binding="{Binding Name, Mode=OneWay}"
@@ -67,26 +130,31 @@
 
                 <DataGridTextColumn Header="Implementing Package"
                                     Width="*"
+                                    IsReadOnly="True"
                                     Binding="{Binding ImplementationType.Assembly}"
                                     ElementStyle="{StaticResource ElementStyle}"/>
 
             </DataGrid.Columns>
-            
+
         </DataGrid>
 
 
         <!--Buttons-->
-        <StackPanel Orientation="Horizontal" FlowDirection="RightToLeft" Grid.Row="1" Grid.ColumnSpan="2">
-            <StackPanel.Resources>
-                <Style TargetType="Button">
-                    <Setter Property="Height" Value="40"/>
-                    <Setter Property="Width" Value="80"/>
-                    <Setter Property="Margin" Value="3"/>
-                    <Setter Property="FontWeight" Value="Medium"/>
-                </Style>
-            </StackPanel.Resources>
-            <Button Content="Save" Command="{Binding SaveServicesCommand}"/>
-        </StackPanel>
-        
+        <Border Grid.Row="2" Grid.ColumnSpan="2"
+                BorderBrush="Black"
+                BorderThickness="0 1 0 0">
+            <StackPanel Orientation="Horizontal" FlowDirection="RightToLeft">
+                <StackPanel.Resources>
+                    <Style TargetType="Button">
+                        <Setter Property="Height" Value="40"/>
+                        <Setter Property="Width" Value="80"/>
+                        <Setter Property="Margin" Value="3"/>
+                        <Setter Property="FontWeight" Value="Medium"/>
+                    </Style>
+                </StackPanel.Resources>
+                <Button Content="Save" Command="{Binding SaveServicesCommand}"/>
+            </StackPanel>
+        </Border>
+
     </Grid>
 </Window>

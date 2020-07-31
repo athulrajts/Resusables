@@ -19,8 +19,7 @@ namespace Localizer.ViewModels
         public LocalizerViewModel(ILocalizerViewSerivce viewSerivce)
         {
             _viewService = viewSerivce;
-
-            LoadSolution(@"C:\Users\AmalRaj\Desktop\Framework Test");
+            LoadSolution(@"..\..\");
         }
 
         public ObservableCollection<Project> Projects { get; set; } = new ObservableCollection<Project>();
@@ -29,10 +28,16 @@ namespace Localizer.ViewModels
         {
             Projects.Clear();
 
-            var dir = Directory.GetDirectories(solutionDirectory, "Properties", SearchOption.AllDirectories);
-            foreach (var item in dir)
+            foreach (var item in Directory.GetDirectories(solutionDirectory, "Properties", SearchOption.AllDirectories))
             {
-                Projects.Add(new Project(item));
+                var ProjectName = Path.GetFileName(Path.GetDirectoryName(item));
+                var keyFile = $@"..\..\Localization\{ProjectName}_Resources-en.resx";
+                
+                /// Add projects that used <see cref="KEI.UI.Wpf.Localize"/> Markup extension 
+                if (File.Exists(keyFile))
+                {
+                    Projects.Add(new Project(item)); 
+                }
             }
         }
 

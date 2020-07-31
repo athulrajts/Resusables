@@ -11,6 +11,10 @@ using TypeInfo = KEI.Infrastructure.Types.TypeInfo;
 using System.Collections.Generic;
 using KEI.Infrastructure.Logging;
 using System.Xml;
+using System.Diagnostics;
+using CommonServiceLocator;
+using System.Runtime.Serialization;
+using KEI.Infrastructure.Configuration;
 
 namespace ServiceEditor
 {
@@ -114,5 +118,45 @@ namespace ServiceEditor
             saveServicesCommnd ?? (saveServicesCommnd = new DelegateCommand(ExecuteSaveServicesCommand));
 
         void ExecuteSaveServicesCommand() => XmlHelper.Serialize(Services, FilePath);
+
+        private DelegateCommand<Service> configureServiceCommand;
+        public DelegateCommand<Service> ConfigureServiceCommand =>
+            configureServiceCommand ??= configureServiceCommand = new DelegateCommand<Service>(ExecuteConfigureServiceCommand);
+
+        void ExecuteConfigureServiceCommand(Service service)
+        {
+            var implementationType = service.ImplementationType.GetUnderlyingType();
+
+            if(implementationType == null)
+            {
+                return;
+            }
+
+            if(implementationType.GetProperty("ConfigPath") is PropertyInfo pi)
+            {
+                var obj = FormatterServices.GetUninitializedObject(implementationType);
+
+                var configPath = pi.GetValue(obj)?.ToString();
+                
+                if (File.Exists(configPath) == false)
+                {
+                    if (implementationType.GetMethod("DefineConfigShape", BindingFlags.NonPublic | BindingFlags.Instance) is MethodInfo mi)
+                    {
+                        var cfg = mi.Invoke(obj, null);
+
+                        if(mi.ReturnType.GetMethod("Build") is MethodInfo bmi)
+                        {
+                            IDataContainer config = (IDataContainer)bmi.Invoke(cfg, null);
+                            config.Store(configPath);
+                        }
+                    } 
+                }
+
+                if (File.Exists(configPath))
+                {
+                    Process.Start("ConfigEditor.exe", configPath); 
+                } 
+            }
+        }
     }
 }

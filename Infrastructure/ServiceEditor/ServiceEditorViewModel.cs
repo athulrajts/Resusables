@@ -1,6 +1,5 @@
 ﻿using KEI.Infrastructure.Service;
 using Prism.Mvvm;
-using System;
 using System.Collections.ObjectModel;
 using System.Reflection;
 using System.IO;
@@ -9,19 +8,37 @@ using Prism.Commands;
 using KEI.Infrastructure;
 using TypeInfo = KEI.Infrastructure.Types.TypeInfo;
 using System.Collections.Generic;
-using KEI.Infrastructure.Logging;
-using System.Xml;
 using System.Diagnostics;
-using CommonServiceLocator;
 using System.Runtime.Serialization;
 using KEI.Infrastructure.Configuration;
+using KEI.Infrastructure.Types;
 
-namespace ServiceEditor
+namespace ServiceEditor.ViewModels
 {
     public class ServiceEditorViewModel : BindableBase
     {
         private const string FilePath = "Configs/Services.cfg";
-        public ObservableCollection<Service> Services { get; set; } = new ObservableCollection<Service>();
+        private readonly IViewService _viewService;
+
+        public ServiceEditorViewModel(IViewService viewService, ImplementationsProvider provider)
+        {
+            _viewService = viewService;
+
+            Services = new ObservableCollection<Service>(provider.GetServices());
+
+            SelectedServices = XmlHelper.Deserialize<ObservableCollection<Service>>(FilePath) ?? new ObservableCollection<Service>();
+
+            SetImplementations();
+        }
+
+        #region Properties
+
+        private ObservableCollection<Service> services;
+        public ObservableCollection<Service> Services
+        {
+            get { return services; }
+            set { SetProperty(ref services, value); }
+        }
 
         private ObservableCollection<Service> selectedServices;
         public ObservableCollection<Service> SelectedServices
@@ -30,78 +47,9 @@ namespace ServiceEditor
             set { SetProperty(ref selectedServices, value); }
         }
 
-        private readonly List<Assembly> assemblies = new List<Assembly>();
+        #endregion
 
-        public ServiceEditorViewModel()
-        { 
-
-            foreach (var assemblyPath in Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory, "*.dll", SearchOption.AllDirectories))
-            {
-                try
-                {
-                    assemblies.Add(Assembly.LoadFrom(assemblyPath));
-                }
-                catch (Exception) { }
-            }
-
-            foreach (var assembly in assemblies.ToList())
-            {
-                if (assembly.IsDynamic == false)
-                {
-                    try
-                    {
-                        var types = assembly.GetExportedTypes();
-
-                        foreach (var type in types)
-                        {
-                            if (type.GetCustomAttribute<ServiceAttribute>() is ServiceAttribute sa)
-                            {
-                                Services.Add(new Service(type, GetImplementations(type), sa));
-                            }
-
-                        }
-                    }
-                    catch (Exception) { }
-                }
-            }
-
-            SelectedServices = XmlHelper.Deserialize<ObservableCollection<Service>>(FilePath);
-
-            if(SelectedServices == null)
-            {
-                SelectedServices = Services;
-                SaveServicesCommand.Execute();
-            }
-
-
-            SetImplementations();
-
-        }
-
-        private List<Type> GetImplementations(Type t)
-        {
-            var implementationsTypes = new List<Type>();
-            foreach (var assembly in assemblies.ToList())
-            {
-                if (assembly.IsDynamic == false)
-                {
-                    try
-                    {
-                        var types = assembly.GetExportedTypes();
-
-                        foreach (var type in types)
-                        {
-                            if (t.IsAssignableFrom(type) && t != type)
-                            {
-                                implementationsTypes.Add(type);
-                            }
-                        }
-                    }
-                    catch (Exception) { }
-                }
-            }
-            return implementationsTypes;
-        }
+        #region Private Functions
 
         private void SetImplementations()
         {
@@ -109,15 +57,31 @@ namespace ServiceEditor
             {
                 service.AvailableImplementations = Services.FirstOrDefault(x => x.Name == service.Name)?.AvailableImplementations;
                 if (service.ImplementationType is TypeInfo t)
+                {
                     service.ImplementationType = service.AvailableImplementations.FirstOrDefault(x => x.FullName == t.FullName);
+                }
             }
         }
 
-        private DelegateCommand saveServicesCommnd;
-        public DelegateCommand SaveServicesCommand =>
-            saveServicesCommnd ?? (saveServicesCommnd = new DelegateCommand(ExecuteSaveServicesCommand));
+        #endregion
 
-        void ExecuteSaveServicesCommand() => XmlHelper.Serialize(Services, FilePath);
+        #region Store Service Config
+
+        private DelegateCommand saveServiceConfigCommnd;
+        public DelegateCommand SaveServiceConfigCommand =>
+            saveServiceConfigCommnd ??= saveServiceConfigCommnd = new DelegateCommand(ExecuteSaveServiceConfigCommand);
+
+        void ExecuteSaveServiceConfigCommand()
+        {
+            if(XmlHelper.Serialize(SelectedServices, FilePath) == true)
+            {
+                _viewService.Inform("Config updated !");
+            }
+        }
+
+        #endregion
+
+        #region Configure Service
 
         private DelegateCommand<Service> configureServiceCommand;
         public DelegateCommand<Service> ConfigureServiceCommand =>
@@ -158,5 +122,58 @@ namespace ServiceEditor
                 } 
             }
         }
+
+        #endregion
+
+        #region Load Service Config
+
+        private DelegateCommand loadServiceConfigCommand;
+        public DelegateCommand LoadServiceConfigCommand =>
+            loadServiceConfigCommand ??= loadServiceConfigCommand = new DelegateCommand(ExecuteLoadServiceConfigCommand);
+
+        void ExecuteLoadServiceConfigCommand()
+        {
+            var fileName = _viewService.BrowseFile("Config File", "cfg");
+
+            if(string.IsNullOrEmpty(fileName))
+            {
+                return;
+            }
+
+            if(XmlHelper.Deserialize<ObservableCollection<Service>>(fileName) is ObservableCollection<Service> cfg)
+            {
+                SelectedServices = cfg;
+                SetImplementations();
+            }
+            else
+            {
+                _viewService.Error("Unable to load config !. corrupted file !");
+            }
+        }
+
+        #endregion
+
+        #region Add Service
+
+        private DelegateCommand<object[]> addServiceCommand;
+        public DelegateCommand<object[]> AddServiceCommand =>
+            addServiceCommand ??= addServiceCommand = new DelegateCommand<object[]>(ExecuteAddServiceCommand);
+
+        void ExecuteAddServiceCommand(object[] parameter)
+        { 
+            if(parameter[0] is Service s && parameter[1] is TypeInfo t)
+            {
+                if(SelectedServices.FirstOrDefault(x => x.Name == s.Name) is Service ss)
+                {
+                    ss.ImplementationType = t;
+                }
+                else
+                {
+                    SelectedServices.Add(s);
+                }
+            }
+        }
+
+        #endregion
     }
 }

@@ -3,6 +3,7 @@ using KEI.Infrastructure.Prism;
 using KEI.UI.Wpf.ViewService;
 using Prism.Ioc;
 using System.Windows;
+using ServiceEditor.Views;
 
 namespace ServiceEditor
 {
@@ -13,7 +14,7 @@ namespace ServiceEditor
     {
         protected override Window CreateShell()
         {
-            return Container.Resolve<ServiceEditor.MainWindow>();
+            return Container.Resolve<MainWindow>();
         }
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)

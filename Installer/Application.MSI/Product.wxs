@@ -42,10 +42,11 @@
     <Property Id="ARPINFOABOUT">https://www.gesinfotek.com/</Property>
 
     <!--Create a basic UI for the installer-->
-    <UIRef Id="WixUI_Mondo"/>
+    <UIRef Id="WixUI_InstallDir"/>
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
     
     <!--Defines components, shortcuts, files etc... for installer-->
-		<Feature Id="ProductFeature" Title="Application" Level="1" ConfigurableDirectory="INSTALLFOLDER">
+		<Feature Id="ProductFeature" Title="Application" Level="1">
       <ComponentGroupRef Id="PublishedComponents" />
 		</Feature>
 	</Product>

@@ -28,7 +28,7 @@ namespace ComponentHarvester
             Copy(Path.Combine(harvestingDir, "Application.exe"), Path.Combine(outputDir, "Application.exe"));
             Copy(Path.Combine(harvestingDir, "ConfigEditor.exe"), Path.Combine(outputDir, "ConfigEditor.exe"));
             Copy(Path.Combine(harvestingDir, "ServiceEditor.exe"), Path.Combine(outputDir, "ServiceEditor.exe"));
-            Copy(Path.Combine(harvestingDir, @"Configs\log4net.config"), Path.Combine(outputDir, @"Configs\log4net.config"));
+            Copy(Path.Combine(harvestingDir, "LogViewer.exe"), Path.Combine(outputDir, "LogViewer.exe"));
             Copy(Path.Combine(harvestingDir, @"Configs\view.view"), Path.Combine(outputDir, @"Configs\view.view"));
             Copy(Path.Combine(harvestingDir, @"Configs\Services.cfg"), Path.Combine(outputDir, @"Configs\Services.cfg"));
 

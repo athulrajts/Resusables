@@ -33,6 +33,7 @@ namespace KEI.Infrastructure.Logging
                 fileInfo = new FileInfo(value);
                 if (fileInfo.Exists == false)
                 {
+                    fileInfo.Directory.Create();
                     WriteMetaData(fileInfo.Create());
                     fileInfo.Refresh();
                 }
@@ -165,6 +166,7 @@ namespace KEI.Infrastructure.Logging
 
             /// Create our base file again
             fileInfo = new FileInfo(FilePath);
+            fileInfo.Directory.Create();
             WriteMetaData(fileInfo.Create()); 
             File.SetCreationTime(FilePath, DateTime.Now);
             fileInfo.Refresh();

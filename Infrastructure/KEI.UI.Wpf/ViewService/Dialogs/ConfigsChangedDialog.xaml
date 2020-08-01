@@ -14,6 +14,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/KEI.UI.Wpf;component/Styles/Themes.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/KEI.UI.Wpf;component/Styles/Buttons.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
@@ -21,6 +22,8 @@
     <prism:Dialog.WindowStyle>
         <Style TargetType="Window">
             <Setter Property="prism:Dialog.WindowStartupLocation" Value="CenterOwner" />
+            <Setter Property="AllowsTransparency" Value="True"/>
+            <Setter Property="Background" Value="Transparent"/>
             <Setter Property="ResizeMode" Value="NoResize"/>
             <Setter Property="ShowInTaskbar" Value="False"/>
             <Setter Property="SizeToContent" Value="WidthAndHeight"/>
@@ -32,9 +35,13 @@
             </Setter>
         </Style>
     </prism:Dialog.WindowStyle>
-    <Grid>
-        <Border Background="White" BorderBrush="Black" BorderThickness="2" >
-            <Grid Margin="5">
+    <Border Padding="5">
+        <Border Background="White" BorderBrush="Black" BorderThickness="2" 
+                Padding="5">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="5" ShadowDepth="5" Color="Gray"/>
+            </Border.Effect>
+            <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition />
@@ -122,26 +129,20 @@
                     <WrapPanel Orientation="Horizontal"
                             FlowDirection="RightToLeft">
                         <Button Command="{Binding CloseDialogCommand}" 
-                                    CommandParameter="No"
-                                    FontWeight="Bold"
-                                    Content="{w:Localize Value='NO'}"
-                                    Width="75" Height="25"
-                                    HorizontalAlignment="Right"  Grid.Row="2"
-                                    Margin="0 0 3 0"
-                                    IsCancel="True"/>
+                                CommandParameter="No"
+                                Content="{w:Localize Value='NO'}"
+                                Style="{StaticResource NegativeButton}"
+                                IsCancel="True"/>
 
                         <Button Command="{Binding CloseDialogCommand}" 
-                                    CommandParameter="Yes"
-                                    FontWeight="Bold"
-                                    Content="{w:Localize Value='YES'}"
-                                    Width="75" Height="25"
-                                    HorizontalAlignment="Right"  Grid.Row="2"
-                                    Margin="0 0 3 0"
-                                    IsDefault="True"/>
+                                CommandParameter="Yes"
+                                Content="{w:Localize Value='YES'}"
+                                Style="{StaticResource PositiveButton}"
+                                IsDefault="True"/>
                     </WrapPanel>
                 </Border>
 
             </Grid>
         </Border>
-    </Grid>
+    </Border>
 </UserControl>

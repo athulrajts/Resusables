@@ -58,31 +58,25 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Values_Changed" xml:space="preserve">
-    <value>変更された値</value>
-  </data>
-  <data name="NO" xml:space="preserve">
-    <value>番号</value>
-  </data>
-  <data name="YES" xml:space="preserve">
-    <value>はい</value>
-  </data>
-  <data name="Are_you_sure_you_want_to_keep_the_updated_settings_?" xml:space="preserve">
-    <value>更新された設定を保持してもよろしいですか？</value>
-  </data>
   <data name="CANCEL" xml:space="preserve">
-    <value>キャンセル</value>
+    <value>hủy bỏ</value>
   </data>
   <data name="ABORT" xml:space="preserve">
-    <value>アボート</value>
+    <value>Huỷ bỏ</value>
   </data>
   <data name="OK" xml:space="preserve">
-    <value>OK</value>
+    <value>đồng ý</value>
+  </data>
+  <data name="NO" xml:space="preserve">
+    <value>Không</value>
+  </data>
+  <data name="YES" xml:space="preserve">
+    <value>Đúng</value>
   </data>
   <data name="Retry" xml:space="preserve">
-    <value>リトライ</value>
+    <value>thử lại</value>
   </data>
   <data name="IGNORE" xml:space="preserve">
-    <value>無視する</value>
+    <value>Làm lơ</value>
   </data>
 </root>

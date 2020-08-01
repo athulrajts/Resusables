@@ -1,4 +1,6 @@
-﻿using System.Data;
+﻿using System.IO;
+using System.Linq;
+using System.Data;
 using System.Windows.Input;
 using System.Threading.Tasks;
 using Prism.Commands;
@@ -15,10 +17,6 @@ using Application.Core;
 using Application.Core.Constants;
 using Application.UI.AdvancedSetup.ViewModels;
 using Application.Production.Views;
-using KEI.Infrastructure.Validation.Attributes;
-using System.IO;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Application.Production.ViewModels
 {

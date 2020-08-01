@@ -5,15 +5,20 @@ using Prism.Events;
 using Prism.Mvvm;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Localizer.ViewModels
 {
     public class TranslationFileEditorViewModel : BindableBase
     {
+        private CancellationToken _cancellationToken;
+        private const int DELAY = 2000;
+
         private ResXLocalizationFile file;
         public ResXLocalizationFile File
         {
@@ -31,83 +36,88 @@ namespace Localizer.ViewModels
 
         private DelegateCommand translateCommand;
         public DelegateCommand TranslateCommand =>
-            translateCommand ?? (translateCommand = new DelegateCommand(ExecuteTranslateCommand));
+            translateCommand ??= translateCommand = new DelegateCommand(ExecuteTranslateCommand);
 
-        async void ExecuteTranslateCommand()
+        private async void ExecuteTranslateCommand()
         {
-            int count = 0;
-            int total = File.Resources.Where(x => string.IsNullOrEmpty(x.TranslatedText)).Count();
+            var translations = File.Resources.Where(x => string.IsNullOrEmpty(x.TranslatedText));
+            int total = translations.Count();
+            _cancellationToken = new CancellationToken();
 
             _viewService.SetBusy("Translating");
 
-            foreach (var item in File.Resources.Where(x => string.IsNullOrEmpty(x.TranslatedText)))
-            {
-                _viewService.UpdateBusyText(new[] { "Translating", $"({count++}/{total})" });
+            var progress = new Progress<int>(count => _viewService.UpdateBusyText(new[] { "Translating", $"{count}/{total}" }));
 
-                item.TranslatedText = await Task.Run(() => Translator.Translate(item.EnglishText, "English", File.Lang));
-
-                await Task.Delay(2000);
-            }
+            await Translate(translations, progress, _cancellationToken);
 
             _viewService.SetAvailable();
         }
 
         private DelegateCommand<IList> translateSelected;
         public DelegateCommand<IList> TranslateSelected =>
-            translateSelected ?? (translateSelected = new DelegateCommand<IList>(ExecuteTranslateSelected));
+            translateSelected ??= translateSelected = new DelegateCommand<IList>(ExecuteTranslateSelected);
 
-        async void ExecuteTranslateSelected(IList param)
+        private async void ExecuteTranslateSelected(IList param)
         {
-            if(param != null)
+            
+            if (param is IEnumerable<Translation> translations)
             {
-                int count = 0;
-                int total = param.Count;
+                int total = translations.Count();
+                
+                _cancellationToken = new CancellationToken();
 
-                _viewService.SetBusy($"Translating");
+                _viewService.SetBusy("Translating");
+                
+                var progress = new Progress<int>(count => _viewService.UpdateBusyText(new[] { "Translating", $"{count}/{total}" }));
 
-                foreach (var item in param)
-                {
-                    if(item is Translation t)
-                    {
-                        _viewService.UpdateBusyText(new[] {"Translating", $"({count++}/{total})" });
+                await Translate(translations, progress, _cancellationToken);
 
-                        t.TranslatedText = await Task.Run(() => Translator.Translate(t.EnglishText, "English", File.Lang));
-
-                        await Task.Delay(2000);
-                    }
-                }
                 _viewService.SetAvailable();
+
             }
+
         }
 
         private DelegateCommand translateAll;
         public DelegateCommand TranslateAll =>
-            translateAll ?? (translateAll = new DelegateCommand(ExecuteTranslateAll));
+            translateAll ??= translateAll = new DelegateCommand(ExecuteTranslateAll);
 
-        async void ExecuteTranslateAll()
+        private async void ExecuteTranslateAll()
         {
-            int count = 0;
             int total = File.Resources.Count;
-
+            _cancellationToken = new CancellationToken();
+            var progress = new Progress<int>(count => _viewService.UpdateBusyText(new[] { "Translating", $"{count}/{total}" }));
+            
             _viewService.SetBusy("Translating");
 
-            foreach (var item in File.Resources)
-            {
-                _viewService.UpdateBusyText(new[] { "Translating", $"({count++}/{total})" });
-
-                item.TranslatedText = await Task.Run(() => Translator.Translate(item.EnglishText, "English", File.Lang));
-
-                await Task.Delay(2000);
-            }
+            await Translate(File.Resources, progress, _cancellationToken);
 
             _viewService.SetAvailable();
         }
 
+        private async Task Translate(IEnumerable<Translation> items, IProgress<int> progress, CancellationToken cancellationToken)
+        {
+            int current = 0;
+            foreach (var item in items)
+            {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return;
+                }
+
+                item.TranslatedText = await Task.Run(() => Translator.Translate(item.EnglishText, "English", File.Lang));
+
+                progress.Report(++current);
+
+                await Task.Delay(DELAY);
+            }
+        }
+
         private DelegateCommand writeCommand;
         public DelegateCommand WriteCommand =>
-            writeCommand ?? (writeCommand = new DelegateCommand(ExecuteWriteCommand));
+            writeCommand ??= writeCommand = new DelegateCommand(ExecuteWriteCommand);
 
-        void ExecuteWriteCommand()
+        private void ExecuteWriteCommand()
         {
             File?.Write();
         }

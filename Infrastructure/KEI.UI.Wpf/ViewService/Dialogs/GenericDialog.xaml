@@ -5,17 +5,18 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:KEI.UI.Wpf.ViewService"
              xmlns:prism="http://prismlibrary.com/"
+             xmlns:w="clr-namespace:KEI.UI.Wpf"
              mc:Ignorable="d" 
              MaxHeight="225"
-             Width="360"
-             MinHeight="150">
-
-    <UserControl.Resources>
-    </UserControl.Resources>
+             Width="470"
+             MinHeight="225"
+             Background="Transparent">
 
     <prism:Dialog.WindowStyle>
         <Style TargetType="Window">
-            <Setter Property="prism:Dialog.WindowStartupLocation" Value="CenterOwner" />
+            <Setter Property="prism:Dialog.WindowStartupLocation"  Value="CenterScreen" />
+            <Setter Property="AllowsTransparency" Value="True"/>
+            <Setter Property="Background" Value="Transparent"/>
             <Setter Property="ShowInTaskbar" Value="False"/>
             <Setter Property="ResizeMode" Value="NoResize"/>
             <Setter Property="SizeToContent" Value="WidthAndHeight"/>
@@ -27,99 +28,117 @@
             </Setter>
         </Style>
     </prism:Dialog.WindowStyle>
-    <Grid>
-        <Border Background="White" BorderBrush="Black" BorderThickness="2.5">
-            <Grid Margin="5">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
 
-                <Border Grid.Row="0" Background="{Binding Title, Converter={local:TitleToBackgroundConverter}, FallbackValue=Orange}"
+    <UserControl.Resources>
+
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/KEI.UI.Wpf;component/Styles/Buttons.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+        
+    </UserControl.Resources>
+    
+    <Grid>
+        <Border Padding="5">
+            <Border Background="White" BorderBrush="Black" BorderThickness="2.5" CornerRadius="5">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="5" ShadowDepth="5" Color="Gray"/>
+                </Border.Effect>
+                <Grid Margin="5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Border Grid.Row="0" Background="{Binding Title, Converter={local:TitleToBackgroundConverter}, FallbackValue=Orange}"
                             BorderBrush="Black" BorderThickness="0.9">
-                    <TextBlock HorizontalAlignment="Left"
+                        <TextBlock HorizontalAlignment="Left"
                                VerticalAlignment="Center" 
                                TextWrapping="Wrap"
                                Foreground="Black"
-                               FontSize="15"
+                               FontSize="20"
                                FontWeight="Bold"
                                Padding="5"
                                Text="{Binding Title, FallbackValue='Title'}">
-                    </TextBlock>
-                </Border>
+                        </TextBlock>
+                    </Border>
 
 
-                <Border Padding="5"
+                    <Border Padding="5"
                             Grid.Row="1">
-                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-                        <TextBlock Text="{Binding Message, FallbackValue='Design time message'}"
-                           HorizontalAlignment="Stretch"
-                           VerticalAlignment="Stretch"
-                           TextWrapping="Wrap" />
-                    </ScrollViewer>
-                </Border>
+                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                            <TextBlock Text="{Binding Message, FallbackValue='Design time message'}"
+                                       HorizontalAlignment="Stretch"
+                                       VerticalAlignment="Stretch"
+                                       FontSize="15"
+                                       TextWrapping="Wrap" />
+                        </ScrollViewer>
+                    </Border>
 
 
-                <Border Grid.Row="2"
+                    <Border Grid.Row="2"
                             Padding="0 5 0 5">
-                    <WrapPanel Orientation="Horizontal"
-                            FlowDirection="RightToLeft">
-                        <WrapPanel.Resources>
-                            <Style TargetType="Button">
-                                <Setter Property="Width" Value="75"/>
-                                <Setter Property="Height" Value="25"/>
-                                <Setter Property="Grid.Row" Value="2"/>
-                                <Setter Property="Margin" Value="0 0 3 0"/>
-                            </Style>
-                        </WrapPanel.Resources>
+                        <WrapPanel Orientation="Horizontal"
+                                   FlowDirection="RightToLeft">
+                            <WrapPanel.Resources>
+                            </WrapPanel.Resources>
 
-                        <Button Command="{Binding CloseDialogCommand}" 
-                                CommandParameter="Cancel" 
-                                Content="CANCEL"
-                                IsCancel="True"
-                                Visibility="{Binding Buttons, Converter={local:DialogButtonVisibilityConverter}, FallbackValue=Visible, ConverterParameter=okcancel}"/>
+                            <Button Command="{Binding CloseDialogCommand}" 
+                                    CommandParameter="Cancel" 
+                                    Content="{w:Localize Value='CANCEL'}"
+                                    IsCancel="True"
+                                    Style="{StaticResource NegativeButton}"
+                                    Visibility="{Binding Buttons, Converter={local:DialogButtonVisibilityConverter}, FallbackValue=Visible, ConverterParameter=okcancel}"/>
 
-                        <Button Command="{Binding CloseDialogCommand}" 
-                                CommandParameter="Abort" 
-                                Content="ABORT"
-                                IsCancel="True"
-                                Visibility="{Binding Buttons, Converter={local:DialogButtonVisibilityConverter}, FallbackValue=Collapsed, ConverterParameter=okabort}"/>
+                            <Button Command="{Binding CloseDialogCommand}" 
+                                    CommandParameter="Abort" 
+                                    Content="{w:Localize Value='ABORT'}"
+                                    IsCancel="True"
+                                    Style="{StaticResource NegativeButton}"
+                                    Visibility="{Binding Buttons, Converter={local:DialogButtonVisibilityConverter}, FallbackValue=Collapsed, ConverterParameter=okabort}"/>
 
-                        <Button Command="{Binding CloseDialogCommand}" 
-                                CommandParameter="Ok" 
-                                Content="OK"
-                                IsDefault="True"
-                                Visibility="{Binding Buttons, Converter={local:DialogButtonVisibilityConverter}, ConverterParameter='ok,okcancel,okabort'}"/>
+                            <Button Command="{Binding CloseDialogCommand}" 
+                                    CommandParameter="Ok" 
+                                    Content="{w:Localize Value='OK'}"
+                                    IsDefault="True"
+                                    Style="{StaticResource PositiveButton}"
+                                    Visibility="{Binding Buttons, Converter={local:DialogButtonVisibilityConverter}, ConverterParameter='ok,okcancel,okabort'}"/>
 
-                        <Button Command="{Binding CloseDialogCommand}" 
-                                CommandParameter="No" 
-                                Content="NO"
-                                IsCancel="True"
-                                Visibility="{Binding Buttons, Converter={local:DialogButtonVisibilityConverter}, FallbackValue=Collapsed, ConverterParameter=yesno}"/>
+                            <Button Command="{Binding CloseDialogCommand}" 
+                                    CommandParameter="No" 
+                                    Content="{w:Localize Value='NO'}"
+                                    IsCancel="True"
+                                    Style="{StaticResource NegativeButton}"
+                                    Visibility="{Binding Buttons, Converter={local:DialogButtonVisibilityConverter}, FallbackValue=Collapsed, ConverterParameter=yesno}"/>
 
 
-                        <Button Command="{Binding CloseDialogCommand}" 
-                                CommandParameter="Yes" 
-                                Content="YES"
-                                IsDefault="True"
-                                Visibility="{Binding Buttons, Converter={local:DialogButtonVisibilityConverter}, FallbackValue=Collapsed, ConverterParameter=yesno}"/>
+                            <Button Command="{Binding CloseDialogCommand}" 
+                                    CommandParameter="Yes" 
+                                    Content="{w:Localize Value='YES'}"
+                                    IsDefault="True"
+                                    Style="{StaticResource PositiveButton}"
+                                    Visibility="{Binding Buttons, Converter={local:DialogButtonVisibilityConverter}, FallbackValue=Collapsed, ConverterParameter=yesno}"/>
 
-                        <Button Command="{Binding CloseDialogCommand}" 
-                                CommandParameter="Retry" 
-                                Content="RETRY"
-                                Visibility="{Binding Buttons, Converter={local:DialogButtonVisibilityConverter}, FallbackValue=Collapsed, ConverterParameter=ignoreretry}"/>
+                            <Button Command="{Binding CloseDialogCommand}" 
+                                    CommandParameter="Retry" 
+                                    Content="{w:Localize Value='Retry'}"
+                                    Style="{StaticResource PositiveButton}"
+                                    Visibility="{Binding Buttons, Converter={local:DialogButtonVisibilityConverter}, FallbackValue=Collapsed, ConverterParameter=ignoreretry}"/>
 
-                        <Button Command="{Binding CloseDialogCommand}" 
-                                CommandParameter="Ignore" 
-                                Content="IGNORE"
-                                Visibility="{Binding Buttons, Converter={local:DialogButtonVisibilityConverter},FallbackValue=Collapsed, ConverterParameter=ignoreretry}"/>
+                            <Button Command="{Binding CloseDialogCommand}" 
+                                    CommandParameter="Ignore" 
+                                    Content="{w:Localize Value='IGNORE'}"
+                                    Style="{StaticResource NegativeButton}"
+                                    Visibility="{Binding Buttons, Converter={local:DialogButtonVisibilityConverter},FallbackValue=Collapsed, ConverterParameter=ignoreretry}"/>
 
 
-                    </WrapPanel>
-                </Border>
+                        </WrapPanel>
+                    </Border>
 
-            </Grid>
+                </Grid>
+            </Border>
         </Border>
     </Grid>
 </UserControl>

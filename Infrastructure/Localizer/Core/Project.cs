@@ -25,20 +25,14 @@ namespace Localizer.Core
         {
             ResourceDirectory = resourceDirectory;
 
-            var keyFileName = $@"..\..\Localization\{ProjectName}_Resources-en.resx";
+            var keyFileName = $@"..\..\Localization\{ProjectName}_Resources-en.txt";
 
             if (File.Exists(keyFileName))
             {
-                using (var rr = new ResXResourceReader(keyFileName))
+                foreach (var item in File.ReadAllLines(keyFileName))
                 {
-                    foreach (DictionaryEntry item in rr)
-                    {
-                        if (item.Value is string)
-                        {
-                            stringKeys.Add(item.Key.ToString());
-                        }
-                    }
-                } 
+                    stringKeys.Add(item?.Trim());
+                }
             }
 
             foreach (var file in Directory.GetFiles(ResourceDirectory, "*.resx"))
@@ -49,7 +43,7 @@ namespace Localizer.Core
                     if (split.Length == 2)
                     {
                         var resxFile = new ResXLocalizationFile(file, split[1]);
-                        stringKeys.ForEach(key => resxFile.AddResource(key, string.Empty));
+                        stringKeys.ForEach(key => resxFile.AddTranslation(new Translation { Key = key, EnglishText = key.Replace("_", " ").ToLower()}));
                         TranslationFiles.Add(resxFile);
                     }
                 }
@@ -75,7 +69,7 @@ namespace Localizer.Core
 
                 var file = new ResXLocalizationFile($@"{ResourceDirectory}\Resources-{twoLetterCode}.resx", twoLetterCode);
 
-                stringKeys.ForEach(key => file.AddResource(key, string.Empty));
+                stringKeys.ForEach(key => file.AddTranslation(new Translation {Key = key, EnglishText = key.Replace("_", " ").ToLower() }));
 
                 TranslationFiles.Add(file);
             }

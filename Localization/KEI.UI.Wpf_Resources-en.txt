@@ -1,0 +1,7 @@
+CANCEL
+ABORT
+OK
+NO
+YES
+Retry
+IGNORE

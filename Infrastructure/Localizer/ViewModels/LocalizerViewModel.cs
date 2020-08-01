@@ -31,7 +31,7 @@ namespace Localizer.ViewModels
             foreach (var item in Directory.GetDirectories(solutionDirectory, "Properties", SearchOption.AllDirectories))
             {
                 var ProjectName = Path.GetFileName(Path.GetDirectoryName(item));
-                var keyFile = $@"..\..\Localization\{ProjectName}_Resources-en.resx";
+                var keyFile = $@"..\..\Localization\{ProjectName}_Resources-en.txt";
                 
                 /// Add projects that used <see cref="KEI.UI.Wpf.Localize"/> Markup extension 
                 if (File.Exists(keyFile))

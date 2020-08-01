@@ -3,38 +3,53 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:KEI.UI.Wpf.ViewService"
         WindowStyle="None"
         xmlns:converters="clr-namespace:KEI.UI.Wpf.Converters"
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
-        Title="LoginWindow" Height="215.366" Width="398.148">
-    <Border BorderBrush="Black" BorderThickness="2">
-        <Grid DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="50"/>
-                <RowDefinition/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
+        AllowsTransparency="True"
+        Background="Transparent"
+        Title="LoginWindow" Height="240" Width="400">
 
-            <!--Title-->
-            <Border Background="#393232" BorderBrush="Black" BorderThickness="0 0 0 2">
-                <TextBlock Text="{Binding HeaderTitle, FallbackValue='Application'}"
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/KEI.UI.Wpf;component/Styles/Buttons.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    
+    <Border Padding="5">
+        <Border BorderBrush="Black" BorderThickness="3" Background="White" CornerRadius="5">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="5" ShadowDepth="5" Color="Gray"/>
+            </Border.Effect>
+            <Grid DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!--Title-->
+                <Border Background="#393232" BorderBrush="Black" BorderThickness="1" Margin="2"
+                        CornerRadius="3 3 0 0">
+                    <TextBlock Text="{Binding HeaderTitle, FallbackValue='Application'}"
                            Foreground="White"
                            VerticalAlignment="Center"
                            Padding="5"
                            FontSize="25"/>
-            </Border>
+                </Border>
 
-            <Border Grid.Row="1">
-                <StackPanel>
-                    <DockPanel LastChildFill="False">
-                        <TextBlock DockPanel.Dock="Left" Text="Username"
+                <Border Grid.Row="1">
+                    <StackPanel>
+                        <DockPanel LastChildFill="False">
+                            <TextBlock DockPanel.Dock="Left" Text="Username"
                                    VerticalAlignment="Center"
                                    FontSize="18"
                                    Margin="10 0 0 0"/>
-                        <TextBox DockPanel.Dock="Right"
+                            <TextBox DockPanel.Dock="Right"
                                  x:Name="usernameTxt"
                                  Height="30"
                                  TabIndex="0"
@@ -42,50 +57,47 @@
                                  Text="{Binding Username}"
                                  Margin="5"
                                  Width="250"/>
-                    </DockPanel>
-                    <DockPanel LastChildFill="False">
-                        <TextBlock DockPanel.Dock="Left" Text="Password"
+                        </DockPanel>
+                        <DockPanel LastChildFill="False">
+                            <TextBlock DockPanel.Dock="Left" Text="Password"
                                    VerticalAlignment="Center"
                                    FontSize="18"
                                    Margin="10 0 0 0"/>
-                        <PasswordBox DockPanel.Dock="Right"
+                            <PasswordBox DockPanel.Dock="Right"
                                      PasswordChanged="PasswordBox_PasswordChanged"
                                      TabIndex="1"
                                      FontSize="18"
                                      Height="30"
                                      Margin="5"
                                      Width="250"/>
-                    </DockPanel>
-                </StackPanel>
-            </Border>
+                        </DockPanel>
+                    </StackPanel>
+                </Border>
 
-            <Border Grid.Row="2" Padding="5">
-                <StackPanel>
-                    <TextBlock Foreground="Red" Text="{Binding ErrorText}" 
+                <Border Grid.Row="2" Padding="5">
+                    <StackPanel>
+                        <TextBlock Foreground="Red" Text="{Binding ErrorText}" 
                                HorizontalAlignment="Center"
                                VerticalAlignment="Center"
                                TextWrapping="Wrap"
                                Visibility="{Binding ErrorText, Converter={converters:ObjectToVisibilityConverter}}"
                                Margin="8"/>
-                    <StackPanel FlowDirection="RightToLeft" Orientation="Horizontal">
-                        <Button Content="Cancel"
-                                TabIndex="4"
-                                Width="100"
-                                FontWeight="Bold"
-                                IsCancel="True"
-                                Click="OnCancel"
-                            Height="40" Margin="0 0 5 0"/>
-                        <Button Content="Login"
-                                Click="OnLogin"
-                                TabIndex="3"
-                                Width="100"
-                                FontWeight="Bold"
-                                IsDefault="True"
-                                Height="40" Margin="0 0 5 0"/>
+                        <StackPanel FlowDirection="RightToLeft" Orientation="Horizontal">
+                            <Button Content="Cancel"
+                                    TabIndex="4"
+                                    IsCancel="True"
+                                    Click="OnCancel"
+                                    Style="{StaticResource NegativeButton}"/>
+                            <Button Content="Login"
+                                    Click="OnLogin"
+                                    TabIndex="3"
+                                    IsDefault="True"
+                                    Style="{StaticResource PositiveButton}"/>
+                        </StackPanel>
                     </StackPanel>
-                </StackPanel>
-            </Border>
+                </Border>
 
-        </Grid>
+            </Grid>
+        </Border>
     </Border>
 </Window>

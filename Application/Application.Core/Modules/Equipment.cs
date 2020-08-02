@@ -10,6 +10,7 @@ using Application.Core.Camera;
 using Application.Core.Constants;
 using Application.Core.Interfaces;
 using KEI.Infrastructure.Events;
+using KEI.Infrastructure.Utils;
 
 namespace Application.Core.Modules
 {
@@ -39,11 +40,11 @@ namespace Application.Core.Modules
 
             _cameraConfig = _configManager.GetConfig(ConfigKeys.Camera);
 
-            _defaultRecipe = PropertyContainerBuilder.Create("Recipe", "Configs/DefaultRecipe.rcp")
+            _defaultRecipe = PropertyContainerBuilder.Create("Recipe", PathUtils.GetPath("Configs/DefaultRecipe.rcp"))
                 .WithProperty("MaximumTransmittance", 100.0, "Maximum Value of Transmittance allowed that considered pass")
                 .WithProperty("MinimumTransmittance", 90.0, "Maximum Value of Transmittance allowed that considered pass")
-                .WithObject("Production DB", new DatabaseSetup { Schema = new List<DatabaseColumn>(DatabaseSchema.SchemaFor<TestResult>()), Name = "Database/Production/Production.csv", CreationMode = DatabaseCreationMode.Daily })
-                .WithObject("Engineering DB", new DatabaseSetup { Schema = new List<DatabaseColumn>(DatabaseSchema.SchemaFor<TestResult>()), Name = "Database/Engineering/Engineering.csv", CreationMode = DatabaseCreationMode.Daily });
+                .WithObject("Production DB", new DatabaseSetup { Schema = new List<DatabaseColumn>(DatabaseSchema.SchemaFor<TestResult>()), Name = PathUtils.GetPath("Database/Production/Production.csv"), CreationMode = DatabaseCreationMode.Daily })
+                .WithObject("Engineering DB", new DatabaseSetup { Schema = new List<DatabaseColumn>(DatabaseSchema.SchemaFor<TestResult>()), Name = PathUtils.GetPath("Database/Engineering/Engineering.csv"), CreationMode = DatabaseCreationMode.Daily });
         }
 
         private IPropertyContainer currentRecipe;

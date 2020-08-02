@@ -14,6 +14,7 @@ using LogViewer.Models.DirectoryTree;
 using Prism.Commands;
 using LogViewer.Parsers;
 using System.Linq;
+using KEI.Infrastructure.Utils;
 
 namespace LogViewer.ViewModels
 {
@@ -36,7 +37,7 @@ namespace LogViewer.ViewModels
 
             ViewDebug = ViewInfo = ViewWarn = ViewError = ViewFatal = true;
 
-            Directory.Add(new DirectoryNode(new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory), "*.slog") { IsExpanded = true });
+            Directory.Add(new DirectoryNode(new DirectoryInfo(PathUtils.GetPath("Logs")), "*.slog") { IsExpanded = true });
 
         }
 

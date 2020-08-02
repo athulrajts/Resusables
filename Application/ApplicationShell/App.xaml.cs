@@ -62,7 +62,7 @@ namespace ApplicationShell
         {
             SplashScreenLogger.Instance.Log("Initializing Application Services");
 
-            var services = XmlHelper.Deserialize<ObservableCollection<Service>>("Configs/Services.cfg");
+            var services = XmlHelper.Deserialize<ObservableCollection<Service>>(PathUtils.GetPath("Configs/Services.cfg"));
             if (services == null)
             {
                 Current.Shutdown();
@@ -72,7 +72,7 @@ namespace ApplicationShell
 
             // Register Logger
             containerRegistry.RegisterLogger(SimpleLogConfigurator.Configure()
-                .WriteToFile(@"Logs\Log.slog").Create()
+                .WriteToFile(PathUtils.GetPath("Logs/Log.slog")).Create()
                 .Finish());
 
             // Register Infrastructure Services
@@ -118,7 +118,7 @@ namespace ApplicationShell
 
             Container.Resolve<ISystemStatusManager>().ApplicationMode = StartupApplicationMode;
 
-            Container.Resolve<IEquipment>().LoadRecipe("Configs/DefaultRecipe.rcp");
+            Container.Resolve<IEquipment>().LoadRecipe(PathUtils.GetPath("Configs/DefaultRecipe.rcp"));
 
             Logger.Debug("Application Initialized");
 

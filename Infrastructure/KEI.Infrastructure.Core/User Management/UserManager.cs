@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
 using KEI.Infrastructure.Helpers;
 using KEI.Infrastructure.Configuration;
+using KEI.Infrastructure.Utils;
 
 namespace KEI.Infrastructure.UserManagement
 {
     public class UserManager : ConfigHolder<List<User>>, IUserManager
     {
-        public UserManager(IViewService viewService) : base(viewService)
+        public UserManager()
         {
             Users = Config;
         }
@@ -14,7 +15,7 @@ namespace KEI.Infrastructure.UserManagement
         public List<User> Users { get; set; }
         public User CurrentUser { get; set; }
 
-        public override string ConfigPath => @"Configs/users.xcfg";
+        public override string ConfigPath => PathUtils.GetPath("Configs/users.xcfg");
         public override string ConfigName => @"Users";
 
         public bool ValidateLogin(string username, string password)

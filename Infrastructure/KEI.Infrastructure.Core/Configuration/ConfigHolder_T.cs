@@ -2,18 +2,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using Prism.Mvvm;
+using KEI.Infrastructure.Logging;
 
 namespace KEI.Infrastructure.Configuration
 {
     public abstract class ConfigHolder<T> : BindableBase, IConfigHolder<T> where T: class, new()
     {
 
-        protected readonly IViewService _viewService;
-
         #region Constructor
-        public ConfigHolder(IViewService viewService)
+        public ConfigHolder()
         {
-            _viewService = viewService;
 
             if (!LoadConfig())
             {
@@ -51,7 +49,7 @@ namespace KEI.Infrastructure.Configuration
 
             if (intermediateConfig == null || string.IsNullOrEmpty(ConfigPath))
             {
-                _viewService.Warn($"Unable to Load Config \"{ConfigName}\", Creating Default Config.");
+                Logger.Warn($"Unable to Load Config \"{ConfigName}\", Creating Default Config.");
                 return false;
             }
 
@@ -69,13 +67,11 @@ namespace KEI.Infrastructure.Configuration
 
         public bool StoreConfig()
         {
-            var fullPath = System.IO.Path.GetFullPath(ConfigPath);
-
             if (typeof(IEnumerable).IsAssignableFrom(typeof(T)))
             {
                 if (XmlHelper.Serialize((Config as IEnumerable<object>).ToListDataContainer(ConfigName), ConfigPath) == false)
                 {
-                    _viewService.Warn($"Unable to Store Config \"{ConfigName}\"");
+                    Logger.Error($"Unable to Store Config \"{ConfigName}\"");
                     return false;
                 }
             }
@@ -83,7 +79,7 @@ namespace KEI.Infrastructure.Configuration
             {
                 if (XmlHelper.Serialize(Config.ToDataContainer(ConfigName), ConfigPath) == false)
                 {
-                    _viewService.Warn($"Unable to Store Config \"{ConfigName}\"");
+                    Logger.Error($"Unable to Store Config \"{ConfigName}\"");
                     return false;
                 }
             }

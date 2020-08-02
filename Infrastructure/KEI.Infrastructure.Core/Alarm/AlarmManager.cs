@@ -1,4 +1,5 @@
 ﻿using KEI.Infrastructure.Configuration;
+using KEI.Infrastructure.Utils;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -10,18 +11,13 @@ namespace KEI.Infrastructure.Alarm
 {
     public class AlarmManager : ConfigHolder<List<AlarmInfo>>, IAlarmManager
     {
-        public AlarmManager(IViewService viewService) : base(viewService)
-        {
-
-        }
-
         public bool HasActiveAlarms => ActiveAlarms.Count > 0;
 
         public ObservableCollection<Alarm> ActiveAlarms { get; set; } = new ObservableCollection<Alarm>();
 
         public ObservableCollection<Alarm> AlarmHistory { get; set; } = new ObservableCollection<Alarm>();
 
-        public override string ConfigPath => @"Configs/alarms.config";
+        public override string ConfigPath => PathUtils.GetPath("Configs/alarms.xcfg");
 
         public override string ConfigName => @"Alarms";
 

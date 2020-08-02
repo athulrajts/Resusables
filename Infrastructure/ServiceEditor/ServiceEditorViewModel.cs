@@ -12,12 +12,13 @@ using System.Diagnostics;
 using System.Runtime.Serialization;
 using KEI.Infrastructure.Configuration;
 using KEI.Infrastructure.Types;
+using KEI.Infrastructure.Utils;
 
 namespace ServiceEditor.ViewModels
 {
     public class ServiceEditorViewModel : BindableBase
     {
-        private const string FilePath = "Configs/Services.cfg";
+        private readonly string FilePath = PathUtils.GetPath("Configs/Services.cfg");
         private readonly IViewService _viewService;
 
         public ServiceEditorViewModel(IViewService viewService, ImplementationsProvider provider)

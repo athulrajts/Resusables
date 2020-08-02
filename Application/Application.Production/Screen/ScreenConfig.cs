@@ -4,19 +4,16 @@ using Prism.Events;
 using KEI.Infrastructure.Screen;
 using KEI.Infrastructure.Configuration;
 using Application.Production.Screen;
+using KEI.Infrastructure.Utils;
 
 namespace KEI.Infrastructure
 {
     public class ScreenConfig : ConfigHolder<ObservableCollection<ScreenInfo>>
     {
-        public ScreenConfig(IViewService viewService) : base(viewService)
-        {
-
-        }
 
         public ObservableCollection<ScreenInfo> InactiveScreens { get; set; } = new ObservableCollection<ScreenInfo>();
 
-        public override string ConfigPath => @"Configs\screens.xcfg";
+        public override string ConfigPath => PathUtils.GetPath("Configs/screens.xcfg");
 
         public override string ConfigName => @"ScreenConfig";
 

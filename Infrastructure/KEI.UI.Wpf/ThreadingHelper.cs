@@ -9,7 +9,7 @@ namespace KEI.Infrastructure
     /// <summary>
     /// Helper class that performs common threading-related functions.
     /// </summary>
-    public class ThreadingHelper
+    public static class ThreadingHelper
     {
         private static Dispatcher m_Dispatcher;
 
@@ -77,14 +77,9 @@ namespace KEI.Infrastructure
             }
         }
 
-        /// <summary>
-        /// Run the specified action in a background thread.
-        /// </summary>
-        /// <param name="p_Action">Action to run.</param>
-        /// <param name="p_OnComplete">Action to run when the task completes (optional).</param>
-        public static void RunInBackgroundTread(Action action) => Task.Run(action);
-
-        public static async Task<TReturn> RunInBackgroundThread<TReturn>(Func<TReturn> func) => await Task.Run(func);
+        public static async void Await(this Task t) => await t;
+        
+        public static async Task<T> Await<T>(this Task<T> t) => await t; 
 
         /// <summary>
         /// Asynchronously invokes the specified action and waits for its completion.

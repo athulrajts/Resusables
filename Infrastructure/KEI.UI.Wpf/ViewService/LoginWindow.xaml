@@ -11,7 +11,16 @@
         AllowsTransparency="True"
         Background="Transparent"
         Title="LoginWindow" Height="240" Width="400">
-
+    <Window.Style>
+        <Style TargetType="Window">
+            <Setter Property="WindowChrome.WindowChrome">
+                <Setter.Value>
+                    <WindowChrome/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Style>
+    
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

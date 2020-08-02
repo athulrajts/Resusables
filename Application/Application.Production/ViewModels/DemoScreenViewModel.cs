@@ -17,6 +17,7 @@ using Application.Core;
 using Application.Core.Constants;
 using Application.UI.AdvancedSetup.ViewModels;
 using Application.Production.Views;
+using KEI.Infrastructure.Utils;
 
 namespace Application.Production.ViewModels
 {
@@ -82,20 +83,22 @@ namespace Application.Production.ViewModels
 
             InitCommands();
 
-            if (File.Exists("Configs/setup.xcfg"))
+            var dbSetupPath = PathUtils.GetPath("Configs/setup.xcfg");
+            var dbPath = PathUtils.GetPath("Database/Test.csv");
+            if (File.Exists(dbSetupPath))
             {
-                setup = PropertyContainerBuilder.FromFile("Configs/setup.xcfg").Morph<DatabaseSetup>();
+                setup = PropertyContainerBuilder.FromFile(dbSetupPath).Morph<DatabaseSetup>();
             }
             else
             {
                 setup = new DatabaseSetup
                 {
                     CreationMode = DatabaseCreationMode.Daily,
-                    Name = "Db/Test.csv",
+                    Name = dbPath,
                     Schema = DatabaseSchema.SchemaFor<DatabaseItem>().ToList()
                 };
 
-                setup.ToPropertyContainer("DB").Store("Configs/setup.xcfg");
+                setup.ToPropertyContainer("DB").Store(dbSetupPath);
             }
 
             _database = new Database(new CSVDatabaseWritter());

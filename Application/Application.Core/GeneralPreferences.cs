@@ -1,11 +1,12 @@
 ﻿using KEI.Infrastructure.Service;
 using KEI.Infrastructure.Configuration;
+using KEI.Infrastructure.Utils;
 
 namespace Application.Core
 {
     public class GeneralPreferences : ConfigHolder
     {
-        public override string ConfigPath => "Configs/general_preferences.xcfg";
+        public override string ConfigPath => PathUtils.GetPath("Configs/general_preferences.xcfg");
 
         public override string ConfigName => "GENERAL_PREFERENCES";
 

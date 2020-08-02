@@ -2,6 +2,7 @@
 using KEI.Infrastructure.Helpers;
 using KEI.Infrastructure.Service;
 using KEI.Infrastructure.Configuration;
+using KEI.Infrastructure.Utils;
 
 namespace Application.Core.Camera
 {
@@ -9,7 +10,7 @@ namespace Application.Core.Camera
     {
         public string Name { get; set; } = "Simulated Camera";
         public bool IsConnected { get; set; }
-        public override string ConfigPath => @"Configs\camera.xcfg";
+        public override string ConfigPath => PathUtils.GetPath("Configs/camera.xcfg");
         public override string ConfigName => "CAMERA";
 
         private static ISystemStatusManager _systemStatusManager;

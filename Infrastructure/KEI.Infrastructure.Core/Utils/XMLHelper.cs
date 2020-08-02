@@ -4,6 +4,7 @@ using System.Xml;
 using System.Text;
 using System.Xml.Serialization;
 using KEI.Infrastructure.Configuration;
+using KEI.Infrastructure.Logging;
 
 namespace KEI.Infrastructure
 {
@@ -20,6 +21,11 @@ namespace KEI.Infrastructure
         {
             try
             {
+                if(Directory.Exists(Path.GetDirectoryName(filePath)) == false)
+                {
+                    Directory.CreateDirectory(Path.GetDirectoryName(filePath));
+                }
+
                 using (FileStream fileStream = new FileStream(filePath, FileMode.Create))
                 {
                     XmlSerializer serializer = new XmlSerializer(data.GetType());
@@ -28,9 +34,9 @@ namespace KEI.Infrastructure
                     return true;
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                //ServiceLocator.Current.GetInstance<ILogManager>().DefaultLogger.Error($"Serialization of {filePath} failed", ex);
+                Logger.Error($"Serialization of {filePath} failed", ex);
                 return false;
             }
         }
@@ -60,8 +66,9 @@ namespace KEI.Infrastructure
 
                 return stream.ToString();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Logger.Error($"Serialization of {typeof(T).FullName} failed", ex);
                 return string.Empty;
             }
         }
@@ -91,8 +98,9 @@ namespace KEI.Infrastructure
                         return default;
                     }
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    Logger.Error($"Unable to deserialize \"{filePath}\" to {typeof(T).FullName}", ex);
                     return default;
                 }
             }

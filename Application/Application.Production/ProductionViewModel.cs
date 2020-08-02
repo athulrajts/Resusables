@@ -28,6 +28,7 @@ namespace Application.Production
         private readonly IDataContainer generalPreferences;
         private readonly IViewService _viewService;
         private readonly IHotkeyService _hotkeyService;
+        private readonly IEventAggregator _eventAggregator;
         private readonly string _assemblyName;
 
         #endregion
@@ -35,14 +36,15 @@ namespace Application.Production
         #region Constructor
 
         public ProductionViewModel(IRegionManager rm, GeneralPreferences gp,
-            IViewService viewService, IHotkeyService hotkeyService)
+            IViewService viewService, IHotkeyService hotkeyService, IEventAggregator eventAggregator)
         {
             regionManager = rm;
             _viewService = viewService;
             _hotkeyService = hotkeyService;
+            _eventAggregator = eventAggregator;
             _assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
 
-            ServiceLocator.Current.GetInstance<IEventAggregator>().GetEvent<ScreenConfigUpdatedEvent>().Subscribe((screens) => PopulateScreens(screens));
+            _eventAggregator.GetEvent<ScreenConfigUpdatedEvent>().Subscribe((screens) => PopulateScreens(screens));
 
             generalPreferences = gp.Config;
 

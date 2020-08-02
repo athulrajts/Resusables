@@ -39,7 +39,7 @@ namespace Application.Production.ViewModels
             IHotkeyService hotkeyService) : base(hotkeyService)
         {
             _viewService = viewService;
-            _screenConfig = ServiceLocator.Current.GetInstance<ScreenConfig>();
+            _screenConfig = screenConfig;
 
 
             ActiveScreens = _screenConfig.Config;

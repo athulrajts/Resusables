@@ -10,14 +10,12 @@ namespace KEI.Infrastructure.Configuration
 {
     public abstract class ConfigHolder : BindableBase, IConfigHolder<IPropertyContainer>
     {
-        protected readonly IViewService _viewService;
         protected readonly ILogger _logger;
         protected readonly IEventAggregator _eventAggregator;
 
         #region Constructor
         public ConfigHolder(IEssentialServices essentialServices)
         {
-            _viewService = essentialServices.ViewService;
             _logger = essentialServices.LogManager.GetLogger(GetType());
             _eventAggregator = essentialServices.EventAggregator;
 
@@ -67,8 +65,7 @@ namespace KEI.Infrastructure.Configuration
 
             if (Config == null)
             {
-                //LOG
-                _viewService.Warn($"Unable to load config \"{ConfigPath}\", Creating new config with default values");
+                _logger.Warn($"Unable to load config \"{ConfigPath}\", Creating new config with default values");
                 return false;
             }
 
@@ -82,7 +79,7 @@ namespace KEI.Infrastructure.Configuration
 
             if (Config.Store(ConfigPath) == false)
             {
-                //LOG
+                _logger.Error($"Unable to store confing \"{ConfigPath}\"");
                 return false;
             }
 

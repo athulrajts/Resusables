@@ -17,6 +17,8 @@ using Application.UI.Converters;
 using Application.Engineering.Layout;
 using Application.Engineering.Dialogs;
 using KEI.Infrastructure.Events;
+using System;
+using KEI.Infrastructure.Utils;
 
 namespace Application.Engineering
 {
@@ -44,9 +46,51 @@ namespace Application.Engineering
 
             SubscribeToEvents();
 
-            Sections = XmlHelper.Deserialize<ObservableCollection<ContentSectionModel>>(@"Configs/view.view");
+            var configPath = PathUtils.GetPath(@"Configs/view.view");
+
+            Sections = XmlHelper.Deserialize<ObservableCollection<ContentSectionModel>>(configPath);
+
+            if(Sections is null)
+            {
+                Sections = GetDefaultSections();
+                XmlHelper.Serialize(Sections, configPath);
+            }
 
             viewMemory = Sections.Select(x => x.IsChecked).ToArray();
+        }
+
+        private ObservableCollection<ContentSectionModel> GetDefaultSections()
+        {
+            return new ObservableCollection<ContentSectionModel>
+            {
+                new ContentSectionModel
+                {
+                    Region = "Result",
+                    Title = "Result",
+                    IconSource = "Resources/results.png",
+                    Dock = System.Windows.Controls.Dock.Right,
+                    MinWidth = 100,
+                    IsChecked = true
+                },
+                new ContentSectionModel
+                {
+                    Region = "Database",
+                    Title = "Database",
+                    IconSource = "Resources/database.png",
+                    Dock = System.Windows.Controls.Dock.Right,
+                    MinWidth = 300,
+                    IsChecked = true
+                },
+                new ContentSectionModel
+                {
+                    Region = "Image",
+                    Title = "Image",
+                    IconSource = "Resources/image.png",
+                    Dock = System.Windows.Controls.Dock.Left,
+                    IsChecked = true
+                }
+
+            };
         }
 
         private void SubscribeToEvents()

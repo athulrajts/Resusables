@@ -7,6 +7,7 @@ using Application.Core.Constants;
 using Application.Core.Interfaces;
 using static Application.Core.Constants.ConfigKeys;
 using KEI.Infrastructure.Events;
+using KEI.Infrastructure.Utils;
 
 namespace Application.Core.Modules
 {
@@ -14,7 +15,7 @@ namespace Application.Core.Modules
     {
 
         #region GenericConfigHolder Members
-        public override string ConfigPath => @"Configs\vision.xcfg";
+        public override string ConfigPath => PathUtils.GetPath(@"Configs/vision.xcfg");
         public override string ConfigName => "VISION";
         protected override PropertyContainerBuilder DefineConfigShape()
         {

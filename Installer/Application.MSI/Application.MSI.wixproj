@@ -55,18 +55,14 @@
   </Target>
   <Target Name="BeforeBuild">
     <PropertyGroup>
-      <DefineConstants>BasePath=..\..\Publish\$(Configuration)\</DefineConstants>
+      <DefineConstants>BasePath=..\..\Publish\$(Configuration)\;ConfigPath=..\..\Build\$(Configuration)\Configs\</DefineConstants>
     </PropertyGroup>
-
     <!--Rebuild Solution-->
     <!--<Exec Command="..\Build.bat $(Configuration)"/>-->
-    
     <!---Copy required files to HeatDirectory Path -->
     <Exec Command="..\ComponentHarvester\bin\Debug\netcoreapp3.1\ComponentHarvester.exe ..\..\Build\$(Configuration) ..\..\Publish\$(Configuration) " />
- 
     <!---Auto Generate components-->
     <HeatDirectory OutputFile="ComponentsGenerated.wxs" DirectoryRefId="INSTALLFOLDER" ComponentGroupName="PublishedComponents" SuppressCom="true" Directory="..\..\Publish\$(Configuration)\" SuppressFragments="true" SuppressRegistry="true" SuppressRootDirectory="true" AutoGenerateGuids="false" GenerateGuidsNow="true" ToolPath="$(WixToolPath)" PreprocessorVariable="var.BasePath" />
-  
   </Target>
   <Target Name="AfterBuild">
   </Target>

@@ -19,6 +19,12 @@ using Application.UI.AdvancedSetup;
 using ApplicationShell.Commands;
 using KEI.Infrastructure.Utils;
 using KEI.Infrastructure.Logging;
+using System.Collections.Generic;
+using KEI.Infrastructure.Types;
+using Application.UI;
+using Application.Core.Camera;
+using KEI.Infrastructure.Database;
+using System.Linq;
 
 #if DEBUG
 using KEI.Infrastructure.Localizer;
@@ -62,14 +68,6 @@ namespace ApplicationShell
         {
             SplashScreenLogger.Instance.Log("Initializing Application Services");
 
-            var services = XmlHelper.Deserialize<ObservableCollection<Service>>(PathUtils.GetPath("Configs/Services.cfg"));
-            if (services == null)
-            {
-                Current.Shutdown();
-                MessageBox.Show("Unable to load Service Config");
-                Environment.Exit(0);
-            }
-
             // Register Logger
             containerRegistry.RegisterLogger(SimpleLogConfigurator.Configure()
                 .WriteToFile(PathUtils.GetPath("Logs/Log.slog")).Create()
@@ -80,7 +78,7 @@ namespace ApplicationShell
             containerRegistry.RegisterUIServices();
 
             // Register Services from Config File
-            containerRegistry.RegisterServices(services);
+            containerRegistry.RegisterServices(GetServices());
 
             // Regster Application Related Services
             containerRegistry.RegisterSingleton<IDatabaseManager, DatabaseManager>();
@@ -92,9 +90,9 @@ namespace ApplicationShell
             containerRegistry.RegisterDialog<AdvancedSetupDialog>();
             containerRegistry.RegisterDialog<StartTestDialog>();
 
+            // Resolve necessary types
             Container.Resolve<IConfigManager>();
             Container.Resolve<IEquipment>();
-
          }
 
 
@@ -157,6 +155,84 @@ namespace ApplicationShell
             splash.Show();
             splash.Hide();
 
+        }
+
+        private IEnumerable<Service> GetServices()
+        {
+            var serviceConfigPath = PathUtils.GetPath("Configs/Services.cfg");
+            List<Service> selectedService = XmlHelper.Deserialize<ObservableCollection<Service>>(serviceConfigPath)?.ToList();
+            List<Service> defaultServices = GetDefaultServices();
+            if (selectedService == null)
+            {
+                selectedService = defaultServices;
+
+                XmlHelper.Serialize(new ObservableCollection<Service>(selectedService), serviceConfigPath);
+            }
+            else
+            {
+                var modifications = new List<Action>();
+
+                foreach (var service in defaultServices)
+                {
+                    if(selectedService.Find(x => x.Name == service.Name) is null)
+                    {
+                        modifications.Add(() => selectedService.Add(service));
+                    }
+                }
+
+                foreach (var service in selectedService)
+                {
+                    if(defaultServices.Find(x => x.Name == service.Name) is null)
+                    {
+                        modifications.Add(() => selectedService.Remove(service));
+                    }
+                }
+
+                if (modifications.Count > 0)
+                {
+                    modifications.ForEach(x => x.Invoke());
+                    XmlHelper.Serialize(new ObservableCollection<Service>(selectedService), serviceConfigPath);
+                }
+            }
+
+            return selectedService;
+        }
+
+        private List<Service> GetDefaultServices()
+        {
+            return new List<Service>
+            {
+                new Service
+                {
+                    ServiceType = new TypeInfo(typeof(IApplicationViewService)),
+                    ImplementationType = new TypeInfo(typeof(ApplicationViewService)),
+                    Name = "View Service"
+                },
+                new Service
+                {
+                    ServiceType = new TypeInfo(typeof(IVisionProcessor)),
+                    ImplementationType = new TypeInfo(typeof(VisionProcessor)),
+                    Name = "Vision"
+                },
+                new Service
+                {
+                    ServiceType = new TypeInfo(typeof(IGreedoCamera)),
+                    ImplementationType = new TypeInfo(typeof(SimulatedCamera)),
+                    Name = "Camera"
+                },
+                new Service
+                {
+                    ServiceType = new TypeInfo(typeof(IDatabaseReader)),
+                    ImplementationType = new TypeInfo(typeof(CSVDatabaseReader)),
+                    Name = "Database Reader"
+                },
+                new Service
+                {
+                    ServiceType = new TypeInfo(typeof(IDatabaseWritter)),
+                    ImplementationType = new TypeInfo(typeof(CSVDatabaseWritter)),
+                    Name = "Database Writter"
+                },
+            };
         }
     }
 }

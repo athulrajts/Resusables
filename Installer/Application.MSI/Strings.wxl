@@ -8,4 +8,7 @@
   <String Id="Keywords">.NET Core, Installer, WiX</String>
   <String Id="DowngradeError">A newer version of Application is already installed.</String>
   <String Id="ProgramFilesFolder">GES</String>
+  <String Id="ProductNameFolder">Application</String>
+  <String Id="CompanyNameFolder">GES</String>
+  <String Id="ConfigsFolderName">Configs</String>
 </WixLocalization>

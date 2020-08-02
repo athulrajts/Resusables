@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace ComponentHarvester
 {
@@ -29,8 +25,6 @@ namespace ComponentHarvester
             Copy(Path.Combine(harvestingDir, "ConfigEditor.exe"), Path.Combine(outputDir, "ConfigEditor.exe"));
             Copy(Path.Combine(harvestingDir, "ServiceEditor.exe"), Path.Combine(outputDir, "ServiceEditor.exe"));
             Copy(Path.Combine(harvestingDir, "LogViewer.exe"), Path.Combine(outputDir, "LogViewer.exe"));
-            Copy(Path.Combine(harvestingDir, @"Configs\view.view"), Path.Combine(outputDir, @"Configs\view.view"));
-            Copy(Path.Combine(harvestingDir, @"Configs\Services.cfg"), Path.Combine(outputDir, @"Configs\Services.cfg"));
 
             CleanDirectories(outputDir);
         }
@@ -70,13 +64,20 @@ namespace ComponentHarvester
 
         public static void Copy(string source, string dest)
         {
+            if(File.Exists(source) == false)
+            {
+                return;
+            }
+
             File.Copy(source, dest, true);
         }
 
         public static void DeleteDir(string path)
         {
             if (Directory.Exists(path) == false)
+            {
                 return;
+            }
 
             var dir = new DirectoryInfo(path);
 

@@ -13,14 +13,26 @@
       <?if $(var.Platform) = x64 ?>
         <!--Program Files (64 Bit)-->
         <Directory Id="ProgramFiles64Folder">
-          <Directory Id="INSTALLFOLDER" Name="!(loc.ProgramFilesFolder)" />
+          <Directory Id="INSTALLFOLDER" Name="!(loc.ProgramFilesFolder)">
+            <Directory Id="LocalConfigsFolder" Name="Configs"/>
+          </Directory>
         </Directory>
       <?else?>
         <!--Program Files (32 Bit)-->
         <Directory Id="ProgramFilesFolder">
-          <Directory Id="INSTALLFOLDER" Name="!(loc.ProgramFilesFolder)" />
+          <Directory Id="INSTALLFOLDER" Name="!(loc.ProgramFilesFolder)">
+            <Directory Id="LocalConfigFolder" Name="Configs"/>
+          </Directory>
         </Directory>
       <?endif?>
+
+      <Directory Id="CommonAppDataFolder">
+        <Directory Id="CompanyNameFolder" Name="!(loc.CompanyNameFolder)">
+          <Directory Id="ProductNameFolder" Name="!(loc.ProductNameFolder)">
+            <Directory Id="CommonConfigsFolder" Name="!(loc.ConfigsFolderName)"/>
+          </Directory>
+        </Directory>
+      </Directory>
    
     </Directory>
     

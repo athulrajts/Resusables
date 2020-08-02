@@ -2,7 +2,7 @@
   "profiles": {
     "ComponentHarvester": {
       "commandName": "Project",
-      "commandLineArgs": "\"C:\\Users\\AmalRaj\\Desktop\\Framework Test\\Build\\Debug\" \"C:\\Users\\AmalRaj\\Desktop\\Framework Test\\Publish\\Debug\""
+      "commandLineArgs": "\"C:\\Users\\AmalRaj\\Desktop\\Framework Test\\Build\\Release\" \"C:\\Users\\AmalRaj\\Desktop\\Framework Test\\Publish\\Release\""
     }
   }
 }

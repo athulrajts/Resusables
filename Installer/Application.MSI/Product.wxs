@@ -43,12 +43,13 @@
 
     <!--Create a basic UI for the installer-->
     <UIRef Id="WixUI_InstallDir"/>
-    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER"/>
     
     <!--Defines components, shortcuts, files etc... for installer-->
 		<Feature Id="ProductFeature" Title="Application" Level="1">
       <ComponentGroupRef Id="PublishedComponents" />
-		</Feature>
+    </Feature>
+    
 	</Product>
   
 </Wix>

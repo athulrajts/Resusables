@@ -92,7 +92,7 @@ namespace KEI.Infrastructure.Configuration
             return ret;
         }
 
-        internal Selector Clone(string newValue)
+        public Selector Clone(string newValue)
         {
             var ret = new Selector();
             ret.Option = Option;

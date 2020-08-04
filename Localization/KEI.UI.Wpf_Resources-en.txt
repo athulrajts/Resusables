@@ -5,3 +5,5 @@ NO
 YES
 Retry
 IGNORE
+Values Changed
+Are you sure you want to keep the updated settings ?

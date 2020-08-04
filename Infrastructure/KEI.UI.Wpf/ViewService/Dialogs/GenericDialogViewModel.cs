@@ -4,16 +4,18 @@ using Prism.Mvvm;
 using Prism.Services.Dialogs;
 using System;
 using System.Globalization;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 
 namespace KEI.UI.Wpf.ViewService
 {
-    public class GenericDialogViewModel : BindableBase, IDialogAware
+    public class GenericDialogViewModel : BaseDialogViewModel
     {
-        private DelegateCommand<string> _closeDialogCommand;
-        public DelegateCommand<string> CloseDialogCommand =>
-            _closeDialogCommand ?? (_closeDialogCommand = new DelegateCommand<string>(CloseDialog));
 
         private string _message;
         public string Message
@@ -23,7 +25,7 @@ namespace KEI.UI.Wpf.ViewService
         }
 
         private string _title = DialogType.Other.ToString();
-        public string Title
+        public override string Title
         {
             get { return _title; }
             set { SetProperty(ref _title, value); }
@@ -43,67 +45,12 @@ namespace KEI.UI.Wpf.ViewService
             set => SetProperty(ref titleBackground, value);
         }
 
-
-        public event Action<IDialogResult> RequestClose;
-
-        protected virtual void CloseDialog(string parameter)
-        {
-            ButtonResult result = ButtonResult.None;
-
-            switch (parameter?.ToLower())
-            {
-                case "ok":
-                    result = ButtonResult.OK;
-                    break;
-                case "cancel":
-                    result = ButtonResult.Cancel;
-                    break;
-                case "yes":
-                    result = ButtonResult.Yes;
-                    break;
-                case "no":
-                    result = ButtonResult.No;
-                    break;
-                case "ignore":
-                    result = ButtonResult.Ignore;
-                    break;
-                case "retry":
-                    result = ButtonResult.Retry;
-                    break;
-                case "abort":
-                    result = ButtonResult.Abort;
-                    break;
-
-                default:
-                    result = ButtonResult.None;
-                    break;
-            }
-
-            RaiseRequestClose(new DialogResult(result));
-        }
-
-        public virtual void RaiseRequestClose(IDialogResult dialogResult)
-        {
-            RequestClose?.Invoke(dialogResult);
-        }
-
-        public virtual bool CanCloseDialog()
-        {
-            return true;
-        }
-
-        public virtual void OnDialogClosed()
-        {
-
-        }
-
-        public virtual void OnDialogOpened(IDialogParameters parameters)
+        public override void OnDialogOpened(IDialogParameters parameters)
         {
             Message = parameters.GetValue<string>("message");
             Title = parameters.GetValue<string>("title");
             Buttons = parameters.GetValue<string>("buttons");
         }
-
     }
 
     internal enum DialogType

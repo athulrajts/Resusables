@@ -128,7 +128,7 @@ namespace KEI.UI.Wpf.Configuration
         {
             if (Data.Value is Selector s)
             {
-                Data.Value = new Selector() { SelectedItem = value, Option = s.Option };
+                Data.Value = s.Clone(value);
             }
             else
             {

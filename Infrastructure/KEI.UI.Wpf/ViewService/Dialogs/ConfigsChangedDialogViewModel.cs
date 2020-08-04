@@ -8,48 +8,12 @@ using System.Collections.Generic;
 
 namespace KEI.UI.Wpf.ViewService
 {
-    public class ConfigsChangedDialogViewModel : BindableBase, IDialogAware
+    public class ConfigsChangedDialogViewModel : BaseDialogViewModel
     {
-        private DelegateCommand<string> _closeDialogCommand;
-        public DelegateCommand<string> CloseDialogCommand =>
-            _closeDialogCommand ?? (_closeDialogCommand = new DelegateCommand<string>(CloseDialog));
 
-        public string Title => "Values Changed";
+        public override string Title { get; set; } = "Values Changed";
 
-        public event Action<IDialogResult> RequestClose;
-
-        public ConfigsChangedDialogViewModel()
-        {
-        }
-
-        protected virtual void CloseDialog(string parameter)
-        {
-            ButtonResult result = ButtonResult.OK;
-
-            if (parameter.ToLower() == "yes")
-                result = ButtonResult.Yes;
-            else if (parameter.ToLower() == "no")
-                result = ButtonResult.No;
-
-            RaiseRequestClose(new DialogResult(result));
-        }
-
-        public virtual void RaiseRequestClose(IDialogResult dialogResult)
-        {
-            RequestClose?.Invoke(dialogResult);
-        }
-
-        public virtual bool CanCloseDialog()
-        {
-            return true;
-        }
-
-        public virtual void OnDialogClosed()
-        {
-
-        }
-
-        public virtual void OnDialogOpened(IDialogParameters parameters)
+        public override void OnDialogOpened(IDialogParameters parameters)
         {
             History.Clear();
 

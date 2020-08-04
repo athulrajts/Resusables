@@ -1,4 +1,7 @@
-﻿using System.ComponentModel;
+﻿using CommonServiceLocator;
+using KEI.Infrastructure.Events;
+using Prism.Events;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -16,5 +19,6 @@ namespace KEI.UI.Wpf.ViewService.Dialogs
             DataContext = CommonServiceLocator.ServiceLocator.Current.GetInstance<LoadingOverlayViewModel>();
             Cursor = Cursors.Wait;
         }
+
     }
 }

@@ -3,12 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:prism="http://prismlibrary.com/"
-             xmlns:controls="clr-namespace:KEI.UI.Wpf.Controls"
-             mc:Ignorable="d" 
-             Height="{Binding Height}"
-             Width="{Binding Width}"
-             d:DesignHeight="450" d:DesignWidth="800">
+             mc:Ignorable="d"
+             d:DesignHeight="450"
+             d:DesignWidth="800">
     <UserControl.Resources>
         <Color x:Key="FilledColor" A="255" B="155" R="155" G="155"/>
         <Color x:Key="UnfilledColor" A="0" B="155" R="155" G="155"/>
@@ -269,16 +266,17 @@
                                     <Ellipse x:Name="ellipse7" Canvas.Top="34.25" Canvas.Left="7" />
                                     <Ellipse Width="39.5" Height="39.5" Canvas.Left="8.75" Canvas.Top="8" Visibility="Hidden"/>
                                 </Canvas>
-                                <ItemsControl ItemsSource="{Binding LoadingText}">
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <Label Content="{Binding}"
-                                                   HorizontalAlignment="Center"
-                                                   VerticalAlignment="Center"
-                                                   FontSize="25"/>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
+
+                                <TextBlock Text="{Binding LoadingText}"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center"
+                                           FontSize="45"
+                                           FontWeight="UltraBlack"
+                                           TextAlignment="Center">
+                                    <TextBlock.Foreground>
+                                        <SolidColorBrush Color="White" Opacity="0.25"/>
+                                    </TextBlock.Foreground>
+                                </TextBlock>
 
                             </StackPanel>
                         </Border>
@@ -287,19 +285,6 @@
             </Setter>
         </Style>
     </UserControl.Resources>
-    
-    <prism:Dialog.WindowStyle>
-        <Style TargetType="Window">
-            <Setter Property="WindowState" Value="{Binding WindowState}"/>
-            <Setter Property="ShowInTaskbar" Value="False"/>
-            <Setter Property="WindowState" Value="Normal"/>
-            <Setter Property="AllowsTransparency" Value="True"/>
-            <Setter Property="ResizeMode" Value="NoResize"/>
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="SizeToContent" Value="WidthAndHeight"/>
-            <Setter Property="WindowStyle" Value="None"/>
-        </Style>
-    </prism:Dialog.WindowStyle>
 
     <Grid>
         <Control Style="{StaticResource BusyAnimationStyle}"/>

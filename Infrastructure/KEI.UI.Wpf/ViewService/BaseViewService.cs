@@ -13,6 +13,9 @@ using Prism.Services.Dialogs;
 using Prism.Unity;
 using System;
 using System.Reflection;
+using System.Windows;
+using System.Windows.Controls.Primitives;
+using System.Windows.Media;
 
 namespace KEI.UI.Wpf.ViewService
 {
@@ -22,6 +25,8 @@ namespace KEI.UI.Wpf.ViewService
         protected static ILogger _logger;
         protected static IEventAggregator _eventAggregator;
         protected bool isBusy;
+
+        private Window loading;
 
         public BaseViewService(IDialogService dialogService, ILogManager logManager, IEventAggregator eventAggregator)
         {
@@ -41,35 +46,57 @@ namespace KEI.UI.Wpf.ViewService
         public void Inform(string info)
         {
             _logger.Info(info);
-            _dialogService.ShowDialog(DialogNames.GenericDialog, new DialogParameters($"message={info}&title={DialogType.Info}&buttons={PromptOptions.Ok}"), r => {});
+            _dialogService.ShowDialog(DialogNames.GenericDialog, new DialogParameters($"message={info}&title={DialogType.Info}&buttons={PromptOptions.Ok}"), r => { });
         }
 
         public void SetAvailable()
         {
-            ServiceLocator.Current.GetInstance<IEventAggregator>().GetEvent<SetAvailableEvent>().Publish();
+            if(IsBusy == false)
+            {
+                return;
+            }
+
+            loading?.Close();
             isBusy = false;
         }
 
         public void SetBusy(string[] msg = null)
         {
-            if(msg == null)
+            if(IsBusy)
             {
-                msg = new string[] { "Loading" }; 
+                return;
             }
 
-            DialogParameters @params = new DialogParameters();
-            @params.Add("text", msg);
+            if (msg == null)
+            {
+                msg = new string[] { "Loading" };
+            }
 
-            _dialogService.Show(typeof(LoadingOverlay).Name, @params, r => { });
+            loading = new Window
+            {
+                Height = Application.Current.MainWindow.ActualHeight,
+                Width = Application.Current.MainWindow.ActualWidth,
+                AllowsTransparency = true,
+                WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                WindowStyle = WindowStyle.None,
+                WindowState = Application.Current.MainWindow.WindowState,
+                Owner = Application.Current.MainWindow,
+                Background = Brushes.Transparent,
+                Content = new LoadingOverlay { DataContext = new LoadingOverlayViewModel { LoadingText = string.Join(Environment.NewLine, msg) } }
+            };
+
+            loading.Show();
+
             isBusy = true;
         }
+
         public void SetBusy(string msg = "Loading..") => SetBusy(new string[] { msg });
 
         public PromptResult Prompt(string confirmMsg, PromptOptions buttons)
         {
             _logger.Info(confirmMsg);
             ButtonResult result = ButtonResult.None;
-            _dialogService.ShowDialog(DialogNames.GenericDialog, new DialogParameters($"message={confirmMsg}&title={DialogType.Confirm}&buttons={buttons}"), r => 
+            _dialogService.ShowDialog(DialogNames.GenericDialog, new DialogParameters($"message={confirmMsg}&title={DialogType.Confirm}&buttons={buttons}"), r =>
             {
                 _logger.Info($"User Confirmation : {r.Result}");
                 result = r.Result;
@@ -91,7 +118,7 @@ namespace KEI.UI.Wpf.ViewService
             new ObjectEditorWindow(o).ShowDialog();
         }
 
-        public string BrowseFile(string description ="", string filters ="")
+        public string BrowseFile(string description = "", string filters = "")
         {
             var dlg = new CommonOpenFileDialog();
             dlg.AddToMostRecentlyUsedList = false;
@@ -105,7 +132,7 @@ namespace KEI.UI.Wpf.ViewService
             dlg.IsFolderPicker = false;
             if (!string.IsNullOrEmpty(description) && !string.IsNullOrEmpty(filters))
             {
-                dlg.Filters.Add(new CommonFileDialogFilter(description, filters)); 
+                dlg.Filters.Add(new CommonFileDialogFilter(description, filters));
             }
             dlg.DefaultDirectory = AppDomain.CurrentDomain.BaseDirectory;
             dlg.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory;
@@ -150,7 +177,7 @@ namespace KEI.UI.Wpf.ViewService
 
             if (sfd.ShowDialog() == true)
             {
-                if(!string.IsNullOrEmpty(sfd.FileName))
+                if (!string.IsNullOrEmpty(sfd.FileName))
                     saveAction(sfd.FileName);
             }
         }
@@ -160,8 +187,11 @@ namespace KEI.UI.Wpf.ViewService
         public void UpdateBusyText(string[] msg)
         {
             if (msg == null)
+            {
                 return;
-            _eventAggregator.GetEvent<UpdateBusyText>().Publish(msg);
+            }
+
+            _eventAggregator.GetEvent<UpdateBusyText>().Publish(string.Join(Environment.NewLine, msg));
         }
 
         protected static class DialogNames
@@ -171,7 +201,7 @@ namespace KEI.UI.Wpf.ViewService
         }
     }
 
-    internal class UpdateBusyText : PubSubEvent<string[]> { }
+    internal class UpdateBusyText : PubSubEvent<string> { }
 
     public static class ContainerRegisteryExtensions
     {

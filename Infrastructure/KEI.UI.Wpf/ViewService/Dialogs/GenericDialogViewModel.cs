@@ -45,11 +45,58 @@ namespace KEI.UI.Wpf.ViewService
             set => SetProperty(ref titleBackground, value);
         }
 
+        private PromptResult defaultResult;
+        public PromptResult DefaultResult
+        {
+            get { return defaultResult; }
+            set { SetProperty(ref defaultResult, value); }
+        }
+
+        private bool isAutoClose;
+        public bool IsAutoClose
+        {
+            get { return isAutoClose; }
+            set { SetProperty(ref isAutoClose, value); }
+        }
+
+        private int timeRemaining;
+        public int TimeRemaining
+        {
+            get { return timeRemaining; }
+            set { SetProperty(ref timeRemaining, value); }
+        }
+
         public override void OnDialogOpened(IDialogParameters parameters)
         {
             Message = parameters.GetValue<string>("message");
             Title = parameters.GetValue<string>("title");
             Buttons = parameters.GetValue<string>("buttons");
+
+            if(parameters.ContainsKey("timeout") && 
+                parameters.ContainsKey("defaultResult"))
+            {
+                var timeout = parameters.GetValue<TimeSpan>("timeout");
+                defaultResult = parameters.GetValue<PromptResult>("defaultResult");
+                IsAutoClose = true;
+
+                TimeRemaining = (int)timeout.TotalSeconds;
+                
+                AwaitTimeout(timeout);
+            }
+        }
+
+        private async void AwaitTimeout(TimeSpan timeout)
+        {
+            for (int i = 0; i < (int)timeout.TotalSeconds; i++)
+            {
+                await Task.Delay(1000);
+                TimeRemaining -= 1;
+            }
+
+            if (IsOpen)
+            {
+                CloseDialog(defaultResult.ToString()); 
+            }
         }
     }
 

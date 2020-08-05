@@ -1,10 +1,6 @@
 ﻿using CommonServiceLocator;
-using KEI.Infrastructure.Events;
 using Prism.Events;
 using Prism.Mvvm;
-using Prism.Services.Dialogs;
-using System;
-using System.Windows;
 
 namespace KEI.UI.Wpf.ViewService.Dialogs
 {

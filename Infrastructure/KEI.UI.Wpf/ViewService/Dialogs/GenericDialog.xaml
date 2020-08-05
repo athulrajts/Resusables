@@ -5,6 +5,7 @@
                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
                 xmlns:local="clr-namespace:KEI.UI.Wpf.ViewService"
                 xmlns:w="clr-namespace:KEI.UI.Wpf"
+                xmlns:c="clr-namespace:KEI.UI.Wpf.Converters"
                 mc:Ignorable="d" 
                 MaxHeight="225"
                 Width="470"
@@ -47,13 +48,28 @@
 
                     <Border Padding="5"
                             Grid.Row="1">
-                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-                            <TextBlock Text="{Binding Message, FallbackValue='Design time message'}"
+                        <DockPanel>
+                            <TextBlock Visibility="{Binding IsAutoClose, Converter={c:BooleanToVisibilityConverter}}"
+                                       DockPanel.Dock="Bottom"
+                                       HorizontalAlignment="Center"
+                                       TextWrapping="Wrap"
+                                       TextAlignment="Center">
+                                <Run Text="Defaulting to"/>
+                                <Run Text="{Binding DefaultResult}" FontWeight="Bold" FontStyle="Italic"/>
+                                <Run Text="in"/>
+                                <Run Text="{Binding TimeRemaining}" FontWeight="Bold" FontStyle="Italic"/>
+                                <Run Text="seconds"/>
+                            </TextBlock>
+
+                            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                                <TextBlock Text="{Binding Message, FallbackValue='Design time message'}"
                                        HorizontalAlignment="Stretch"
                                        VerticalAlignment="Stretch"
                                        FontSize="15"
                                        TextWrapping="Wrap" />
-                        </ScrollViewer>
+                            </ScrollViewer>
+                            
+                        </DockPanel>
                     </Border>
 
 

@@ -14,6 +14,8 @@ namespace KEI.UI.Wpf.ViewService
         public DelegateCommand<string> CloseDialogCommand =>
             _closeDialogCommand ??= _closeDialogCommand = new DelegateCommand<string>(CloseDialog);
 
+        public bool IsOpen { get; set; } = true;
+
         protected virtual async void CloseDialog(string parameter)
         {
             ButtonResult result = (parameter?.ToLower()) switch
@@ -32,6 +34,8 @@ namespace KEI.UI.Wpf.ViewService
 
             await Task.Delay(200);
 
+            IsOpen = false;
+            
             RequestClose?.Invoke(new DialogResult(result));
         }
 

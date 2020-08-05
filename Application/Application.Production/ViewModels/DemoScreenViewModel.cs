@@ -18,6 +18,7 @@ using Application.Core.Constants;
 using Application.UI.AdvancedSetup.ViewModels;
 using Application.Production.Views;
 using KEI.Infrastructure.Utils;
+using System;
 
 namespace Application.Production.ViewModels
 {
@@ -120,16 +121,16 @@ namespace Application.Production.ViewModels
         }
         private void InitCommands()
         {
-            ShowInfoCommand = new DelegateCommand(() => _viewService.Inform(DialogText));
+            ShowInfoCommand = new DelegateCommand(() => _viewService.Inform(DialogText, true));
             ShowWarningCommand = new DelegateCommand(() => _viewService.Warn(DialogText));
             ShowErrorCommand = new DelegateCommand(() => _viewService.Error(DialogText));
             SetBusyCommand = new DelegateCommand(async () =>
             {
-                _viewService.SetBusy(new[] { "Loading", "5" });
+                _viewService.SetBusy("Loading", "5");
                 for (int i = 5; i > 0; i--)
                 {
                     await Task.Delay(1000);
-                    _viewService.UpdateBusyText(new[] { "Loading", (i - 1).ToString() });
+                    _viewService.UpdateBusyText("Loading", $"{i - 1}");
                 }
                 _viewService.SetAvailable();
             });
@@ -137,7 +138,8 @@ namespace Application.Production.ViewModels
             {
                 if (option is PromptOptions po)
                 {
-                    _viewService.Prompt(DialogText, po); 
+                    //_viewService.Prompt(DialogText, po); 
+                    _viewService.PromptWithDefault(DialogText, po, PromptResult.Retry, TimeSpan.FromSeconds(5));
                 }
             });
 

@@ -1,6 +1,5 @@
 ﻿using CommonServiceLocator;
 using KEI.Infrastructure;
-using KEI.Infrastructure.Events;
 using KEI.Infrastructure.Localizer;
 using KEI.UI.Wpf.Controls.ObjectEditors;
 using KEI.UI.Wpf.Hotkey;
@@ -14,7 +13,6 @@ using Prism.Unity;
 using System;
 using System.Reflection;
 using System.Windows;
-using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 
 namespace KEI.UI.Wpf.ViewService
@@ -37,21 +35,96 @@ namespace KEI.UI.Wpf.ViewService
 
         public bool IsBusy => isBusy;
 
-        public void Error(string error)
+        public void Error(string error, bool isModal = false)
         {
             _logger.Error(error);
-            _dialogService.ShowDialog(DialogNames.GenericDialog, new DialogParameters($"message={error}&title={DialogType.Error}&buttons={PromptOptions.Ok}"), r => { });
+
+            var parameters = new DialogParameters
+            {
+                { "message", error  },
+                { "title", DialogType.Error },
+                { "buttons", PromptOptions.Ok },
+            };
+
+            ShowGenericDialog(parameters, isModal);
         }
 
-        public void Inform(string info)
+        public void Inform(string info, bool isModal = false)
         {
             _logger.Info(info);
-            _dialogService.ShowDialog(DialogNames.GenericDialog, new DialogParameters($"message={info}&title={DialogType.Info}&buttons={PromptOptions.Ok}"), r => { });
+
+            var parameters = new DialogParameters
+            {
+                { "message", info  },
+                { "title", DialogType.Info },
+                { "buttons", PromptOptions.Ok },
+            };
+
+            ShowGenericDialog(parameters, isModal);
+        }
+
+        public void Warn(string warning, bool isModal = false)
+        {
+            _logger.Warn(warning);
+
+            var parameters = new DialogParameters
+            {
+                { "message", warning  },
+                { "title", DialogType.Warning },
+                { "buttons", PromptOptions.Ok },
+            };
+
+            ShowGenericDialog(parameters, isModal);
+        }
+
+
+        public PromptResult Prompt(string confirmMsg, PromptOptions buttons)
+        {
+            _logger.Info(confirmMsg);
+            ButtonResult result = ButtonResult.None;
+
+            var parameters = new DialogParameters
+            {
+                { "message", confirmMsg  },
+                { "title", DialogType.Confirm },
+                { "buttons", buttons },
+            };
+
+            _dialogService.ShowDialog(DialogNames.GenericDialog, parameters, r =>
+            {
+                _logger.Info($"User Confirmation : {r.Result}");
+                result = r.Result;
+            });
+
+            return (PromptResult)(int)result;
+        }
+
+        public PromptResult PromptWithDefault(string message, PromptOptions buttons, PromptResult defaultResult, TimeSpan timeout)
+        {
+            _logger.Info(message);
+            ButtonResult result = ButtonResult.None;
+
+            var parameters = new DialogParameters
+            {
+                { "message", message  },
+                { "title", DialogType.Confirm },
+                { "buttons", buttons },
+                { "defaultResult", defaultResult},
+                { "timeout", timeout }
+            };
+
+            _dialogService.ShowDialog(DialogNames.GenericDialog, parameters, r =>
+            {
+                _logger.Info($"User Confirmation : {r.Result}");
+                result = r.Result;
+            });
+
+            return (PromptResult)(int)result;
         }
 
         public void SetAvailable()
         {
-            if(IsBusy == false)
+            if (IsBusy == false)
             {
                 return;
             }
@@ -60,16 +133,11 @@ namespace KEI.UI.Wpf.ViewService
             isBusy = false;
         }
 
-        public void SetBusy(string[] msg = null)
+        public void SetBusy(params string[] msg)
         {
-            if(IsBusy)
+            if (IsBusy)
             {
                 return;
-            }
-
-            if (msg == null)
-            {
-                msg = new string[] { "Loading" };
             }
 
             loading = new Window
@@ -90,25 +158,14 @@ namespace KEI.UI.Wpf.ViewService
             isBusy = true;
         }
 
-        public void SetBusy(string msg = "Loading..") => SetBusy(new string[] { msg });
-
-        public PromptResult Prompt(string confirmMsg, PromptOptions buttons)
+        public void UpdateBusyText(params string[] msg)
         {
-            _logger.Info(confirmMsg);
-            ButtonResult result = ButtonResult.None;
-            _dialogService.ShowDialog(DialogNames.GenericDialog, new DialogParameters($"message={confirmMsg}&title={DialogType.Confirm}&buttons={buttons}"), r =>
+            if (msg == null || IsBusy == false)
             {
-                _logger.Info($"User Confirmation : {r.Result}");
-                result = r.Result;
-            });
+                return;
+            }
 
-            return (PromptResult)(int)result;
-        }
-
-        public void Warn(string warning)
-        {
-            _logger.Warn(warning);
-            _dialogService.ShowDialog(DialogNames.GenericDialog, new DialogParameters($"message={warning}&title={DialogType.Warning}&buttons={PromptOptions.Ok}"), r => { });
+            _eventAggregator.GetEvent<UpdateBusyText>().Publish(string.Join(Environment.NewLine, msg));
         }
 
         public virtual void SwitchUser() => ServiceLocator.Current.GetInstance<LoginWindow>().ShowDialog();
@@ -182,16 +239,16 @@ namespace KEI.UI.Wpf.ViewService
             }
         }
 
-        public void UpdateBusyText(string msg = "Loading") => UpdateBusyText(new string[] { msg });
-
-        public void UpdateBusyText(string[] msg)
+        private void ShowGenericDialog(DialogParameters parameters, bool isModal)
         {
-            if (msg == null)
+            if (isModal)
             {
-                return;
+                _dialogService.ShowDialog(DialogNames.GenericDialog, parameters, r => { });
             }
-
-            _eventAggregator.GetEvent<UpdateBusyText>().Publish(string.Join(Environment.NewLine, msg));
+            else
+            {
+                _dialogService.Show(DialogNames.GenericDialog, parameters, r => { });
+            }
         }
 
         protected static class DialogNames

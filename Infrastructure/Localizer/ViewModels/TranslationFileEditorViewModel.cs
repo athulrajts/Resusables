@@ -46,7 +46,7 @@ namespace Localizer.ViewModels
 
             _viewService.SetBusy("Translating");
 
-            var progress = new Progress<int>(count => _viewService.UpdateBusyText(new[] { "Translating", $"{count}/{total}" }));
+            var progress = new Progress<int>(count => _viewService.UpdateBusyText("Translating", $"{count}/{total}"));
 
             await Translate(translations, progress, _cancellationToken);
 
@@ -59,16 +59,15 @@ namespace Localizer.ViewModels
 
         private async void ExecuteTranslateSelected(IList param)
         {
-            
             if (param is IEnumerable<Translation> translations)
             {
                 int total = translations.Count();
-                
+
                 _cancellationToken = new CancellationToken();
 
                 _viewService.SetBusy("Translating");
-                
-                var progress = new Progress<int>(count => _viewService.UpdateBusyText(new[] { "Translating", $"{count}/{total}" }));
+
+                var progress = new Progress<int>(count => _viewService.UpdateBusyText("Translating", $"{count}/{total}"));
 
                 await Translate(translations, progress, _cancellationToken);
 
@@ -86,8 +85,9 @@ namespace Localizer.ViewModels
         {
             int total = File.Resources.Count;
             _cancellationToken = new CancellationToken();
-            var progress = new Progress<int>(count => _viewService.UpdateBusyText(new[] { "Translating", $"{count}/{total}" }));
-            
+
+            var progress = new Progress<int>(count => _viewService.UpdateBusyText("Translating", $"{count}/{total}"));
+
             _viewService.SetBusy("Translating");
 
             await Translate(File.Resources, progress, _cancellationToken);

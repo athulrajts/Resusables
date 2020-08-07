@@ -38,7 +38,7 @@ namespace ConfigEditor.Models
         {
             Name = string.IsNullOrEmpty(dc.Name) ? "Untitled" : dc.Name;
 
-            foreach (var item in dc.DataCollection)
+            foreach (var item in dc)
             {
                 if(item.Value is IPropertyContainer dcValue)
                 {

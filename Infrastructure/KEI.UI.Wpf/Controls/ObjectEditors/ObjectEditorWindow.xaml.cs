@@ -29,7 +29,7 @@ namespace KEI.UI.Wpf.Controls.ObjectEditors
                 {
                     IsCollection = true;
 
-                    foreach (var item in c.DataCollection)
+                    foreach (var item in c)
                     {
                         EditingCollection.Add(item.Value);
                     }

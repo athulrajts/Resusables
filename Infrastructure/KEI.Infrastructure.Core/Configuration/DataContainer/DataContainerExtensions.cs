@@ -41,7 +41,7 @@ namespace KEI.Infrastructure.Configuration
 
         private static void ToDictionaryInternal(IDataContainer dc, ref Dictionary<string, DataObject> dictionary, string name)
         {
-            foreach (DataObject item in dc.DataCollection)
+            foreach (DataObject item in dc)
             {
                 if (item.Value is IPropertyContainer dcValue)
                 {

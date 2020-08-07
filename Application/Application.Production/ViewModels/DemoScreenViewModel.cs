@@ -58,6 +58,16 @@ namespace Application.Production.ViewModels
                 .WithObject("Object Property", this)
                 .Build();
 
+            IPropertyContainer samplePropertyContainerThree = new PropertyDictionary
+            {
+                {"IntegerProperty", 22 },
+                {"FloalProperty", 3.14},
+                {"DoubleProperty", 3.14142 },
+                {"BoolProperty", false },
+                {"StringProperty", "Hello World" },
+                {"EnumProperty", ApplicationMode.Production }
+            };
+
             ValidationRule = ValidationBuilder.Create(true)
                 .Length(5)
                 .Length(2, 10)
@@ -143,7 +153,7 @@ namespace Application.Production.ViewModels
                 }
             });
 
-            EditDatabaseCommand = new DelegateCommand(() => 
+            EditDatabaseCommand = new DelegateCommand(() =>
             {
                 //new System.Windows.Window
                 //{

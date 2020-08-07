@@ -20,7 +20,7 @@ namespace KEI.Infrastructure.Core.Tests
 
             IDataContainer data = DataContainerBuilder.CreateObject("Untitiled", obj);
 
-            Assert.Equal(count, data.DataCollection.Count);
+            Assert.Equal(count, data.Count);
         }
         
         [Theory]
@@ -33,7 +33,7 @@ namespace KEI.Infrastructure.Core.Tests
 
             IPropertyContainer property = PropertyContainerBuilder.CreateObject("Untitled", obj);
 
-            Assert.Equal(count, property.DataCollection.Count);
+            Assert.Equal(count, property.Count);
         }
 
         [Theory]

@@ -141,7 +141,7 @@
                     <!--Name-->
                     <Border Grid.Column="0" BorderBrush="{DynamicResource Theme.AccentBorder}" BorderThickness="2 2 0 2" CornerRadius="8 0 0 0">
                         <Grid>
-                            <Border Background="{DynamicResource Theme.Accent}" CornerRadius="8 0 0 0"/>
+                            <Border Background="{DynamicResource Theme.Accent}" CornerRadius="8 0 0 0" Height="36" VerticalAlignment="Top"/>
                             <TextBlock Text="Name" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource Theme.AccentForeground}"/>
                         </Grid>
                     </Border>
@@ -168,7 +168,7 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <ListBox ItemsSource="{Binding SelectedConfigClone.DataCollection}" HorizontalContentAlignment="Stretch"
+                    <ListBox ItemsSource="{Binding SelectedConfigClone}" HorizontalContentAlignment="Stretch"
                              VerticalContentAlignment="Stretch"
                              SelectedItem="{Binding SelectedData}"
                              x:Name="listbox"

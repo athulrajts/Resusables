@@ -7,13 +7,15 @@ using Prism.Mvvm;
 using KEI.Infrastructure.Types;
 using KEI.Infrastructure.Helpers;
 using System.ComponentModel;
+using System.Xml.Schema;
+using System.Xml;
 
 namespace KEI.Infrastructure.Configuration
 {
     /// <summary>
     /// Base class for <see cref="DataContainer"/> and <see cref="PropertyContainer"/>
     /// </summary>
-    public abstract class DataContainerBase : BindableBase, IDataContainer
+    public abstract class DataContainerBase : BindableBase, IDataContainer, IXmlSerializable, IEnumerable
     {
         #region Properties
 
@@ -38,7 +40,7 @@ namespace KEI.Infrastructure.Configuration
         [XmlElement(IsNullable = false)]
         public TypeInfo UnderlyingType { get; set; }
 
-        public abstract IReadOnlyCollection<DataObject> DataCollection { get; }
+        public abstract int Count { get; }
 
         #endregion
 
@@ -56,7 +58,7 @@ namespace KEI.Infrastructure.Configuration
 
             if (split.Length == 1)
             {
-                var dataItem = DataCollection.FirstOrDefault(x => x.Name == key);
+                var dataItem = Find(key);
 
                 if (dataItem == null)
                 {
@@ -111,7 +113,7 @@ namespace KEI.Infrastructure.Configuration
 
             if (split.Length == 1)
             {
-                var dataItem = DataCollection.FirstOrDefault(x => x.Name == key);
+                var dataItem = Find(key);
 
                 if (dataItem == null)
                 {
@@ -184,7 +186,7 @@ namespace KEI.Infrastructure.Configuration
         /// </summary>
         /// <param name="key">data Key to search for</param>
         /// <returns>Is Found</returns>
-        public virtual bool ContainsProperty(string key) => DataCollection.FirstOrDefault(x => x.Name == key) is DataObject;
+        public virtual bool ContainsProperty(string key) => Find(key) is DataObject;
 
 
         /// <summary>
@@ -205,7 +207,7 @@ namespace KEI.Infrastructure.Configuration
             {
                 if (prop.CanWrite)
                 {
-                    if (DataCollection.FirstOrDefault(x => x.Name == prop.Name) is DataObject di)
+                    if (Find(prop.Name) is DataObject di)
                     {
                         if (di.Value is IConvertible)
                         {
@@ -222,7 +224,7 @@ namespace KEI.Infrastructure.Configuration
                             {
                                 var list = Activator.CreateInstance(cfgMorphType) as IList;
 
-                                foreach (var item in cfg.DataCollection)
+                                foreach (var item in cfg)
                                 {
                                     if (item.Value is IDataContainer objectCfg)
                                     {
@@ -263,7 +265,7 @@ namespace KEI.Infrastructure.Configuration
 
             if (typeof(IList).IsAssignableFrom(morphType))
             {
-                foreach (var item in DataCollection)
+                foreach (var item in this)
                 {
                     if (item.Value is IDataContainer objectCfg)
                     {
@@ -290,7 +292,7 @@ namespace KEI.Infrastructure.Configuration
         /// Allows <see cref="IDataContainer"/> to be used in foreach loop
         /// </summary>
         /// <returns></returns>
-        public virtual IEnumerator<DataObject> GetEnumerator() => DataCollection.GetEnumerator();
+        public abstract IEnumerator<DataObject> GetEnumerator();
 
 
         /// <summary>
@@ -298,7 +300,7 @@ namespace KEI.Infrastructure.Configuration
         /// Is not recursives, will not provide keys for child <see cref="IDataContainer"/>
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<string> GetKeys() => DataCollection.Select(x => x.Name);
+        public abstract IEnumerable<string> GetKeys();
 
         #region Bubble Up Property Changed Notifications from Children
 
@@ -430,5 +432,305 @@ namespace KEI.Infrastructure.Configuration
 
         public abstract void Add(DataObject obj);
         public abstract void Remove(DataObject name);
+        public abstract DataObject Find(string key);
+        
+        /// <summary>
+        /// Gets <see cref="PropertyObject"/> with given name
+        /// </summary>
+        /// <param name="key">name of <see cref="PropertyObject"/></param>
+        /// <returns>reference of <see cref="PropertyObject"/></returns>
+        public DataObject FindRecursive(string key)
+        {
+            var split = key.Split('.');
+
+            if (split.Length == 1)
+            {
+                return Find(key);
+            }
+            else
+            {
+                object temp = null;
+                Get(split.First(), ref temp);
+                if (temp is DataContainerBase dc)
+                {
+                    return dc.Find(string.Join(".", split.Skip(1)));
+                }
+                else
+                {
+                    throw new Exception("Nested configs should be of type PropertyContainer");
+                }
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        
+        public XmlSchema GetSchema() => null;
+
+        public virtual void ReadXml(XmlReader reader)
+        {
+            // We need to for storing the type of a property
+            Type typeAttribute = null;
+
+            // Temp object for reading from xml
+            var dataObj = new DataObject();
+
+            /// Read <see cref="IDataContainer.Name"/> from XML if it exists
+            /// Stored as attribute
+            if (reader.HasAttributes)
+            {
+                reader.MoveToAttribute(0);
+                Name = reader.Value;
+            }
+
+
+            while (reader.Read())
+            {
+                // Skip if NodeType is not Element
+                // No relevant information available here.
+                if (reader.NodeType != XmlNodeType.Element)
+                {
+                    continue;
+                }
+
+                if (reader.NodeType == XmlNodeType.Element && reader.Name == "Data")
+                {
+
+                    // Add previously parsing property to the collection
+                    // Since we're done with that and starting parsing a new item.
+                    if (dataObj.Value != null)
+                    {
+                        Add(dataObj);
+                        typeAttribute = null;
+                    }
+
+                    dataObj = new DataObject();
+
+
+                    while (reader.MoveToNextAttribute())
+                    {
+
+                        if (reader.Name == nameof(DataObject.Name))
+                        {
+                            dataObj.Name = reader.Value;
+                        }
+                        else if (reader.Name == nameof(DataObject.Value))
+                        {
+                            if (typeAttribute != null)
+                            {
+                                dataObj.Value = typeAttribute.ConvertFrom(reader.Value);
+                            }
+                            else
+                            {
+                                dataObj.ValueString = reader.Value;
+                            }
+                        }
+                        else if (reader.Name == "Type")
+                        {
+                            typeAttribute = Type.GetType($"System.{reader.Value}");
+
+                            if (typeAttribute != null)
+                            {
+                                if (string.IsNullOrEmpty(dataObj.ValueString) == false)
+                                {
+                                    dataObj.Value = typeAttribute.ConvertFrom(dataObj.ValueString);
+                                }
+                            }
+                        }
+                    }
+                }
+                else if (reader.NodeType == XmlNodeType.Element && reader.Name == "DataContainer")
+                {
+                    // Add previously parsing property to the collection
+                    // Since we're done with that and starting parsing a new item.
+                    if (dataObj.Value != null)
+                    {
+                        Add(dataObj);
+                        typeAttribute = null;
+                    }
+
+                    var dcObj = new DataObject();
+
+                    IDataContainer dc = (IDataContainer)reader.ReadObjectXML(GetType());
+                    dcObj.Name = dc.Name;
+                    dcObj.Value = dc;
+                    Add(dcObj);
+                }
+                /// Read <see cref="DataObject.Value"/> when Value is <see cref="Selector"/>
+                else if (reader.NodeType == XmlNodeType.Element && reader.Name == "EnumData")
+                {
+                    if (dataObj.Value != null)
+                    {
+                        Add(dataObj);
+                        dataObj = new DataObject();
+                    }
+
+                    var enumProp = new DataObject();
+                    var selector = new Selector();
+                    int count = 0;
+
+                    /// Read all Attributes
+                    /// 1. Name
+                    /// 2. Value
+                    /// 3. (Optional) Count
+                    /// ** Count needed when <see cref="Selector"/> object is not
+                    /// based on a <see cref="Enum"/> Type
+                    while (reader.MoveToNextAttribute())
+                    {
+                        /// Read <see cref="Selector.SelectedItem"/>
+                        if (reader.Name == "Value")
+                        {
+                            selector.SelectedItem = reader.Value;
+                        }
+                        /// Read <see cref="DataObject.Name"/>
+                        else if (reader.Name == nameof(DataObject.Name))
+                        {
+                            enumProp.Name = reader.Value;
+                        }
+                        /// Only needed to parse xml
+                        /// This could probably be removed later.
+                        else if (reader.Name == "Count")
+                        {
+                            count = XmlConvert.ToInt32(reader.Value);
+                        }
+                    }
+
+                    /// If count == 0 we are dealing with <see cref="Enum"/> based Selector
+                    if (count == 0)
+                    {
+                        enumProp.Value = selector;
+                    }
+                    /// Else we need also read the allowed values
+                    else
+                    {
+                        for (int i = 0; i < count; i++)
+                        {
+                            reader.ReadToFollowing("Option");
+                            reader.Read();
+                            selector.Option.Add(reader.Value);
+                        }
+                        enumProp.Value = selector;
+                    }
+
+                    // need to skip to move to the correct node.
+                    reader.Read();
+
+                    /// Read <see cref="Selector.Type"/>
+                    selector.Type = reader.ReadObjectXML<TypeInfo>();
+
+                    /// Fill the Allowed types for <see cref="Enum"/> based Selector
+                    /// That is need to populate <see cref="System.Windows.Controls.ComboBox"/>
+                    if (count == 0)
+                    {
+                        selector.Option = new List<string>(Enum.GetNames(selector.Type.GetUnderlyingType()));
+                    }
+
+                    // Add it to collection and we're done paring
+                    Add(enumProp);
+                }
+
+                /// Read <see cref="IDataContainer.UnderlyingType"/>
+                else if (reader.NodeType == XmlNodeType.Element && reader.Name == nameof(UnderlyingType))
+                {
+                    UnderlyingType = reader.ReadObjectXML<TypeInfo>();
+                }
+            }
+
+            // We're done reading through all of the XML
+            // Add last object we were parsing to the list
+            if (dataObj.Value != null)
+            {
+                Add(dataObj);
+            }
+        }
+
+        public virtual void WriteXml(XmlWriter writer)
+        {
+            /// if we have a <see cref="IDataContainer.Name"/>
+            /// Write it as an <see cref="XmlAttribute"/>
+            if (string.IsNullOrEmpty(Name) == false)
+            {
+                writer.WriteAttributeString(nameof(Name), Name);
+            }
+
+            /// if we have an <see cref="IDataContainer.UnderlyingType"/>
+            /// Write it as an <see cref="XmlAttribute"/>
+            if (UnderlyingType != null)
+            {
+                writer.WriteObjectXML(UnderlyingType);
+            }
+
+            foreach (var item in this)
+            {
+
+                /// If <see cref="DataObject.Value"/> is <see cref="DataContainerBase"/>
+                /// We're recursively call this function again
+                if (item.Value is DataContainerBase inner)
+                {
+                    writer.WriteObjectXML(inner);
+                }
+                /// If <see cref="DataObject.Value"/> is <see cref="Selector"/>
+                else if (item.Value is Selector selector)
+                {
+                    var type = selector.Type.GetUnderlyingType();
+
+                    /// Write <see cref="XmlElement"/> with <see cref="XmlElement.Name"/> as "EnumProperty"
+                    /// Need to refactor to avoid hard coded strings
+                    writer.WriteStartElement("EnumData");
+
+                    /// Write <see cref="DataObject.Name"/> as <see cref="XmlAttribute"/>
+                    writer.WriteAttributeString(nameof(item.Name), item.Name);
+
+                    /// If we are not dealing with <see cref="Enum"/> based <see cref="Selector"/>
+                    /// write the number of allowed items also to make parsing easier
+                    if (type.IsEnum == false)
+                    {
+                        writer.WriteAttributeString("Count", selector.Option.Count.ToString());
+                    }
+
+                    /// Write <see cref="Selector.SelectedItem"/> as Value <see cref="XmlAttribute"/>
+                    writer.WriteAttributeString("Value", selector.SelectedItem);
+
+                    /// Write all the allowed values in <see cref="Selector.Option"/>
+                    if (type.IsEnum == false)
+                    {
+                        foreach (var op in selector.Option)
+                        {
+                            writer.WriteElementString("Option", op);
+                        }
+                    }
+
+                    /// Write type of elements in <see cref="Selector.Option"/>
+                    writer.WriteObjectXML(selector.Type);
+
+                    /// Write the End Element for "EnumProperty"
+                    writer.WriteEndElement();
+                }
+                /// We are dealing with a <see cref="PropertyObject"/> who <see cref="DataObject.Value"/> can be
+                /// Directly converted to and from <see cref="string"/> type
+                else
+                {
+                    /// Write Start Element
+                    /// Need to refactor Hard coded strings
+                    writer.WriteStartElement("Data");
+
+                    /// Write <see cref="DataObject.Name"/> as <see cref="XmlAttribute"/>
+                    writer.WriteAttributeString(nameof(item.Name), item.Name);
+
+                    string typeName = "String";
+                    if (item.Value != null)
+                    {
+                        typeName = item.Value?.GetType().Name;
+                    }
+
+                    writer.WriteAttributeString(nameof(item.Value), item.ValueString);
+                    writer.WriteAttributeString("Type", typeName);
+
+                    // Write End Element for Property
+                    writer.WriteEndElement();
+                }
+
+            }
+
+        }
     }
 }

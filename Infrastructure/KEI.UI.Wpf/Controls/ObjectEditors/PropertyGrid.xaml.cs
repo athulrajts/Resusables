@@ -52,7 +52,7 @@ namespace KEI.UI.Wpf.Controls.Configuration
                     var config = e.NewValue as IPropertyContainer;
                     pg.objectNameTxt.Text = config.Name;
 
-                    foreach (var data in config.DataCollection)
+                    foreach (var data in config)
                     {
                         pg.props.Add(new DataItemPropertyInfo((PropertyObject)data));
                     }

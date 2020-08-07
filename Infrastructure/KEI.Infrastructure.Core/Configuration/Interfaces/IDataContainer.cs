@@ -6,7 +6,6 @@ namespace KEI.Infrastructure.Configuration
 {
     public interface IDataContainer : INotifyPropertyChanged
     {
-        IReadOnlyCollection<DataObject> DataCollection { get; }
         string FilePath { get; set; }
         string Name { get; set; }
         TypeInfo UnderlyingType { get; set; }
@@ -21,10 +20,10 @@ namespace KEI.Infrastructure.Configuration
         bool Store(string path);
         IEnumerator<DataObject> GetEnumerator();
         IEnumerable<string> GetKeys();
-
         bool Merge(IDataContainer data);
-        
         void Add(DataObject obj);
         void Remove(DataObject obj);
+        DataObject Find(string key);
+        int Count { get; }
     }
 }

@@ -18,7 +18,7 @@ namespace KEI.Infrastructure.Configuration
         /// <summary>
         /// Object the builder uses
         /// </summary>
-        private PropertyContainer config = new PropertyContainer();
+        private IPropertyContainer config;
 
         /// <summary>
         /// Filename if the config built need to be saved
@@ -29,25 +29,43 @@ namespace KEI.Infrastructure.Configuration
 
         #region Constructor
 
-        private PropertyContainerBuilder()
+        private PropertyContainerBuilder(StorageMode storageMode = StorageMode.DictionaryBased)
         {
-            config = new PropertyContainer();
+            config = storageMode switch
+            {
+                StorageMode.DictionaryBased => new PropertyDictionary(),
+                StorageMode.ListBased => new PropertyContainer(),
+                _ => new PropertyDictionary()
+            };
             filename = string.Empty;
         }
 
-        private PropertyContainerBuilder(string configName, string fileName = "")
+        private PropertyContainerBuilder(string configName, string fileName = "", StorageMode storageMode = StorageMode.DictionaryBased)
         {
-            config = new PropertyContainer { Name = configName, FilePath = fileName };
+            config = storageMode switch
+            {
+                StorageMode.DictionaryBased => new PropertyDictionary { Name = configName, FilePath = filename },
+                StorageMode.ListBased => new PropertyContainer { Name = configName, FilePath = filename },
+                _ => new PropertyDictionary { Name = configName, FilePath = filename }
+            };
             filename = fileName;
         }
 
-        public static PropertyContainerBuilder Create(string name, string filename = "") => new PropertyContainerBuilder(name, filename);
+        public static PropertyContainerBuilder Create(string name, string filename = "", StorageMode storageMode = StorageMode.DictionaryBased)
+            => new PropertyContainerBuilder(name, filename, storageMode);
 
-        public static PropertyContainerBuilder Create() => new PropertyContainerBuilder();
+        public static PropertyContainerBuilder Create(StorageMode storageMode = StorageMode.DictionaryBased) 
+            => new PropertyContainerBuilder(storageMode);
 
         #endregion
 
-        public static IPropertyContainer FromFile(string path) => PropertyContainer.FromFile(path);
+        public static IPropertyContainer FromFile(string path, StorageMode storageMode = StorageMode.DictionaryBased)
+            => storageMode switch
+            {
+                StorageMode.DictionaryBased => PropertyDictionary.FromFile(path),
+                StorageMode.ListBased => PropertyContainer.FromFile(path),
+                _ => PropertyDictionary.FromFile(path)
+            };
 
         #region Builder Methods
 
@@ -65,7 +83,7 @@ namespace KEI.Infrastructure.Configuration
             if (config.ContainsProperty(name))
                 return this;
 
-            config.AddProperty(new PropertyObject
+            config.Add(new PropertyObject
             {
                 Name = name,
                 Description = description,
@@ -165,7 +183,7 @@ namespace KEI.Infrastructure.Configuration
             if (config.ContainsProperty(name))
                 return this;
 
-            config.AddProperty(new PropertyObject
+            config.Add(new PropertyObject
             {
                 Name = name,
                 Description = description,
@@ -182,7 +200,7 @@ namespace KEI.Infrastructure.Configuration
             if (config.ContainsProperty(name))
                 return this;
 
-            config.AddProperty(new PropertyObject
+            config.Add(new PropertyObject
             {
                 Name = name,
                 Description = description,
@@ -205,12 +223,12 @@ namespace KEI.Infrastructure.Configuration
         /// <param name="value">file path</param>
         /// <param name="description">description for property</param>
         /// <returns><see cref="PropertyContainerBuilder"/> instance</returns>
-    public PropertyContainerBuilder WithFile(string property, string value, string description = null)
+        public PropertyContainerBuilder WithFile(string property, string value, string description = null)
         {
             if (config.ContainsProperty(property))
                 return this;
 
-            config.AddProperty(new PropertyObject
+            config.Add(new PropertyObject
             {
                 Name = property,
                 ValueString = value?.ToString(),
@@ -238,7 +256,7 @@ namespace KEI.Infrastructure.Configuration
             if (config.ContainsProperty(property))
                 return this;
 
-            config.AddProperty(new PropertyObject
+            config.Add(new PropertyObject
             {
                 Name = property,
                 ValueString = value?.ToString(),
@@ -262,7 +280,7 @@ namespace KEI.Infrastructure.Configuration
         public PropertyContainerBuilder WithObject<T>(string name, T value)
            where T : class
         {
-            if (config.ContainsProperty(name) || value is null )
+            if (config.ContainsProperty(name) || value is null)
                 return this;
 
             var objectConfig = new PropertyContainerBuilder(name);
@@ -352,7 +370,7 @@ namespace KEI.Infrastructure.Configuration
             if (config.ContainsProperty(name) || value is null)
                 return this;
 
-            config.AddProperty(new PropertyObject
+            config.Add(new PropertyObject
             {
                 Name = name,
                 ValueString = value.ToString(),
@@ -381,7 +399,7 @@ namespace KEI.Infrastructure.Configuration
             if (config.ContainsProperty(property))
                 return this;
 
-            config.AddProperty(new PropertyObject
+            config.Add(new PropertyObject
             {
                 Name = property,
                 ValueString = value?.ToString(),
@@ -402,13 +420,15 @@ namespace KEI.Infrastructure.Configuration
         /// <param name="name">Name of the result <see cref="PropertyContainer"/></param>
         /// <param name="list"><see cref="IEnumerable{T}"/> that is used as reference to build <see cref="PropertyContainer"/></param>
         /// <returns><see cref="PropertyContainer"/> built using <see cref="IEnumerable{T}"/> as reference</returns>
-        public static IPropertyContainer CreateList<T>(string name, IEnumerable<T> list)
+        public static IPropertyContainer CreateList<T>(string name, IEnumerable<T> list, StorageMode storageMode = StorageMode.DictionaryBased)
             where T : class
         {
             if (list is null)
+            {
                 return null;
+            }
 
-            var listConfig = new PropertyContainerBuilder(name);
+            var listConfig = new PropertyContainerBuilder(name, "", storageMode);
             listConfig.SetUnderlyingType(new TypeInfo(list.GetType()));
             for (int i = 0; i < list.Count(); i++)
             {
@@ -424,22 +444,26 @@ namespace KEI.Infrastructure.Configuration
         /// <param name="name">Name of the result <see cref="PropertyContainer"/></param>
         /// <param name="value"><see cref="object"/> that is used a reference to build <see cref="PropertyContainer"/></param>
         /// <returns><see cref="PropertyContainer"/> built using <see cref="object"/> as reference</returns>
-        public static IPropertyContainer CreateObject<T>(string name, T value)
+        public static IPropertyContainer CreateObject<T>(string name, T value, StorageMode storageMode = StorageMode.DictionaryBased)
             where T : class
         {
             if (value is null)
+            {
                 return null;
+            }
 
-            var objectCfg = new PropertyContainerBuilder(name);
+            var objectCfg = new PropertyContainerBuilder(name, "", storageMode);
 
             objectCfg.SetUnderlyingType(new TypeInfo(value.GetType()));
 
-            var props = value == null ? typeof(T).GetProperties() : value.GetType().GetProperties();
+            var props = value.GetType().GetProperties();
 
             foreach (var prop in props)
             {
                 if (!prop.CanWrite)
+                {
                     continue;
+                }
 
                 if (prop.PropertyType.IsPrimitiveType())
                 {

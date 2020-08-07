@@ -1,9 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Xml;
-using System.Text;
 using System.Xml.Serialization;
-using KEI.Infrastructure.Configuration;
 using KEI.Infrastructure.Logging;
 
 namespace KEI.Infrastructure
@@ -21,18 +19,17 @@ namespace KEI.Infrastructure
         {
             try
             {
-                if(Directory.Exists(Path.GetDirectoryName(filePath)) == false)
+                var dir = Path.GetDirectoryName(filePath);
+                if (string.IsNullOrEmpty(dir) == false && Directory.Exists(dir) == false)
                 {
-                    Directory.CreateDirectory(Path.GetDirectoryName(filePath));
+                    Directory.CreateDirectory(dir);
                 }
 
-                using (FileStream fileStream = new FileStream(filePath, FileMode.Create))
-                {
-                    XmlSerializer serializer = new XmlSerializer(data.GetType());
-                    serializer.Serialize(fileStream, data);
-                    fileStream.Close();
-                    return true;
-                }
+                using FileStream fileStream = new FileStream(filePath, FileMode.Create);
+                XmlSerializer serializer = new XmlSerializer(data.GetType());
+                serializer.Serialize(fileStream, data);
+                fileStream.Close();
+                return true;
             }
             catch (Exception ex)
             {
@@ -86,17 +83,15 @@ namespace KEI.Infrastructure
 
                 try
                 {
-                    using (FileStream fileStream = new FileStream(filePath, FileMode.Open))
+                    using var fileStream = new FileStream(filePath, FileMode.Open);
+                    XmlSerializer serializer = new XmlSerializer(typeof(T));
+                    object data = serializer.Deserialize(fileStream);
+                    fileStream.Close();
+                    if (data != null && data is T t)
                     {
-                        XmlSerializer serializer = new XmlSerializer(typeof(T));
-                        object data = serializer.Deserialize(fileStream);
-                        fileStream.Close();
-                        if (data != null && data is T)
-                        {
-                            return (T)data;
-                        }
-                        return default;
+                        return t;
                     }
+                    return default;
                 }
                 catch (Exception ex)
                 {
@@ -107,23 +102,45 @@ namespace KEI.Infrastructure
             return default;
         }
 
+        public static object Deserialize(string filePath, Type type)
+        {
+            if (File.Exists(filePath))
+            {
+
+                try
+                {
+                    using var fileStream = new FileStream(filePath, FileMode.Open);
+                    XmlSerializer serializer = new XmlSerializer(type);
+                    object data = serializer.Deserialize(fileStream);
+                    fileStream.Close();
+                    if (data != null && data is { } o)
+                    {
+                        return o;
+                    }
+                    return default;
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error($"Unable to deserialize \"{filePath}\" to {type.FullName}", ex);
+                    return default;
+                }
+            }
+            return default;
+        }
+
 
         public static T DeserializeFromString<T>(string xml)
         {
             var serializer = new XmlSerializer(typeof(T));
-            using (TextReader reader = new StringReader(xml))
-            {
-                return (T)serializer.Deserialize(reader);
-            }
+            using var reader = new StringReader(xml);
+            return (T)serializer.Deserialize(reader);
         }
 
         public static object DeserializeFromString(Type type, string xml)
         {
             var serializer = new XmlSerializer(type);
-            using (TextReader reader = new StringReader(xml))
-            {
-                return serializer.Deserialize(reader);
-            }
+            using var reader = new StringReader(xml);
+            return serializer.Deserialize(reader);
         }
 
 
@@ -133,9 +150,15 @@ namespace KEI.Infrastructure
             return (T)s.Deserialize(reader.ReadSubtree());
         }
 
+        public static object ReadObjectXML(this XmlReader reader, Type type)
+        {
+            var s = new XmlSerializer(type);
+            return s.Deserialize(reader.ReadSubtree());
+        }
+
         public static void WriteObjectXML<T>(this XmlWriter writer, T obj)
         {
-            var s = new XmlSerializer(typeof(T));
+            var s = new XmlSerializer(obj.GetType());
             s.Serialize(writer, obj, new XmlSerializerNamespaces(new[] { XmlQualifiedName.Empty }));
         }
     }

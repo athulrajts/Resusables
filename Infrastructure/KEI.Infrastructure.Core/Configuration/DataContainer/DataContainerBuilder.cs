@@ -7,14 +7,25 @@ using TypeInfo = KEI.Infrastructure.Types.TypeInfo;
 
 namespace KEI.Infrastructure.Configuration
 {
+    public enum StorageMode
+    {
+        DictionaryBased,
+        ListBased,
+    }
+
     public class DataContainerBuilder
     {
-        DataContainer config = new DataContainer();
-        public DataContainerBuilder(string name)
+        IDataContainer config;
+        public DataContainerBuilder(string name, StorageMode storageMode = StorageMode.DictionaryBased)
         {
-            config = new DataContainer() { Name = name };
+            config = storageMode switch
+            {
+                StorageMode.DictionaryBased => new DataDictionary { Name = name },
+                StorageMode.ListBased => new DataContainer { Name = name},
+                _ => new DataDictionary { Name = name }
+            };
         }
-        public DataContainer Build() => config;
+        public IDataContainer Build() => config;
 
         private void SetUnderlyingType(TypeInfo t) => config.UnderlyingType = t;
 
@@ -23,7 +34,7 @@ namespace KEI.Infrastructure.Configuration
             if (config.ContainsProperty(name) || value is null)
                 return this;
 
-            config.Data.Add(new DataObject
+            config.Add(new DataObject
             {
                 Name = name,
                 ValueString = value.ToString(),
@@ -38,7 +49,7 @@ namespace KEI.Infrastructure.Configuration
             if (config.ContainsProperty(name))
                 return this;
 
-            config.Data.Add(new DataObject
+            config.Add(new DataObject
             {
                 Name = name,
                 Value = new Selector(enumType)
@@ -98,13 +109,13 @@ namespace KEI.Infrastructure.Configuration
             return this;
         }
 
-        public static IDataContainer CreateObject<T>(string name, T value)
+        public static IDataContainer CreateObject<T>(string name, T value, StorageMode storageMode = StorageMode.DictionaryBased)
             where T : class
         {
             if (value is null)
                 return null;
 
-            var objectCfg = new DataContainerBuilder(name);
+            var objectCfg = new DataContainerBuilder(name, storageMode);
 
             objectCfg.SetUnderlyingType(new TypeInfo(value.GetType()));
 
@@ -119,7 +130,7 @@ namespace KEI.Infrastructure.Configuration
                 {
                     if (prop.PropertyType.IsEnum)
                     {
-                        objectCfg.WithEnum(prop.Name,(Enum)prop.GetValue(value));
+                        objectCfg.WithEnum(prop.Name, (Enum)prop.GetValue(value));
                     }
                     else
                     {
@@ -140,12 +151,12 @@ namespace KEI.Infrastructure.Configuration
             return objectCfg.Build();
         }
 
-        public static IDataContainer CreateList(string name, IEnumerable<object> list)
+        public static IDataContainer CreateList(string name, IEnumerable<object> list, StorageMode storageMode = StorageMode.DictionaryBased)
         {
             if (list is null)
                 return null;
 
-            var listConfig = new DataContainerBuilder(name);
+            var listConfig = new DataContainerBuilder(name, storageMode);
             listConfig.SetUnderlyingType(new TypeInfo(list.GetType()));
             for (int i = 0; i < list.Count(); i++)
             {

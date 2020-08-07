@@ -16,7 +16,7 @@ namespace Localizer.ViewModels
 {
     public class TranslationFileEditorViewModel : BindableBase
     {
-        private CancellationToken _cancellationToken;
+        private CancellationTokenSource _cancellationTokenSource;
         private const int DELAY = 2000;
 
         private ResXLocalizationFile file;
@@ -42,13 +42,13 @@ namespace Localizer.ViewModels
         {
             var translations = File.Resources.Where(x => string.IsNullOrEmpty(x.TranslatedText));
             int total = translations.Count();
-            _cancellationToken = new CancellationToken();
+            _cancellationTokenSource = new CancellationTokenSource();
 
             _viewService.SetBusy("Translating");
 
             var progress = new Progress<int>(count => _viewService.UpdateBusyText("Translating", $"{count}/{total}"));
 
-            await Translate(translations, progress, _cancellationToken);
+            await Translate(translations, progress, _cancellationTokenSource.Token);
 
             _viewService.SetAvailable();
         }
@@ -63,13 +63,13 @@ namespace Localizer.ViewModels
             {
                 int total = translations.Count();
 
-                _cancellationToken = new CancellationToken();
+                _cancellationTokenSource = new CancellationTokenSource();
 
                 _viewService.SetBusy("Translating");
 
                 var progress = new Progress<int>(count => _viewService.UpdateBusyText("Translating", $"{count}/{total}"));
 
-                await Translate(translations, progress, _cancellationToken);
+                await Translate(translations, progress, _cancellationTokenSource.Token);
 
                 _viewService.SetAvailable();
 
@@ -84,13 +84,13 @@ namespace Localizer.ViewModels
         private async void ExecuteTranslateAll()
         {
             int total = File.Resources.Count;
-            _cancellationToken = new CancellationToken();
+            _cancellationTokenSource = new CancellationTokenSource();
 
             var progress = new Progress<int>(count => _viewService.UpdateBusyText("Translating", $"{count}/{total}"));
 
             _viewService.SetBusy("Translating");
 
-            await Translate(File.Resources, progress, _cancellationToken);
+            await Translate(File.Resources, progress, _cancellationTokenSource.Token);
 
             _viewService.SetAvailable();
         }
@@ -102,7 +102,7 @@ namespace Localizer.ViewModels
             {
                 if (cancellationToken.IsCancellationRequested)
                 {
-                    return;
+                    cancellationToken.ThrowIfCancellationRequested();
                 }
 
                 item.TranslatedText = await Task.Run(() => Translator.Translate(item.EnglishText, "English", File.Lang));

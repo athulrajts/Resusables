@@ -93,8 +93,6 @@ namespace ApplicationShell
             // Resolve necessary types
             Container.Resolve<IConfigManager>();
             Container.Resolve<IEquipment>();
-
-            var dd = XmlHelper.Deserialize<DataDictionary>("Configs/screens.xcfg");
         }
 
 

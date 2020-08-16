@@ -27,7 +27,7 @@ namespace Application.Core.Modules
         private readonly PropertyContainerBuilder _defaultRecipe;
         private readonly IPropertyContainer _cameraConfig;
         public Equipment(IEventAggregator ea, IDatabaseManager dbm, IApplicationViewService viewService,
-            IGreedoCamera camera, IConfigManager configManager, IVisionProcessor processor,
+            IConfigManager configManager, IVisionProcessor processor, IGreedoCamera camera,
             ISystemStatusManager statusManager)
         {
             _eventAggregator = ea;

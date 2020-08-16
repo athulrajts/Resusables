@@ -43,13 +43,13 @@ namespace KEI.Infrastructure.Configuration
                 }
             }
 
-           _eventAggregator.GetEvent<ConfigLoadedEvent>().Publish(Config as PropertyContainer);
+           _eventAggregator.GetEvent<ConfigLoadedEvent>().Publish(Config);
         }
 
         #endregion
 
         public void RemoveBinding<T>(string propertyKey, Expression<Func<T>> expression) => Config.RemoveBinding(propertyKey, expression);
-        public void SetBinding<T>(string propertyKey, Expression<Func<T>> expression, BindingMode mode = BindingMode.TwoWay) => Config.SetBinding(propertyKey, expression);
+        public void SetBinding<T>(string propertyKey, Expression<Func<T>> expression, BindingMode mode = BindingMode.TwoWay) => Config.SetBinding(propertyKey, expression, mode);
 
         #region IConfigHolder<T> Members
         

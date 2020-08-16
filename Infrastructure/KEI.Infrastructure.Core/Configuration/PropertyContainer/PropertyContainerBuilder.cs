@@ -44,9 +44,9 @@ namespace KEI.Infrastructure.Configuration
         {
             config = storageMode switch
             {
-                StorageMode.DictionaryBased => new PropertyDictionary { Name = configName, FilePath = filename },
-                StorageMode.ListBased => new PropertyContainer { Name = configName, FilePath = filename },
-                _ => new PropertyDictionary { Name = configName, FilePath = filename }
+                StorageMode.DictionaryBased => new PropertyDictionary { Name = configName, FilePath = fileName },
+                StorageMode.ListBased => new PropertyContainer { Name = configName, FilePath = fileName },
+                _ => new PropertyDictionary { Name = configName, FilePath = fileName }
             };
             filename = fileName;
         }

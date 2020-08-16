@@ -293,7 +293,7 @@ namespace Application.Engineering
             }
 
             if (Directory.Exists(folderPath))
-                Process.Start(Path.GetFullPath(folderPath));
+                Process.Start("explorer", Path.GetFullPath(folderPath));
         }
 
         #endregion

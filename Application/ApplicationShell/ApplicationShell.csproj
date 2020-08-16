@@ -10,11 +10,9 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>..\..\Build\Debug\</OutputPath>
-    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <OutputPath>..\..\Build\Release\</OutputPath>
-    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <OutputPath>..\..\Build\x64\Debug\</OutputPath>
@@ -29,7 +27,7 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
-    <OutputPath>bin\x86\Release\</OutputPath>
+    <OutputPath>..\..\Build\x86\Release\</OutputPath>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup>
@@ -50,11 +48,14 @@
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Infrastructure\KEI.Infrastructure.Logging.Log4Net\KEI.Infrastructure.Logging.Log4Net.csproj" />
-    <ProjectReference Include="..\..\Infrastructure\KEI.Resources\KEI.Resources.csproj" />
     <ProjectReference Include="..\..\Infrastructure\KEI.UI.Wpf\KEI.UI.Wpf.csproj" />
     <ProjectReference Include="..\Application.Core\Application.Core.csproj" />
     <ProjectReference Include="..\Application.UI\Application.UI.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="KEI.Resources">
+      <HintPath>..\..\Build\Debug\KEI.Resources.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <None Update="log4net.config">

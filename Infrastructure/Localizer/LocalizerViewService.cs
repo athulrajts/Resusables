@@ -14,12 +14,6 @@ namespace Localizer
 
     public class LocalizerViewService : BaseViewService, ILocalizerViewSerivce
     {
-        public LocalizerViewService(IDialogService dialogService, ILogManager logManager, IEventAggregator eventAggregator) 
-            : base(dialogService,logManager,eventAggregator)
-        {
-
-        }
-
         public void ShowTranslateResXDialog()
         {
             var window = new LocalizeFromBaseResxWindow { WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen };

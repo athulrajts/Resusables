@@ -13,12 +13,6 @@ namespace ConfigEditor.Dialogs
 
     public class ConfigEditorViewService : BaseViewService, IConfigEditorViewService
     {
-        public ConfigEditorViewService(IDialogService dialogService, ILogManager logManager, IEventAggregator eventAggregator) 
-            : base(dialogService,logManager, eventAggregator)
-        {
-            
-        }
-
         public (string left, string right) BrowseCompairFiles()
         {
             var window = new SelectFilesToCompareWindow() { WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen};

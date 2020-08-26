@@ -1,18 +1,12 @@
 ﻿using KEI.Infrastructure;
-using Prism.Commands;
-using Prism.Mvvm;
 using Prism.Services.Dialogs;
 using System;
 using System.Globalization;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Media;
-using System.Windows.Media.Animation;
 
-namespace KEI.UI.Wpf.ViewService
+namespace KEI.UI.Wpf.ViewService.ViewModels
 {
     public class GenericDialogViewModel : BaseDialogViewModel
     {

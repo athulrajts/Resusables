@@ -85,17 +85,17 @@ namespace KEI.Infrastructure.Configuration
             }
             else
             {
-                if (dc is DataContainer d)
+                if (dc is IDataContainer d)
                 {
-                    d.Data.Add(new DataObject
+                    d.Add(new DataObject
                     {
                         Name = key,
                         Value = value,
                     });
                 }
-                else if(dc is PropertyContainer p)
+                else if(dc is IPropertyContainer p)
                 {
-                    p.AddProperty(new PropertyObject
+                    p.Add(new PropertyObject
                     {
                         Name = key,
                         Value = value,

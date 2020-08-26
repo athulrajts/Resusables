@@ -1,8 +1,10 @@
 ﻿using Application.Core;
 using Application.Core.Models;
+using Application.UI.AdvancedSetup;
 using KEI.Infrastructure;
 using KEI.Infrastructure.Configuration;
 using KEI.Infrastructure.Events;
+using KEI.UI.Wpf;
 using KEI.UI.Wpf.ViewService;
 using Prism.Events;
 using Prism.Services.Dialogs;
@@ -12,28 +14,40 @@ namespace Application.UI
 {
     public class ApplicationViewService : BaseViewService, IApplicationViewService
     {
+        private readonly IDialogService _dialogService;
+        private readonly IEventAggregator _eventAggregator;
         private IPropertyContainer _recipe;
-        public ApplicationViewService(IDialogService dialogService, ILogManager logManager, IEventAggregator ea) : base(dialogService, logManager, ea)
+        
+        public ApplicationViewService(IDialogService dialogService, ILogManager logManager, IEventAggregator ea)
         {
-            ea.GetEvent<RecipeLoadedEvent>().Subscribe((recipe) => _recipe = recipe);
+            _dialogService = dialogService;
+            _eventAggregator = ea;
+            
+            _eventAggregator.GetEvent<RecipeLoadedEvent>().Subscribe((recipe) => _recipe = recipe);
         }
 
 
         public PromptResult ShowUpdatedConfigs(Dictionary<string, Dictionary<string, ConfigHistoryItem>> history)
         {
-            DialogParameters @params = new DialogParameters();
-            @params.Add("changes", history);
+            DialogParameters parameters = new DialogParameters
+            {
+                { "changes", history }
+            };
 
-            var result = PromptResult.Yes;
 
-            _dialogService.ShowDialog("ConfigsChangedDialog", @params, r => { result = (PromptResult)(int)r.Result; });
+            var dialog = new DialogWindowHost<ConfigsChangedDialog, ConfigsChangedDialogViewModel>(parameters);
 
-            return result;
+            dialog.ShowDialog();
+             
+            return dialog.Result;
         }
 
         public void ShowAdvancedSetup()
         {
-            _dialogService.ShowDialog(typeof(AdvancedSetup.AdvancedSetupDialog).Name, null, r => { });
+            var dialog = new DialogWindowHost<AdvancedSetupDialog, AdvancedSetupDialogViewModel>();
+
+            dialog.ShowDialog();
+
         }
 
         public ButtonResult StartTestDialog()

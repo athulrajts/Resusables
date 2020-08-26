@@ -11,7 +11,6 @@ namespace KEI.Infrastructure.Logging
         public SimpleLogManager(SimpleLogger seed)
         {
             DefaultLogger = seedLogger = seed;
-            DefaultLogger.Debug("Logmanager Initialized");
         }
 
         public override ILogger GetLogger([CallerFilePath] string name = "")

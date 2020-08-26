@@ -2,11 +2,9 @@
 using Prism.Mvvm;
 using Prism.Services.Dialogs;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace KEI.UI.Wpf.ViewService
+namespace KEI.UI.Wpf.ViewService.ViewModels
 {
     public abstract class BaseDialogViewModel : BindableBase, IDialogViewModel
     {

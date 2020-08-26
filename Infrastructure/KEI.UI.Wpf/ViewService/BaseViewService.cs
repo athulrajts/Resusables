@@ -1,43 +1,34 @@
-﻿using CommonServiceLocator;
+﻿using System;
+using System.Windows;
+using System.Reflection;
+using Microsoft.Win32;
+using CommonServiceLocator;
+using Microsoft.WindowsAPICodePack.Dialogs;
+using Prism.Ioc;
+using Prism.Unity;
+using Prism.Services.Dialogs;
 using KEI.Infrastructure;
+using KEI.Infrastructure.Logging;
 using KEI.Infrastructure.Localizer;
-using KEI.UI.Wpf.Controls.ObjectEditors;
 using KEI.UI.Wpf.Hotkey;
 using KEI.UI.Wpf.ViewService.Dialogs;
-using Microsoft.Win32;
-using Microsoft.WindowsAPICodePack.Dialogs;
-using Prism.Events;
-using Prism.Ioc;
-using Prism.Services.Dialogs;
-using Prism.Unity;
-using System;
-using System.Reflection;
-using System.Windows;
-using System.Windows.Media;
+using KEI.UI.Wpf.Controls.ObjectEditors;
+using KEI.UI.Wpf.ViewService.Views;
+using KEI.UI.Wpf.ViewService.ViewModels;
 
 namespace KEI.UI.Wpf.ViewService
 {
     public class BaseViewService : IViewService
     {
-        protected IDialogService _dialogService;
-        protected static ILogger _logger;
-        protected static IEventAggregator _eventAggregator;
         protected bool isBusy;
 
         private Window loading;
-
-        public BaseViewService(IDialogService dialogService, ILogManager logManager, IEventAggregator eventAggregator)
-        {
-            _dialogService = dialogService;
-            _logger = logManager.GetLogger();
-            _eventAggregator = eventAggregator;
-        }
 
         public bool IsBusy => isBusy;
 
         public void Error(string error, bool isModal = false)
         {
-            _logger.Error(error);
+            Logger.Error(error);
 
             var parameters = new DialogParameters
             {
@@ -46,12 +37,14 @@ namespace KEI.UI.Wpf.ViewService
                 { "buttons", PromptOptions.Ok },
             };
 
-            ShowGenericDialog(parameters, isModal);
+            var host = new DialogWindowHost<GenericDialog>(parameters);
+
+            host.ShowDialog(isModal);
         }
 
         public void Inform(string info, bool isModal = false)
         {
-            _logger.Info(info);
+            Logger.Info(info);
 
             var parameters = new DialogParameters
             {
@@ -59,13 +52,15 @@ namespace KEI.UI.Wpf.ViewService
                 { "title", DialogType.Info },
                 { "buttons", PromptOptions.Ok },
             };
+            
+            var host = new DialogWindowHost<GenericDialog>(parameters);
 
-            ShowGenericDialog(parameters, isModal);
+            host.ShowDialog(isModal);
         }
 
         public void Warn(string warning, bool isModal = false)
         {
-            _logger.Warn(warning);
+            Logger.Warn(warning);
 
             var parameters = new DialogParameters
             {
@@ -73,15 +68,16 @@ namespace KEI.UI.Wpf.ViewService
                 { "title", DialogType.Warning },
                 { "buttons", PromptOptions.Ok },
             };
+            
+            var host = new DialogWindowHost<GenericDialog>(parameters);
 
-            ShowGenericDialog(parameters, isModal);
+            host.ShowDialog(isModal);
         }
 
 
         public PromptResult Prompt(string confirmMsg, PromptOptions buttons)
         {
-            _logger.Info(confirmMsg);
-            ButtonResult result = ButtonResult.None;
+            Logger.Info(confirmMsg);
 
             var parameters = new DialogParameters
             {
@@ -90,19 +86,16 @@ namespace KEI.UI.Wpf.ViewService
                 { "buttons", buttons },
             };
 
-            _dialogService.ShowDialog(DialogNames.GenericDialog, parameters, r =>
-            {
-                _logger.Info($"User Confirmation : {r.Result}");
-                result = r.Result;
-            });
+            var host = new DialogWindowHost<GenericDialog>(parameters);
 
-            return (PromptResult)(int)result;
+            host.ShowDialog();
+
+            return host.Result;
         }
 
         public PromptResult PromptWithDefault(string message, PromptOptions buttons, PromptResult defaultResult, TimeSpan timeout)
         {
-            _logger.Info(message);
-            ButtonResult result = ButtonResult.None;
+            Logger.Info(message);
 
             var parameters = new DialogParameters
             {
@@ -113,13 +106,11 @@ namespace KEI.UI.Wpf.ViewService
                 { "timeout", timeout }
             };
 
-            _dialogService.ShowDialog(DialogNames.GenericDialog, parameters, r =>
-            {
-                _logger.Info($"User Confirmation : {r.Result}");
-                result = r.Result;
-            });
+            var host = new DialogWindowHost<GenericDialog>(parameters);
 
-            return (PromptResult)(int)result;
+            host.ShowDialog();
+
+            return host.Result;
         }
 
         public void SetAvailable()
@@ -140,17 +131,18 @@ namespace KEI.UI.Wpf.ViewService
                 return;
             }
 
-            loading = new Window
+            IDialogParameters parameters = new DialogParameters
+            {
+                { "text", string.Join(Environment.NewLine, msg) }
+            };
+
+            loading = new DialogWindowHost<LoadingOverlay,LoadingOverlayViewModel>(parameters)
             {
                 Height = Application.Current.MainWindow.ActualHeight,
                 Width = Application.Current.MainWindow.ActualWidth,
-                AllowsTransparency = true,
-                WindowStartupLocation = WindowStartupLocation.CenterOwner,
-                WindowStyle = WindowStyle.None,
                 WindowState = Application.Current.MainWindow.WindowState,
                 Owner = Application.Current.MainWindow,
-                Background = Brushes.Transparent,
-                Content = new LoadingOverlay { DataContext = new LoadingOverlayViewModel { LoadingText = string.Join(Environment.NewLine, msg) } }
+                SizeToContent = SizeToContent.Manual
             };
 
             loading.Show();
@@ -165,7 +157,10 @@ namespace KEI.UI.Wpf.ViewService
                 return;
             }
 
-            _eventAggregator.GetEvent<UpdateBusyText>().Publish(string.Join(Environment.NewLine, msg));
+            if(loading?.DataContext is LoadingOverlayViewModel vm)
+            {
+                vm.SetBusyText(string.Join(Environment.NewLine, msg));
+            }
         }
 
         public virtual void SwitchUser() => ServiceLocator.Current.GetInstance<LoginWindow>().ShowDialog();
@@ -239,26 +234,7 @@ namespace KEI.UI.Wpf.ViewService
             }
         }
 
-        private void ShowGenericDialog(DialogParameters parameters, bool isModal)
-        {
-            if (isModal)
-            {
-                _dialogService.ShowDialog(DialogNames.GenericDialog, parameters, r => { });
-            }
-            else
-            {
-                _dialogService.Show(DialogNames.GenericDialog, parameters, r => { });
-            }
-        }
-
-        protected static class DialogNames
-        {
-            public static readonly string GenericDialog = typeof(GenericDialog).Name;
-
-        }
     }
-
-    internal class UpdateBusyText : PubSubEvent<string> { }
 
     public static class ContainerRegisteryExtensions
     {
@@ -266,9 +242,7 @@ namespace KEI.UI.Wpf.ViewService
         {
             registry.RegisterSingleton<IViewService, BaseViewService>();
             registry.RegisterSingleton<IHotkeyService, HotkeyService>();
-            registry.RegisterDialog<GenericDialog>();
             registry.RegisterDialog<ConfigsChangedDialog>();
-            registry.RegisterDialog<LoadingOverlay>();
             registry.RegisterInstance<IStringLocalizer>(new ResourceManagerStringLocalizer(Assembly.GetExecutingAssembly()), Assembly.GetExecutingAssembly().GetName().Name);
 
             Infrastructure.ViewService.Service = registry.GetContainer().TryResolve<IViewService>();

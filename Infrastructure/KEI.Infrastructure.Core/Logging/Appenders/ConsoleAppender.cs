@@ -19,7 +19,7 @@ namespace KEI.Infrastructure.Logging
                 _ => ConsoleColor.Gray
             };
 
-            string log = $"[ {msg.Level.GetEnumDescription()} ] {msg.Time:yyyy-MM-dd HH:mm:ss,ffff} {msg.Name} {Path.GetFileName(msg.FileName)} {msg.Message}";
+            string log = $"[ {msg.Level.GetEnumDescription()} ] {msg.Time:yyyy-MM-dd HH:mm:ss,ffff} {msg.Name} LN-{msg.LineNumber} {msg.FileName} {msg.Message}";
 
             Console.WriteLine(log);
         }

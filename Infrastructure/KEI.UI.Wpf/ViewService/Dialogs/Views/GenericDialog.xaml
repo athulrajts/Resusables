@@ -1,11 +1,13 @@
-﻿<w:DialogWindow x:Class="KEI.UI.Wpf.ViewService.GenericDialog"
+﻿<w:DialogWindow x:Class="KEI.UI.Wpf.ViewService.Views.GenericDialog"
                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-                xmlns:local="clr-namespace:KEI.UI.Wpf.ViewService"
+                xmlns:local="clr-namespace:KEI.UI.Wpf.ViewService.ViewModels"
                 xmlns:w="clr-namespace:KEI.UI.Wpf"
                 xmlns:c="clr-namespace:KEI.UI.Wpf.Converters"
+                xmlns:p="http://prismlibrary.com/"
+                p:ViewModelLocator.AutoWireViewModel="True"
                 mc:Ignorable="d" 
                 MaxHeight="225"
                 Width="470"
@@ -83,28 +85,24 @@
                             <Button Command="{Binding CloseDialogCommand}" 
                                     CommandParameter="Cancel" 
                                     Content="{w:Localize Value='CANCEL'}"
-                                    IsCancel="True"
                                     Style="{StaticResource NegativeButton}"
                                     Visibility="{Binding Buttons, Converter={local:DialogButtonVisibilityConverter}, FallbackValue=Visible, ConverterParameter=okcancel}"/>
 
                             <Button Command="{Binding CloseDialogCommand}" 
                                     CommandParameter="Abort" 
                                     Content="{w:Localize Value='ABORT'}"
-                                    IsCancel="True"
                                     Style="{StaticResource NegativeButton}"
                                     Visibility="{Binding Buttons, Converter={local:DialogButtonVisibilityConverter}, FallbackValue=Collapsed, ConverterParameter=okabort}"/>
 
                             <Button Command="{Binding CloseDialogCommand}" 
                                     CommandParameter="Ok" 
                                     Content="{w:Localize Value='OK'}"
-                                    IsDefault="True"
                                     Style="{StaticResource PositiveButton}"
                                     Visibility="{Binding Buttons, Converter={local:DialogButtonVisibilityConverter}, ConverterParameter='ok,okcancel,okabort'}"/>
 
                             <Button Command="{Binding CloseDialogCommand}" 
                                     CommandParameter="No" 
                                     Content="{w:Localize Value='NO'}"
-                                    IsCancel="True"
                                     Style="{StaticResource NegativeButton}"
                                     Visibility="{Binding Buttons, Converter={local:DialogButtonVisibilityConverter}, FallbackValue=Collapsed, ConverterParameter=yesno}"/>
 
@@ -112,7 +110,6 @@
                             <Button Command="{Binding CloseDialogCommand}" 
                                     CommandParameter="Yes" 
                                     Content="{w:Localize Value='YES'}"
-                                    IsDefault="True"
                                     Style="{StaticResource PositiveButton}"
                                     Visibility="{Binding Buttons, Converter={local:DialogButtonVisibilityConverter}, FallbackValue=Collapsed, ConverterParameter=yesno}"/>
 

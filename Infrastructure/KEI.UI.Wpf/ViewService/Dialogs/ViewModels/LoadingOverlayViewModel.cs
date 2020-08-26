@@ -1,10 +1,9 @@
-﻿using CommonServiceLocator;
-using Prism.Events;
-using Prism.Mvvm;
+﻿using KEI.UI.Wpf.ViewService.ViewModels;
+using Prism.Services.Dialogs;
 
 namespace KEI.UI.Wpf.ViewService.Dialogs
 {
-    public class LoadingOverlayViewModel : BindableBase
+    public class LoadingOverlayViewModel : BaseDialogViewModel
     {
 
         private string loadingText;
@@ -14,10 +13,16 @@ namespace KEI.UI.Wpf.ViewService.Dialogs
             set { SetProperty(ref loadingText, value); }
         }
 
-        public LoadingOverlayViewModel()
-        { 
-            ServiceLocator.Current.GetInstance<IEventAggregator>().GetEvent<UpdateBusyText>().Subscribe(msg => LoadingText = msg, ThreadOption.UIThread);
+        public override string Title { get; set; } = "Loading";
+
+        public void SetBusyText(string msg)
+        {
+            LoadingText = msg;
         }
 
+        public override void OnDialogOpened(IDialogParameters parameters)
+        {
+            LoadingText = parameters.GetValue<string>("text");
+        }
     }
 }

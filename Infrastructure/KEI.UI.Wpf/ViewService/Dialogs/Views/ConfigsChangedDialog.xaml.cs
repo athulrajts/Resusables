@@ -10,7 +10,6 @@ namespace KEI.UI.Wpf.ViewService
         public ConfigsChangedDialog()
         {
             InitializeComponent();
-            DataContext = CommonServiceLocator.ServiceLocator.Current.GetInstance<ConfigsChangedDialogViewModel>();
         }
     }
 }

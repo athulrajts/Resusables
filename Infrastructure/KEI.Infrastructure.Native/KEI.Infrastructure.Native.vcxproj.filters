@@ -1,0 +1,145 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\Logging">
+      <UniqueIdentifier>{69660db1-fec6-47dc-b441-6891a0cd164d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Logging">
+      <UniqueIdentifier>{f8fcb7b5-6f94-4afd-994c-7e296985ce79}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\DataContainer">
+      <UniqueIdentifier>{804e1e5d-420b-4a20-8252-9f913615ba85}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\DataContainer">
+      <UniqueIdentifier>{03b704c7-9b0c-47ac-b5e0-c09ed1039d91}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\ViewService">
+      <UniqueIdentifier>{fd6f364b-11c7-4469-b2ed-cc52bd7c1a92}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ViewService">
+      <UniqueIdentifier>{821cacae-9aae-4e96-9deb-21879be474d7}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Infrastructure\Directory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Infrastructure\exports.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Infrastructure\File.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Infrastructure\OS.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Infrastructure\Path.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Infrastructure\Utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Infrastructure\Logger.h">
+      <Filter>Header Files\Logging</Filter>
+    </ClInclude>
+    <ClInclude Include="LoggerNativeWrapper.h">
+      <Filter>Header Files\Logging</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Infrastructure\LogManager.h">
+      <Filter>Header Files\Logging</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Infrastructure\DataContainer.h">
+      <Filter>Header Files\DataContainer</Filter>
+    </ClInclude>
+    <ClInclude Include="DataContainerNativeWrapper.h">
+      <Filter>Header Files\DataContainer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Infrastructure\Infrastructure.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LogManagerNativeWrapper.h">
+      <Filter>Header Files\Logging</Filter>
+    </ClInclude>
+    <ClInclude Include="ViewServiceNativeWrapper.h">
+      <Filter>Header Files\ViewService</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Infrastructure\ViewService.h">
+      <Filter>Header Files\ViewService</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Infrastructure\MessageBoxService.h">
+      <Filter>Header Files\ViewService</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="AssemblyInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="File.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Path.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Directory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OS.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\include\Infrastructure\Logger.cpp">
+      <Filter>Source Files\Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\include\Infrastructure\LogManager.cpp">
+      <Filter>Source Files\Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="DataContainer.cpp">
+      <Filter>Source Files\DataContainer</Filter>
+    </ClCompile>
+    <ClCompile Include="LoggerNativeWrapper.cpp">
+      <Filter>Source Files\Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="ViewServiceNativeWrapper.cpp">
+      <Filter>Source Files\ViewService</Filter>
+    </ClCompile>
+    <ClCompile Include="ViewService.cpp">
+      <Filter>Source Files\ViewService</Filter>
+    </ClCompile>
+    <ClCompile Include="MessageBoxService.cpp">
+      <Filter>Source Files\ViewService</Filter>
+    </ClCompile>
+    <ClCompile Include="NativeInitializer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="app.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="app.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+</Project>

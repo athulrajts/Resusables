@@ -164,5 +164,8 @@ namespace KEI.Infrastructure.Configuration
             }
             return listConfig.Build();
         }
+
+        public static IDataContainer FromFile(string path)
+            => DataDictionary.FromFile(path);
     }
 }

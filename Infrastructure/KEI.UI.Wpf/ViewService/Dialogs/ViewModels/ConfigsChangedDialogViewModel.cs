@@ -1,9 +1,6 @@
 ﻿using KEI.Infrastructure.Configuration;
-using KEI.Infrastructure.Localizer;
-using Prism.Commands;
-using Prism.Mvvm;
+using KEI.UI.Wpf.ViewService.ViewModels;
 using Prism.Services.Dialogs;
-using System;
 using System.Collections.Generic;
 
 namespace KEI.UI.Wpf.ViewService
@@ -17,7 +14,7 @@ namespace KEI.UI.Wpf.ViewService
         {
             History.Clear();
 
-            History = (Dictionary<string, Dictionary<string, ConfigHistoryItem>>)parameters.GetValue<object>("changes");
+            History = parameters.GetValue<Dictionary<string, Dictionary<string, ConfigHistoryItem>>>("changes");
         }
 
         private Dictionary<string, Dictionary<string, ConfigHistoryItem>> history = new Dictionary<string, Dictionary<string, ConfigHistoryItem>>();

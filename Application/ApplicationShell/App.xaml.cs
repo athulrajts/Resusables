@@ -114,6 +114,10 @@ namespace ApplicationShell
         {
             SplashScreenLogger.Instance.Log("Application Initialized");
 
+            // Initialize Native Wrappers are registering
+            NativeInitializer.InitializeLogger();
+            NativeInitializer.InitalizeViewService();
+
             Container.Resolve<ISystemStatusManager>().ApplicationMode = StartupApplicationMode;
 
             Container.Resolve<IEquipment>().LoadRecipe(PathUtils.GetPath("Configs/DefaultRecipe.rcp"));

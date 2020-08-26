@@ -181,5 +181,22 @@ namespace KEI.Infrastructure.Configuration
         public override void Remove(DataObject obj) => Remove(obj.Name);
 
         public override DataObject Find(string key) => internalDictionary.ContainsKey(key) ? internalDictionary[key] as DataObject : null;
+
+        /// <summary>
+        /// Create <see cref="DataDictionary"/> from XML serialized file
+        /// </summary>
+        /// <param name="path">Path to XML file</param>
+        /// <returns><see cref="DataDictionary"/> deserilized from path</returns>
+        public static DataDictionary FromFile(string path)
+        {
+            if (XmlHelper.Deserialize<DataDictionary>(path) is DataDictionary dc)
+            {
+                dc.FilePath = path;
+                Console.WriteLine("Read");
+                return dc;
+            }
+
+            return null;
+        }
     }
 }

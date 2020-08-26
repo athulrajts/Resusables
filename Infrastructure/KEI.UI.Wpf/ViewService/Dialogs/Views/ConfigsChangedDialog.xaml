@@ -3,8 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:prism="http://prismlibrary.com/"
-             xmlns:vs="clr-namespace:KEI.UI.Wpf.ViewService"
              xmlns:w="clr-namespace:KEI.UI.Wpf"
              mc:Ignorable="d" 
              MaxHeight="700"

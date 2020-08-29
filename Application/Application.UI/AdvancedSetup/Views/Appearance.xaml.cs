@@ -1,6 +1,4 @@
-﻿using Application.UI.AdvancedSetup.ViewModels;
-using CommonServiceLocator;
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 
 namespace Application.UI.AdvancedSetup.Views
 {
@@ -12,7 +10,6 @@ namespace Application.UI.AdvancedSetup.Views
         public Appearance()
         {
             InitializeComponent();
-            DataContext = ServiceLocator.Current.GetInstance<AppearanceViewModel>();
         }
     }
 }

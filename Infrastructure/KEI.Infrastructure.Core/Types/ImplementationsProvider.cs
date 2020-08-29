@@ -34,6 +34,8 @@ namespace KEI.Infrastructure.Types
 
         public IEnumerable<Assembly> GetAssemblies() => assemblies;
 
+        public List<Type> GetImplementations<T>() => GetImplementations(typeof(T));
+
         public List<Type> GetImplementations(Type t)
         {
             if (_implementations.ContainsKey(t) == false)

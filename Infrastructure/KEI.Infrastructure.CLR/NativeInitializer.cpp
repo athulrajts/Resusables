@@ -14,4 +14,14 @@ public:
 	{
 		ViewServiceNativeWrapper::AutoInitialize();
 	}
+
+	static void SetLogger(KEI::Infrastructure::ILogManager^ log_manager)
+	{
+		LogManagerNativeWrapper::SetLogger(log_manager);
+	}
+
+	static void SetViewService(KEI::Infrastructure::IViewService^ view_service)
+	{
+		ViewServiceNativeWrapper::SetViewService(view_service);
+	}
 };

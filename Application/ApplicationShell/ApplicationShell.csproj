@@ -53,8 +53,8 @@
     <ProjectReference Include="..\Application.UI\Application.UI.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="KEI.Infrastructure.Native">
-      <HintPath>..\..\Build\Debug\KEI.Infrastructure.Native.dll</HintPath>
+    <Reference Include="KEI.Infrastructure.CLR">
+      <HintPath>..\..\Build\Debug\KEI.Infrastructure.CLR.dll</HintPath>
     </Reference>
     <Reference Include="KEI.Resources">
       <HintPath>..\..\Build\Debug\KEI.Resources.dll</HintPath>

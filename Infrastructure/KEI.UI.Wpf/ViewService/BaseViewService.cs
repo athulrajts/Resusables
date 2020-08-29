@@ -26,7 +26,7 @@ namespace KEI.UI.Wpf.ViewService
 
         public bool IsBusy => isBusy;
 
-        public void Error(string error, bool isModal = false)
+        public void Error(string error, bool isModal = true)
         {
             Logger.Error(error);
 
@@ -42,7 +42,7 @@ namespace KEI.UI.Wpf.ViewService
             host.ShowDialog(isModal);
         }
 
-        public void Inform(string info, bool isModal = false)
+        public void Inform(string info, bool isModal = true)
         {
             Logger.Info(info);
 
@@ -52,13 +52,13 @@ namespace KEI.UI.Wpf.ViewService
                 { "title", DialogType.Info },
                 { "buttons", PromptOptions.Ok },
             };
-            
+
             var host = new DialogWindowHost<GenericDialog>(parameters);
 
             host.ShowDialog(isModal);
         }
 
-        public void Warn(string warning, bool isModal = false)
+        public void Warn(string warning, bool isModal = true)
         {
             Logger.Warn(warning);
 
@@ -68,7 +68,7 @@ namespace KEI.UI.Wpf.ViewService
                 { "title", DialogType.Warning },
                 { "buttons", PromptOptions.Ok },
             };
-            
+
             var host = new DialogWindowHost<GenericDialog>(parameters);
 
             host.ShowDialog(isModal);
@@ -136,7 +136,7 @@ namespace KEI.UI.Wpf.ViewService
                 { "text", string.Join(Environment.NewLine, msg) }
             };
 
-            loading = new DialogWindowHost<LoadingOverlay,LoadingOverlayViewModel>(parameters)
+            loading = new DialogWindowHost<LoadingOverlay, LoadingOverlayViewModel>(parameters)
             {
                 Height = Application.Current.MainWindow.ActualHeight,
                 Width = Application.Current.MainWindow.ActualWidth,
@@ -157,7 +157,7 @@ namespace KEI.UI.Wpf.ViewService
                 return;
             }
 
-            if(loading?.DataContext is LoadingOverlayViewModel vm)
+            if (loading?.DataContext is LoadingOverlayViewModel vm)
             {
                 vm.SetBusyText(string.Join(Environment.NewLine, msg));
             }
@@ -172,20 +172,26 @@ namespace KEI.UI.Wpf.ViewService
 
         public string BrowseFile(string description = "", string filters = "")
         {
-            var dlg = new CommonOpenFileDialog();
-            dlg.AddToMostRecentlyUsedList = false;
-            dlg.AllowNonFileSystemItems = false;
-            dlg.EnsureFileExists = true;
-            dlg.EnsurePathExists = true;
-            dlg.EnsureReadOnly = false;
-            dlg.EnsureValidNames = true;
-            dlg.Multiselect = false;
-            dlg.ShowPlacesList = true;
-            dlg.IsFolderPicker = false;
+            var dlg = new CommonOpenFileDialog
+            {
+                AddToMostRecentlyUsedList = false,
+                AllowNonFileSystemItems = false,
+                EnsureFileExists = true,
+                EnsurePathExists = true,
+                EnsureReadOnly = false,
+                EnsureValidNames = true,
+                Multiselect = false,
+                ShowPlacesList = true,
+                IsFolderPicker = false,
+                DefaultDirectory = AppDomain.CurrentDomain.BaseDirectory,
+                InitialDirectory = AppDomain.CurrentDomain.BaseDirectory
+            };
+
             if (!string.IsNullOrEmpty(description) && !string.IsNullOrEmpty(filters))
             {
                 dlg.Filters.Add(new CommonFileDialogFilter(description, filters));
             }
+
             dlg.DefaultDirectory = AppDomain.CurrentDomain.BaseDirectory;
             dlg.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory;
 
@@ -199,18 +205,20 @@ namespace KEI.UI.Wpf.ViewService
 
         public string BrowseFolder()
         {
-            var dlg = new CommonOpenFileDialog();
-            dlg.AddToMostRecentlyUsedList = false;
-            dlg.AllowNonFileSystemItems = false;
-            dlg.EnsureFileExists = true;
-            dlg.EnsurePathExists = true;
-            dlg.EnsureReadOnly = false;
-            dlg.EnsureValidNames = true;
-            dlg.Multiselect = false;
-            dlg.ShowPlacesList = true;
-            dlg.IsFolderPicker = true;
-            dlg.DefaultDirectory = AppDomain.CurrentDomain.BaseDirectory;
-            dlg.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            var dlg = new CommonOpenFileDialog
+            {
+                AddToMostRecentlyUsedList = false,
+                AllowNonFileSystemItems = false,
+                EnsureFileExists = true,
+                EnsurePathExists = true,
+                EnsureReadOnly = false,
+                EnsureValidNames = true,
+                Multiselect = false,
+                ShowPlacesList = true,
+                IsFolderPicker = true,
+                DefaultDirectory = AppDomain.CurrentDomain.BaseDirectory,
+                InitialDirectory = AppDomain.CurrentDomain.BaseDirectory
+            };
 
             if (dlg.ShowDialog() == CommonFileDialogResult.Ok)
             {

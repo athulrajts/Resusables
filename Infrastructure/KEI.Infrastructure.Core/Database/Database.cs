@@ -14,6 +14,7 @@ namespace KEI.Infrastructure.Database
         private IEnumerable<DatabaseColumn> _resultColumns;
         private IEnumerable<AggregateDatabaseColumn> _aggregateColumns;
         public IDatabaseWritter DatabaseWritter { get; private set; }
+        
         public Database(IDatabaseWritter dbWriter)
         {
             DatabaseWritter = dbWriter;

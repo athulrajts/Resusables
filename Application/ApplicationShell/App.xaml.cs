@@ -80,6 +80,10 @@ namespace ApplicationShell
             // Register Services from Config File
             containerRegistry.RegisterServices(GetServices());
 
+            // Initialize Native
+            NativeInitializer.SetLogger(Container.Resolve<ILogManager>());
+            NativeInitializer.SetViewService(Container.Resolve<IViewService>());
+
             // Regster Application Related Services
             containerRegistry.RegisterSingleton<IDatabaseManager, DatabaseManager>();
             containerRegistry.RegisterSingleton<ISystemStatusManager, ApplicationViewModel>();
@@ -105,7 +109,8 @@ namespace ApplicationShell
         protected override IModuleCatalog CreateModuleCatalog()
         {
             var moduleCatalog = new DirectoryModuleCatalog() { ModulePath = @".\Plugins" };
-            moduleCatalog.AddModule(new ModuleInfo { ModuleName = typeof(ApplicationModule).Name, ModuleType = typeof(ApplicationModule).AssemblyQualifiedName });
+            moduleCatalog.AddModule<ApplicationModule>();
+            moduleCatalog.AddModule<ApplicationUIModule>();
             return moduleCatalog;
         }
 
@@ -113,10 +118,6 @@ namespace ApplicationShell
         protected override void OnInitialized()
         {
             SplashScreenLogger.Instance.Log("Application Initialized");
-
-            // Initialize Native Wrappers are registering
-            NativeInitializer.InitializeLogger();
-            NativeInitializer.InitalizeViewService();
 
             Container.Resolve<ISystemStatusManager>().ApplicationMode = StartupApplicationMode;
 

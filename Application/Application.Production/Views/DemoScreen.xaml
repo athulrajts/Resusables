@@ -9,6 +9,7 @@
              xmlns:w="clr-namespace:KEI.UI.Wpf.Controls.Configuration;assembly=KEI.UI.Wpf"
              xmlns:ctrl="clr-namespace:Application.UI.Controls;assembly=Application.UI"
              xmlns:v="clr-namespace:Application.Production.ViewModels"
+             xmlns:ww="clr-namespace:KEI.UI.Wpf;assembly=KEI.UI.Wpf"
              prism:ViewModelLocator.AutoWireViewModel="True"
              mc:Ignorable="d" 
              d:DesignHeight="880" d:DesignWidth="1900"
@@ -67,7 +68,7 @@
                                Title="Message"/>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                     <Button Style="{StaticResource NormalButton}"
-                        Content="{Localize Value='Info'}"
+                        Content="{ww:Localize Value='Info'}"
                         Command="{Binding ShowInfoCommand}"/>
                     <Button Style="{StaticResource NormalButton}"
                         Content="{Localize Value='Warn'}"

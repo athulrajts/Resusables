@@ -22,7 +22,7 @@ std::vector<std::string> Directory::GetFiles(std::string path)
 
     for each (String ^ file in IO::Directory::EnumerateFiles(gcnew String(path.c_str())))
     {
-        files.push_back(MarashalString(file));
+        files.push_back(MarshalString(file));
     }
 
     return files;
@@ -34,7 +34,7 @@ std::vector<std::string> Directory::GetDirectories(std::string path)
 
     for each (String ^ file in IO::Directory::EnumerateDirectories(gcnew String(path.c_str())))
     {
-        dirs.push_back(MarashalString(file));
+        dirs.push_back(MarshalString(file));
     }
 
     return dirs;

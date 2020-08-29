@@ -14,58 +14,57 @@ using KEI.Infrastructure.Configuration;
 using KEI.Infrastructure.Database.Models;
 using Application.Core;
 using Application.Core.Interfaces;
+using System.Collections.Specialized;
 
 namespace Application.UI.AdvancedSetup.ViewModels
 {
+
     public class DatabaseSetupViewModel : BindableBase, IAdvancedSetup
     {
         public ObservableCollection<ResultViewModel> ResultTypes { get; set; } = new ObservableCollection<ResultViewModel>();
         public ObservableCollection<ResultProperty> SelectedResultProperties { get; set; } = new ObservableCollection<ResultProperty>();
 
         private readonly IViewService _viewService;
-        private readonly IPropertyContainer _currentRecipe;
-        private readonly DatabaseSetup setup = null;
-        private readonly IPropertyContainer setupConfig = null;
-        public DatabaseSetupViewModel()
+        private readonly IDataContainer _currentRecipe;
+        private readonly DatabaseSetup _setup;
+        private readonly IDataContainer _setupConfig;
+        
+        public DatabaseSetupViewModel(IEquipment equipment, IViewService viewService,
+            ISystemStatusManager systemStatusManager, ImplementationsProvider provider)
         {
-            _viewService = ServiceLocator.Current.GetInstance<IViewService>();
-            _currentRecipe = ServiceLocator.Current.GetInstance<IEquipment>().CurrentRecipe;
-            var appMode = ServiceLocator.Current.GetInstance<ISystemStatusManager>().ApplicationMode;
+            _viewService = viewService;
+            _currentRecipe = equipment.CurrentRecipe;
 
-            _currentRecipe.Get($"{appMode} DB", ref setupConfig);
+            ResultTypes.CollectionChanged += ResultTypes_CollectionChanged;
 
-            setup = (DatabaseSetup)setupConfig.Morph();
+            var appMode = systemStatusManager.ApplicationMode;
+            _currentRecipe.Get($"{appMode} DB", ref _setupConfig);
+            _setup = (DatabaseSetup)_setupConfig.Morph();
 
-            var resultTypes = ServiceLocator.Current.GetInstance<ImplementationsProvider>().GetImplementations(typeof(IDatabaseContext));
-            resultTypes.ForEach(x =>
-            {
-                    var rm = new ResultViewModel(x);
-                    foreach (ResultProperty item in rm.Children)
-                    {
-                        item.PropertyChanged += Selection_Changed;
+            // Take currently valid results
+            PopulateSetup(provider.GetImplementations<IDatabaseContext>().ToArray());
 
-                        if (setup?.Schema.FirstOrDefault(col => col.FullName == item.Column.FullName) is DatabaseColumn dc)
-                        {
-                            item.Column = dc;
-                            item.IsSelected = true;
-                        }
-                    }
-                    ResultTypes.Add(rm);
-            });
+            AddPassFailColumnTypes();
+        }
 
-            var passFailColumn = new ResultProperty { Column = new PassFailDatabaseColumn() };
-            var errColumn = new ResultProperty { Column = new ErrorDatabaseColumn() };
+        /// <summary>
+        /// For Demo purpose only
+        /// Actual implementation should not use this constructure
+        /// </summary>
+        /// <param name="setupConfig"></param>
+        /// <param name="resultTypes"></param>
+        public DatabaseSetupViewModel(IViewService viewService, IDataContainer setupConfig, params Type[] resultTypes)
+        {
+            _viewService = viewService;
+            _setupConfig = setupConfig;
+            _setup = setupConfig.Morph<DatabaseSetup>();
 
-            passFailColumn.PropertyChanged += Selection_Changed;
-            errColumn.PropertyChanged += Selection_Changed;
+            ResultTypes.CollectionChanged += ResultTypes_CollectionChanged;
 
-            ResultTypes.Add(new ResultViewModel { Name = "Aggregates", Children = new ObservableCollection<object> { passFailColumn, errColumn } });
+            // Show user given results only
+            PopulateSetup(resultTypes);
 
-            if (setup?.Schema.FirstOrDefault(col => col.GetType() == typeof(ErrorDatabaseColumn)) is ErrorDatabaseColumn err)
-                errColumn.IsSelected = true;
-
-            if (setup?.Schema.FirstOrDefault(col => col.GetType() == typeof(PassFailDatabaseColumn)) is PassFailDatabaseColumn pfc)
-                passFailColumn.IsSelected = true;
+            AddPassFailColumnTypes();
         }
 
         private DelegateCommand<ResultProperty> editCommand;
@@ -98,9 +97,9 @@ namespace Application.UI.AdvancedSetup.ViewModels
                 if (saveSchemaCommand == null)
                     saveSchemaCommand = new DelegateCommand(() =>
                     {
-                        setup.Schema = SelectedResultProperties.Select(x => x.Column).ToList();
-                        setupConfig.Set("Schema", setup.Schema.ToListPropertyContainer("Schema"));
-                        _currentRecipe.Store();
+                        _setup.Schema = SelectedResultProperties.Select(x => x.Column).ToList();
+                        _setupConfig.Set("Schema", _setup.Schema.ToListPropertyContainer("Schema"));
+                        _currentRecipe?.Store();
 
                     });
                 return saveSchemaCommand;
@@ -113,6 +112,7 @@ namespace Application.UI.AdvancedSetup.ViewModels
 
         ~DatabaseSetupViewModel()
         {
+            ResultTypes.CollectionChanged -= ResultTypes_CollectionChanged;
             foreach (ResultViewModel item in ResultTypes)
             {
                 foreach (ResultProperty props in item.Children)
@@ -130,7 +130,7 @@ namespace Application.UI.AdvancedSetup.ViewModels
                 {
                     if (rp.IsSelected)
                     {
-                        if (!SelectedResultProperties.Contains(rp))
+                        if (SelectedResultProperties.Contains(rp) == false)
                         {
                             SelectedResultProperties.Add(rp);
                         }
@@ -142,6 +142,64 @@ namespace Application.UI.AdvancedSetup.ViewModels
                 }
             }
         }
+
+        private void ResultTypes_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if(e.Action == NotifyCollectionChangedAction.Add)
+            {
+                foreach (var result in e.NewItems.Cast<ResultViewModel>())
+                {
+                    foreach (var property in result.Children.Cast<ResultProperty>())
+                    {
+                        property.PropertyChanged += Selection_Changed;
+
+                        if (_setup?.Schema.FirstOrDefault(col => col.FullName == property.Column.FullName) is DatabaseColumn dc)
+                        {
+                            property.Column = dc;
+                            property.IsSelected = true;
+                        }
+                    }
+                }
+            }
+            else if(e.Action == NotifyCollectionChangedAction.Remove)
+            {
+                foreach (var result in e.OldItems.Cast<ResultViewModel>())
+                {
+                    foreach (var property in result.Children.Cast<INotifyPropertyChanged>())
+                    {
+                        property.PropertyChanged -= Selection_Changed;
+                    }
+                }
+            }
+        }
+
+        private void PopulateSetup(params Type[] resultTypes) => 
+            resultTypes.ToList()
+            .ForEach(x => ResultTypes.Add(new ResultViewModel(x)));
+
+        private void AddPassFailColumnTypes()
+        {
+            var passFailColumn = new ResultProperty { Column = new PassFailDatabaseColumn() };
+            var errColumn = new ResultProperty { Column = new ErrorDatabaseColumn() };
+
+            passFailColumn.PropertyChanged += Selection_Changed;
+            errColumn.PropertyChanged += Selection_Changed;
+
+            ResultTypes.Add(new ResultViewModel 
+            {
+                Name = "Aggregates",
+                Children = new ObservableCollection<object> { passFailColumn, errColumn }
+            });
+
+            errColumn.IsSelected = _setup?
+                .Schema
+                .FirstOrDefault(col => col.GetType() == typeof(ErrorDatabaseColumn)) is ErrorDatabaseColumn;
+
+            passFailColumn.IsSelected = _setup?
+                .Schema
+                .FirstOrDefault(col => col.GetType() == typeof(PassFailDatabaseColumn)) is PassFailDatabaseColumn;
+        }
+
     }
 
     public class ResultViewModel : TreeNode

@@ -131,7 +131,7 @@ bool DataContainerNativeWrapper::Get(std::string key, std::string& value)
 {
 	String^ val = gcnew String(value.c_str());
 	bool retValue = instance->Get(gcnew String(key.c_str()), val);
-	value = MarashalString(val);
+	value = MarshalString(val);
 	return retValue;
 }
 
@@ -199,7 +199,7 @@ std::vector<std::string> DataContainerNativeWrapper::GetKeys()
 
 	for each (String^ key in instance->GetKeys())
 	{
-		keys.push_back(MarashalString(key));
+		keys.push_back(MarshalString(key));
 	}
 
 	return keys;

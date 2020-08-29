@@ -14,7 +14,7 @@ bool File::Exists(std::string path)
 std::string File::ReadAllText(std::string path)
 {
     String^ text = IO::File::ReadAllText(gcnew String(path.c_str()));
-    return MarashalString(text);
+    return MarshalString(text);
 }
 
 std::vector<std::string> File::ReadAllLines(std::string path)
@@ -24,7 +24,7 @@ std::vector<std::string> File::ReadAllLines(std::string path)
 
     for each (String^ line in allLines)
     {
-        lines.push_back(MarashalString(line));
+        lines.push_back(MarshalString(line));
     }
     return lines;
 }

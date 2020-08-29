@@ -9,7 +9,6 @@ using Application.UI.AdvancedSetup.Views;
 
 namespace Application.UI.AdvancedSetup.ViewModels
 {
-    [RegisterSingleton]
     public class AppearanceViewModel : BaseViewModel, IAdvancedSetup
     {
         public override string ScreenName => typeof(Appearance).Name;
@@ -80,10 +79,11 @@ namespace Application.UI.AdvancedSetup.ViewModels
             get
             {
                 if (updateConfig == null)
-                    updateConfig = new DelegateCommand(() => 
+                {
+                    updateConfig = new DelegateCommand(() =>
                     {
                         bool needSave = false;
-                        if(currentTheme != selectedTheme)
+                        if (currentTheme != selectedTheme)
                         {
                             needSave = true;
                             _generalPreferences.Set("Theme", selectedTheme);
@@ -96,10 +96,13 @@ namespace Application.UI.AdvancedSetup.ViewModels
                             currentShowCommandsOnLeft = showCommandsOnLeft;
                         }
 
-                        if(needSave)
+                        if (needSave)
+                        {
                             _generalPreferences.Store();
+                        }
 
                     });
+                }
                 return updateConfig;
             }
         }

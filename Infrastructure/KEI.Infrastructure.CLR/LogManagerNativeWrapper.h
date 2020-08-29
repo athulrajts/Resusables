@@ -20,6 +20,11 @@ public:
 		return ManagedLogManager;
 	}
 
+	static void SetLogger(KEI::Infrastructure::ILogManager^ log_manager)
+	{
+		ManagedLogManager = log_manager;
+	}
+
 private:
 	static msclr::gcroot<KEI::Infrastructure::ILogManager^> ManagedLogManager;
 };

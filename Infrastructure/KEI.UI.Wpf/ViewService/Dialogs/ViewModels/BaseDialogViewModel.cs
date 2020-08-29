@@ -47,6 +47,6 @@ namespace KEI.UI.Wpf.ViewService.ViewModels
 
         public virtual void OnDialogClosed() { }
 
-        public abstract void OnDialogOpened(IDialogParameters parameters);
+        public virtual void OnDialogOpened(IDialogParameters parameters) { }
     }
 }

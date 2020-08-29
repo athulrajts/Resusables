@@ -21,7 +21,7 @@
 
     <prism:Dialog.WindowStyle>
         <Style TargetType="Window">
-            <Setter Property="prism:Dialog.WindowStartupLocation" Value="CenterOwner" />
+            <Setter Property="prism:Dialog.WindowStartupLocation" Value="CenterScreen" />
             <Setter Property="ShowInTaskbar" Value="False"/>
             <Setter Property="ResizeMode" Value="NoResize"/>
             <Setter Property="SizeToContent" Value="WidthAndHeight"/>

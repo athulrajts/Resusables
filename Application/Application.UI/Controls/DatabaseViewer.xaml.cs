@@ -1,15 +1,14 @@
-﻿using KEI.Infrastructure.Database;
-using System;
-using System.Data;
+﻿using System.Data;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Controls;
+using KEI.Infrastructure.Database;
 
 namespace Application.UI.Controls
 {
     /// <summary>
     /// Interaction logic for DatabaseViewer.xaml
-    /// </summary>
+    /// </summary> 
     public partial class DatabaseViewer : UserControl
     {
         public DataTable Data
@@ -31,26 +30,18 @@ namespace Application.UI.Controls
                 for (int i = 0; i < dt.Columns.Count; i++)
                 {
                     TaggedDatagridTextColumn dgtc = new TaggedDatagridTextColumn();
-                    TaggedDataColumn dc = dt.Columns[i] as TaggedDataColumn;
-                    var columnName = dc.ColumnName;
-                    var columnCaption = dc.Caption;
-                    dgtc.Binding = new Binding(columnName);
-                    dgtc.Header = columnCaption;
-                    dgtc.Width = DataGridLength.Auto;
-                    dgtc.IsReadOnly = true;
-                    dgtc.Tag = dc.Tag;
-                    dbv.dataGrid.Columns.Add(dgtc);
+                    if (dt.Columns[i] is TaggedDataColumn dc)
+                    {
+                        dgtc.Binding = new Binding(dc.ColumnName);
+                        dgtc.Header = dc.Caption;
+                        dgtc.Width = DataGridLength.Auto;
+                        dgtc.IsReadOnly = true;
+                        dgtc.Tag = dc.Tag;
+                        dbv.dataGrid.Columns.Add(dgtc); 
+                    }
                 }
             }
         }
-        public DatabaseSchema Schema
-        {
-            get { return (DatabaseSchema)GetValue(SchemaProperty); }
-            set { SetValue(SchemaProperty, value); }
-        }
-
-        public static readonly DependencyProperty SchemaProperty =
-            DependencyProperty.Register("Schema", typeof(DatabaseSchema), typeof(DatabaseViewer), new PropertyMetadata(null));
 
         public DatabaseViewer()
         {

@@ -11,7 +11,6 @@ namespace Application.UI.AdvancedSetup.Views
         public DatabaseSetupView()
         {
             InitializeComponent();
-            DataContext = new DatabaseSetupViewModel();
         }
     }
 }

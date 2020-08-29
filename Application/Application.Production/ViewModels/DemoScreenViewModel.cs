@@ -92,7 +92,7 @@ namespace Application.Production.ViewModels
 
             generalPerferences.SetBinding("Theme", () => Theme, BindingMode.OneWayToSource);
 
-            InitCommands();
+
 
             var dbSetupPath = PathUtils.GetPath("Configs/setup.xcfg");
             var dbPath = PathUtils.GetPath("Database/Test.csv");
@@ -120,6 +120,8 @@ namespace Application.Production.ViewModels
             Data = _database.GetData();
 
             ValidationRule.Validate(ValidatingText);
+            
+            InitCommands();
 
             RaisePropertyChanged(string.Empty);
         }
@@ -131,7 +133,7 @@ namespace Application.Production.ViewModels
         }
         private void InitCommands()
         {
-            ShowInfoCommand = new DelegateCommand(() => _viewService.Inform(DialogText, true));
+            ShowInfoCommand = new DelegateCommand(() => _viewService.Inform(DialogText));
             ShowWarningCommand = new DelegateCommand(() => _viewService.Warn(DialogText));
             ShowErrorCommand = new DelegateCommand(() => _viewService.Error(DialogText));
             SetBusyCommand = new DelegateCommand(async () =>
@@ -144,26 +146,27 @@ namespace Application.Production.ViewModels
                 }
                 _viewService.SetAvailable();
             });
+           
             ShowPromptCommand = new DelegateCommand<object>(option =>
             {
                 if (option is PromptOptions po)
                 {
-                    //_viewService.Prompt(DialogText, po); 
                     _viewService.PromptWithDefault(DialogText, po, PromptResult.Retry, TimeSpan.FromSeconds(5));
                 }
             });
 
             EditDatabaseCommand = new DelegateCommand(() =>
             {
-                //new System.Windows.Window
-                //{
-                //    Content = new UI.AdvancedSetup.Views.DatabaseSetupView()
-                //    {
-                //        DataContext = new DatabaseSetupViewModel(setup)
-                //    },
-                //    Width = 850,
-                //    Height = 500
-                //}.ShowDialog();
+                var setupConfig = setup.ToPropertyContainer("DB");
+                var vm = new DatabaseSetupViewModel(_viewService, setupConfig, typeof(DatabaseItem));
+                
+                // for demo, shoud not reference UI in viewmodel
+                var dialog = new DialogWindowHost<UI.AdvancedSetup.Views.DatabaseSetupView, DatabaseSetupViewModel>(vm);
+                dialog.ShowDialog();
+
+                _database.StartSession(setupConfig.Morph<DatabaseSetup>());
+
+                Data = _database.GetData();
             });
 
             LogNowCommand = new DelegateCommand(() => _database.AddRecord(DatabaseItem.GetRandom()));

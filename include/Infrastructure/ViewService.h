@@ -30,9 +30,11 @@ class INFRASTRUCTURE_API ViewService
 public:
 
 	static void AutoInitialize();
+    static void InitializeBaseViewService();
 
 	static void WarningDialog(std::string message, bool is_modal = true);
 	static void InformationDialog(std::string message, bool is_modal = true);
 	static void ErrorDialog(std::string message, bool is_modal = true);
     static PromptResult PromptDialog(std::string message, PromptOptions option);
+    static std::string BrowseFile(std::string description, std::string filters = "");
 };

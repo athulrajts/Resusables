@@ -15,9 +15,9 @@ namespace KEI.Infrastructure
         void SetAvailable();
 
         /// <summary>
-        /// 
+        /// Updates text shown in busy overlay
         /// </summary>
-        /// <param name="msg"></param>
+        /// <param name="msg">array messages, each representing a line</param>
         void UpdateBusyText(params string[] msg);
 
         /// <summary>
@@ -28,30 +28,39 @@ namespace KEI.Infrastructure
         /// <summary>
         /// Alerts the user of an error
         /// </summary>
-        /// <param name="strAlert">Error description</param>
-        void Error(string alert, bool isModal = false);
+        /// <param name="message">Error description</param>
+        void Error(string message, bool isModal = true);
 
         /// <summary>
-        /// Asks the user to confirm an action
+        /// Prompts the user for input
         /// </summary>
-        /// <param name="confirmMsg">The action to confirm</param>
-        /// <param name="dialogButtons">Buttons for confirmation</param>
-        /// <returns>True if the user confirms the action, false otherwise</returns>
-        PromptResult Prompt(string confirmMsg, PromptOptions dialogButtons);
+        /// <param name="confirmMsg">message shown in the dialog</param>
+        /// <param name="buttons">User inputs</param>
+        /// <returns>User input</returns>
+        PromptResult Prompt(string confirmMsg, PromptOptions buttons);
 
+        /// <summary>
+        /// Prompts the user for input, and closes itself with default
+        /// result if no input is recieved before <paramref name="timeout"/>
+        /// </summary>
+        /// <param name="message">message shown in the dialog</param>
+        /// <param name="buttons">User inputs</param>
+        /// <param name="defaultResult">Default result if user doesn't respond in time</param>
+        /// <param name="timeout">After timeout dialog closes with <paramref name="defaultResult"/></param>
+        /// <returns>Userinput or <paramref name="defaultResult"/></returns>
         PromptResult PromptWithDefault(string message, PromptOptions buttons, PromptResult defaultResult, TimeSpan timeout);
 
         /// <summary>
         /// Display a warning to the user
         /// </summary>
-        /// <param name="warning">The warning to display</param>
-        void Warn(string warning, bool isModal = false);
+        /// <param name="message">The warning to display</param>
+        void Warn(string message, bool isModal = true);
 
         /// <summary>
         /// Display an informational message to the user
         /// </summary>
-        /// <param name="info">The info to display</param>
-        void Inform(string info, bool isModal = false);
+        /// <param name="message">The info to display</param>
+        void Inform(string message, bool isModal = true);
 
         /// <summary>
         /// Show dialog to Switch user
@@ -67,13 +76,28 @@ namespace KEI.Infrastructure
         /// <summary>
         /// Opens a file dialog to choose a file
         /// </summary>
-        /// <param name="description">description of extension</param>
-        /// <param name="filters">extension</param>
-        /// <returns></returns>
-        string BrowseFile(string description = "", string filters = "");
+        /// <param name="filterName">The name of this filter</param>
+        /// <param name="filterExtensions">The list of extensions in this filter. See remarks</param>
+        /// <remarks>
+        /// The extensionList can use a semicolon(";") or comma (",") to separate extensions.
+        /// Extensions can be prefaced with a period (".") or with the file wild card specifier
+        /// "*.".
+        /// </remarks>
+        /// <returns>filename</returns>
+        string BrowseFile(string filterName = "", string filterExtensions = "");
 
+        /// <summary>
+        /// Opens a file dialog to chose a folder.
+        /// </summary>
+        /// <returns></returns>
         string BrowseFolder();
 
+        /// <summary>
+        /// Opens a file dialog to browse and save a file
+        /// </summary>
+        /// <param name="saveAction">Action to save file given filename</param>
+        /// <param name="filters">A System.String that contains the filter. The default is System.String.Empty,
+        /// which means that no filter is applied and all file types are displayed.</param>
         void SaveFile(Action<string> saveAction, string filters = "");
 
     }

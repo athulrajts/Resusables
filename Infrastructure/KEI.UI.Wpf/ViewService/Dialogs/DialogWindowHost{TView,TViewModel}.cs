@@ -23,7 +23,7 @@ namespace KEI.UI.Wpf
         }
 
 
-        public DialogWindowHost(TViewModel viewModel, IDialogParameters parameters) : base(parameters)
+        public DialogWindowHost(TViewModel viewModel, IDialogParameters parameters = null) : base(parameters)
         {
             InitializeComponents(parameters);
             

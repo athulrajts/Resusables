@@ -8,15 +8,27 @@
 int main()
 {
 
+    //LogManager::InitializeConsole();
+
+    //auto logger = LogManager::GetLogger("Test");
+
+    //logger->Information("TestLog");
+
     std::cout << "Hello World!\n";
 
-    MessageBoxService::ErrorDialog("404");
-    MessageBoxService::WarningDialog("Not Found");
-    MessageBoxService::InfoDialog("How are you ?");
+    bool is_initalized = ViewService::InitializeBaseViewService();
 
-    auto result = MessageBoxService::Question("Are you sure you want to quit ?", MessageBoxButton::YesNo);
+    std::cout << is_initalized;
 
-    std::cout << (int)result;
+    ViewService::BrowseFile("DLL files", "dll");
+
+    //MessageBoxService::ErrorDialog("404");
+    //MessageBoxService::WarningDialog("Not Found");
+    //MessageBoxService::InfoDialog("How are you ?");
+
+    //auto result = MessageBoxService::Question("Are you sure you want to quit ?", MessageBoxButton::YesNo);
+
+    //std::cout << (int)result;
 
     getchar();
 }

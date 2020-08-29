@@ -6,16 +6,20 @@ using Prism.Mvvm;
 using Prism.Services.Dialogs;
 using KEI.Infrastructure.Types;
 using Application.Core.Interfaces;
+using KEI.UI.Wpf.ViewService.ViewModels;
+using KEI.Infrastructure.Prism;
 
 namespace Application.UI.AdvancedSetup
 {
-    public class AdvancedSetupDialogViewModel : BindableBase, IDialogAware
+    [RegisterSingleton(NeedResolve = false)]
+    public class AdvancedSetupDialogViewModel : BaseDialogViewModel
     {
         public ObservableCollection<IAdvancedSetup> AdvancedSetups { get; set; } = new ObservableCollection<IAdvancedSetup>();
         public IAdvancedSetup First => AdvancedSetups.FirstOrDefault(x => x.IsAvailable == true);
-        public AdvancedSetupDialogViewModel()
+        
+        public AdvancedSetupDialogViewModel(ImplementationsProvider provider)
         {
-            var types = ServiceLocator.Current.GetInstance<ImplementationsProvider>().GetImplementations(typeof(IAdvancedSetup));
+            var types = provider.GetImplementations(typeof(IAdvancedSetup));
 
             foreach (var type in types.OrderBy(type => type.Name))
             {
@@ -24,23 +28,7 @@ namespace Application.UI.AdvancedSetup
 
             RaisePropertyChanged(nameof(First));
         }
-        public string Title => "Advanced Setup";
-
-        public event Action<IDialogResult> RequestClose;
-
-        public bool CanCloseDialog()
-        {
-            return true;
-        }
-
-        public void OnDialogClosed()
-        {
-            RequestClose?.Invoke(new DialogResult(ButtonResult.OK));
-        }
-
-        public void OnDialogOpened(IDialogParameters parameters)
-        {
-            return;
-        }
+        
+        public override string Title { get; set; } = "Advanced Setup";
     }
 }

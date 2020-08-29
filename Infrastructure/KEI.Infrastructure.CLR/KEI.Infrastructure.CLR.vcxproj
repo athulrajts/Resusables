@@ -22,7 +22,6 @@
     <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{C0568D9F-61E0-44BF-9103-C871256CF9CF}</ProjectGuid>
     <Keyword>NetCoreCProj</Keyword>
-    <RootNamespace>KEIInfrastructureNative</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <TargetFrameworkVersion>
@@ -76,14 +75,19 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>..\..\Build\$(Configuration)\</OutDir>
+    <OutDir>..\..\Build\Debug\</OutDir>
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>..\..\Build\Release\</OutDir>
+    <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>..\..\Build\$(Configuration)\</OutDir>
+    <OutDir>..\..\Build\Debug\</OutDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>..\..\Build\Release\</OutDir>
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -93,6 +97,7 @@
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>WIN32;_DEBUG;INFRASTRUCTURE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\include\Infrastructure\;.\</AdditionalIncludeDirectories>
+      <AdditionalUsingDirectories>..\..\Build\$(Configuration)</AdditionalUsingDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies />
@@ -105,7 +110,7 @@
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_DEBUG;INFRASTRUCTURE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\include\Infrastructure\;.\</AdditionalIncludeDirectories>
-      <AdditionalUsingDirectories>..\..\Build\$(Configuration)</AdditionalUsingDirectories>
+      <AdditionalUsingDirectories>..\..\Build\Debug\</AdditionalUsingDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies />
@@ -116,7 +121,9 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;INFRASTRUCTURE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\include\Infrastructure\;.\</AdditionalIncludeDirectories>
+      <AdditionalUsingDirectories>..\..\Build\$(Configuration)</AdditionalUsingDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies />
@@ -127,7 +134,9 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;INFRASTRUCTURE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\include\Infrastructure\;.\</AdditionalIncludeDirectories>
+      <AdditionalUsingDirectories>..\..\Build\$(Configuration)</AdditionalUsingDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies />
@@ -186,6 +195,9 @@
     </Reference>
     <Reference Include="KEI.Infrastructure">
       <HintPath>..\..\Build\Debug\KEI.Infrastructure.dll</HintPath>
+    </Reference>
+    <Reference Include="KEI.UI.Wpf">
+      <HintPath>..\..\Build\Debug\KEI.UI.Wpf.dll</HintPath>
     </Reference>
     <Reference Include="Prism">
       <HintPath>..\..\Build\Debug\Prism.dll</HintPath>

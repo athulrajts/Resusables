@@ -24,7 +24,7 @@ namespace KEI.Infrastructure.Prism
 
         public static IContainerRegistry RegisterLocalizationInAssembly(this IContainerRegistry registry)
         {
-            registry.RegisterInstance<IStringLocalizer>(new ResourceManagerStringLocalizer(Assembly.GetExecutingAssembly()), Assembly.GetExecutingAssembly().GetName().Name);
+            registry.RegisterInstance<IStringLocalizer>(new ResourceManagerStringLocalizer(Assembly.GetCallingAssembly()), Assembly.GetCallingAssembly().GetName().Name);
             return registry;
         }
 

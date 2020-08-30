@@ -1,7 +1,6 @@
 ﻿using System.Windows.Input;
 using Prism.Commands;
 using KEI.Infrastructure.Configuration;
-using KEI.Infrastructure.Prism;
 using KEI.Infrastructure.Screen;
 using Application.Core;
 using Application.Core.Interfaces;

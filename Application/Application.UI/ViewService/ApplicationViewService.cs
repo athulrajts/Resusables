@@ -7,8 +7,10 @@ using KEI.Infrastructure.Events;
 using KEI.UI.Wpf;
 using KEI.UI.Wpf.ViewService;
 using Prism.Events;
+using Prism.Regions;
 using Prism.Services.Dialogs;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Application.UI
 {
@@ -16,12 +18,15 @@ namespace Application.UI
     {
         private readonly IDialogService _dialogService;
         private readonly IEventAggregator _eventAggregator;
+        private readonly IRegionManager _regionManager;
         private IPropertyContainer _recipe;
         
-        public ApplicationViewService(IDialogService dialogService, ILogManager logManager, IEventAggregator ea)
+        public ApplicationViewService(IDialogService dialogService, ILogManager logManager, IEventAggregator ea,
+            IRegionManager regionManager)
         {
             _dialogService = dialogService;
             _eventAggregator = ea;
+            _regionManager = regionManager;
             
             _eventAggregator.GetEvent<RecipeLoadedEvent>().Subscribe((recipe) => _recipe = recipe);
         }
@@ -44,7 +49,11 @@ namespace Application.UI
 
         public void ShowAdvancedSetup()
         {
-            var dialog = new DialogWindowHost<AdvancedSetupDialog, AdvancedSetupDialogViewModel>();
+            var dialog = new DialogWindowHost<AdvancedSetupDialog>
+            {
+                Width = 900,
+                Height = 600
+            };
 
             dialog.ShowDialog();
 

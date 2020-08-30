@@ -5,39 +5,38 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:views="clr-namespace:Application.UI.AdvancedSetup.Views"
              xmlns:avvms="clr-namespace:Application.UI.AdvancedSetup.ViewModels"
+             xmlns:local="clr-namespace:Application.UI"
              xmlns:prism="http://prismlibrary.com/"
              xmlns:coverters="clr-namespace:KEI.UI.Wpf.Converters;assembly=KEI.UI.Wpf"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800"
-             Height="600" Width="900">
+             d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
-        <DataTemplate DataType="{x:Type avvms:AppearanceViewModel}">
+        <!--<DataTemplate DataType="{x:Type avvms:AppearanceViewModel}">
             <views:Appearance DataContext="{Binding}"/>
         </DataTemplate>
         <DataTemplate DataType="{x:Type avvms:DatabaseSetupViewModel}">
             <views:DatabaseSetupView DataContext="{Binding}"/>
-        </DataTemplate>
+        </DataTemplate>-->
     </UserControl.Resources>
 
     <prism:Dialog.WindowStyle>
         <Style TargetType="Window">
             <Setter Property="prism:Dialog.WindowStartupLocation" Value="CenterScreen" />
             <Setter Property="ShowInTaskbar" Value="False"/>
-            <Setter Property="ResizeMode" Value="NoResize"/>
-            <Setter Property="SizeToContent" Value="WidthAndHeight"/>
         </Style>
     </prism:Dialog.WindowStyle>
 
     <Grid>
-        <TabControl TabStripPlacement="Left" ItemsSource="{Binding AdvancedSetups}" SelectedItem="{Binding First, Mode=OneWay}">
-            <TabControl.ItemTemplate>
+        <TabControl TabStripPlacement="Left" prism:RegionManager.RegionName="{x:Static local:RegionNames.AdvancedSetup}">
+            <!--<TabControl.ItemTemplate>
                 <DataTemplate>
-                    <Label Content="{Binding Name}"/>
+                    <Label Content="{Binding DataContext.Name}"/>
                 </DataTemplate>
-            </TabControl.ItemTemplate>
+            </TabControl.ItemTemplate>-->
             <TabControl.ItemContainerStyle>
                 <Style TargetType="TabItem">
-                    <Setter Property="Visibility" Value="{Binding IsAvailable, Converter={coverters:BooleanToVisibilityConverter}}"/>
+                    <Setter Property="Visibility" Value="{Binding DataContext.IsAvailable, Converter={coverters:BooleanToVisibilityConverter}}"/>
+                    <Setter Property="Header" Value="{Binding DataContext.Name}"/>
                 </Style>
             </TabControl.ItemContainerStyle>
         </TabControl>

@@ -6,7 +6,7 @@ using System.Windows.Controls;
 
 namespace KEI.UI.Wpf
 {
-    class DialogWindowHost<TView> : DialogWindowHostBase
+    public class DialogWindowHost<TView> : DialogWindowHostBase
         where TView : UserControl
     {
 

@@ -10,7 +10,6 @@ namespace Application.UI.AdvancedSetup
         public AdvancedSetupDialog()
         {
             InitializeComponent();
-            DataContext = CommonServiceLocator.ServiceLocator.Current.GetInstance<AdvancedSetupDialogViewModel>();
         }
     }
 }

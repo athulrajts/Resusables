@@ -22,3 +22,5 @@ Manage Screens
 Update
 Save
 Alarms
+Demos 2
+Demos 3

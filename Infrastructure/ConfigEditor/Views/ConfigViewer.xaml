@@ -14,7 +14,7 @@
                          VerticalContentAlignment="Center"
                          TextWrapping="Wrap"
                          AcceptsReturn="True"
-                         Text="{Binding Value}">
+                         Text="{Binding ValueString}">
             </TextBox>
         </DataTemplate>
 

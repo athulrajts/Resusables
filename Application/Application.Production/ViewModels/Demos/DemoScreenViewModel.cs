@@ -1,23 +1,16 @@
-﻿using System.IO;
-using System.Linq;
-using System.Data;
-using System.Windows.Input;
+﻿using System.Windows.Input;
 using System.Threading.Tasks;
 using Prism.Commands;
 using KEI.Infrastructure;
 using KEI.Infrastructure.Prism;
 using KEI.Infrastructure.Screen;
-using KEI.Infrastructure.Database;
-using KEI.Infrastructure.Localizer;
 using KEI.Infrastructure.Validation;
 using KEI.Infrastructure.Configuration;
 using KEI.UI.Wpf;
 using KEI.UI.Wpf.Hotkey;
 using Application.Core;
 using Application.Core.Constants;
-using Application.UI.AdvancedSetup.ViewModels;
 using Application.Production.Views;
-using KEI.Infrastructure.Utils;
 using System;
 
 namespace Application.Production.ViewModels
@@ -32,41 +25,25 @@ namespace Application.Production.ViewModels
 
         private readonly IViewService _viewService;
         private readonly ISystemStatusManager _statusManager;
-        private readonly IStringLocalizer _localizer;
-        private readonly IDatabase _database;
-        private DatabaseSetup setup;
         public DemoScreenViewModel(IHotkeyService hotkeyService, IViewService viewService,
-            ISystemStatusManager statusManager, IConfigManager configManager,
-            ILocalizationProvider localizationProvider) : base(hotkeyService)
+            ISystemStatusManager statusManager, IConfigManager configManager) : base(hotkeyService)
         {
             _viewService = viewService;
             _statusManager = statusManager;
-            _localizer = localizationProvider.Provide();
 
             var generalPerferences = configManager.GetConfig(ConfigKeys.GeneralPreferences);
 
             SamplePropertyContainer = PropertyContainerBuilder.Create("Config").WithProperty("PropertyOne", true).Build();
-            SamplePropertyContainerTwo = PropertyContainerBuilder.Create("Sample Confing")
-                .WithProperty("IntegerProperty", 22, "Integer Property")
-                .WithProperty("FloalProperty", 3.14, "Float Property")
-                .WithProperty("DoubleProperty", 3.14142, "Double Property")
-                .WithProperty("BoolProperty", false, "Boolean Property")
-                .WithProperty("StringProperty", "Hello World", "String Property")
-                .WithFile("FileProperty", @".\Configs\DefaultRecipe.rcp", "File Path Property")
-                .WithFolder("FolderProperty", @".\Configs", "Folder Path Property")
-                .WithEnum("EnumProperty", ApplicationMode.Production, "Enum Property")
-                .WithObject("Object Property", this)
-                .Build();
 
-            IPropertyContainer samplePropertyContainerThree = new PropertyDictionary
-            {
-                {"IntegerProperty", 22 },
-                {"FloalProperty", 3.14},
-                {"DoubleProperty", 3.14142 },
-                {"BoolProperty", false },
-                {"StringProperty", "Hello World" },
-                {"EnumProperty", ApplicationMode.Production }
-            };
+            //IPropertyContainer samplePropertyContainerThree = new PropertyDictionary
+            //{
+            //    {"IntegerProperty", 22 },
+            //    {"FloalProperty", 3.14},
+            //    {"DoubleProperty", 3.14142 },
+            //    {"BoolProperty", false },
+            //    {"StringProperty", "Hello World" },
+            //    {"EnumProperty", ApplicationMode.Production }
+            //};
 
             ValidationRule = ValidationBuilder.Create(true)
                 .Length(5)
@@ -91,33 +68,6 @@ namespace Application.Production.ViewModels
             SamplePropertyContainer.SetBinding("PropertyOne", () => OneWayToSourceBinding, BindingMode.OneWayToSource);
 
             generalPerferences.SetBinding("Theme", () => Theme, BindingMode.OneWayToSource);
-
-
-
-            var dbSetupPath = PathUtils.GetPath("Configs/setup.xcfg");
-            var dbPath = PathUtils.GetPath("Database/Test.csv");
-            if (File.Exists(dbSetupPath))
-            {
-                setup = PropertyContainerBuilder.FromFile(dbSetupPath).Morph<DatabaseSetup>();
-            }
-            else
-            {
-                setup = new DatabaseSetup
-                {
-                    CreationMode = DatabaseCreationMode.Daily,
-                    Name = dbPath,
-                    Schema = DatabaseSchema.SchemaFor<DatabaseItem>().ToList()
-                };
-
-                setup.ToPropertyContainer("DB").Store(dbSetupPath);
-            }
-
-            _database = new Database(new CSVDatabaseWritter());
-            _database.StartSession(setup);
-
-            _database.AddRecord(DatabaseItem.GetRandom());
-
-            Data = _database.GetData();
 
             ValidationRule.Validate(ValidatingText);
             
@@ -154,22 +104,6 @@ namespace Application.Production.ViewModels
                     _viewService.PromptWithDefault(DialogText, po, PromptResult.Retry, TimeSpan.FromSeconds(5));
                 }
             });
-
-            EditDatabaseCommand = new DelegateCommand(() =>
-            {
-                var setupConfig = setup.ToPropertyContainer("DB");
-                var vm = new DatabaseSetupViewModel(_viewService, setupConfig, typeof(DatabaseItem));
-                
-                // for demo, shoud not reference UI in viewmodel
-                var dialog = new DialogWindowHost<UI.AdvancedSetup.Views.DatabaseSetupView, DatabaseSetupViewModel>(vm);
-                dialog.ShowDialog();
-
-                _database.StartSession(setupConfig.Morph<DatabaseSetup>());
-
-                Data = _database.GetData();
-            });
-
-            LogNowCommand = new DelegateCommand(() => _database.AddRecord(DatabaseItem.GetRandom()));
         }
 
         private string dialogText = "Hello World!!";
@@ -227,20 +161,6 @@ namespace Application.Production.ViewModels
             set { SetProperty(ref validatingText, value, () => UpdateValidation()); }
         }
 
-        private DataTable data;
-        public DataTable Data
-        {
-            get { return data; }
-            set { SetProperty(ref data, value); }
-        }
-
-        private DatabaseItem dataBaseObject = DatabaseItem.GetRandom();
-        public DatabaseItem DatabaseObject
-        {
-            get { return dataBaseObject; }
-            set { SetProperty(ref dataBaseObject, value); }
-        }
-
         public ValidatorGroup ValidationRule { get; set; }
         public ICommand ShowInfoCommand { get; set; }
         public ICommand ShowWarningCommand { get; set; }
@@ -250,6 +170,5 @@ namespace Application.Production.ViewModels
         public ICommand EditDatabaseCommand { get; set; }
         public ICommand LogNowCommand { get; set; }
         public IPropertyContainer SamplePropertyContainer { get; set; }
-        public IPropertyContainer SamplePropertyContainerTwo { get; set; }
     }
 }

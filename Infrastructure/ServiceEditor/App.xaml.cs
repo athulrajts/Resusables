@@ -22,6 +22,7 @@ namespace ServiceEditor
             containerRegistry.RegisterConsoleLogger();
             containerRegistry.RegisterInfrastructureServices();
             containerRegistry.RegisterUIServices();
+            containerRegistry.RegisterLocalizationInAssembly();
         }
     }
 }

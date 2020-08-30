@@ -5,7 +5,7 @@
     <prism:PrismApplication.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/KEI.Resources;component/VisualStudioIcons/Icons.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/KEI.Icons;component/VisualStudioIcons/Icons.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             <LinearGradientBrush x:Key="AlternatingRowBrush" EndPoint="1,0.5" StartPoint="0,0.5">
                 <GradientStop Color="LightBlue" Offset="0"/>

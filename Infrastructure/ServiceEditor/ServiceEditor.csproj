@@ -32,19 +32,21 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Resource Include="724package_100522.ico" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\Application\Application.Core\Application.Core.csproj" />
-    <ProjectReference Include="..\KEI.UI.Wpf\KEI.UI.Wpf.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="Prism.Core" Version="7.2.0.1422" />
+    <PackageReference Include="Prism.Unity" Version="7.2.0.1422" />
+    <PackageReference Include="Prism.Wpf" Version="7.2.0.1422" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="KEI.Resources">
-      <HintPath>..\..\Build\Debug\KEI.Resources.dll</HintPath>
+    <Reference Include="KEI.Icons">
+      <HintPath>..\..\Build\Debug\KEI.Icons.dll</HintPath>
+    </Reference>
+    <Reference Include="KEI.UI.Wpf">
+      <HintPath>..\..\Build\Debug\KEI.UI.Wpf.dll</HintPath>
     </Reference>
   </ItemGroup>
 </Project>

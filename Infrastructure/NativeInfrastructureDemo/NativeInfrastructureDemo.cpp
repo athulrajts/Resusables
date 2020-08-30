@@ -16,9 +16,7 @@ int main()
 
     std::cout << "Hello World!\n";
 
-    bool is_initalized = ViewService::InitializeBaseViewService();
-
-    std::cout << is_initalized;
+    ViewService::InitializeBaseViewService();
 
     ViewService::BrowseFile("DLL files", "dll");
 

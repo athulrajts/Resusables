@@ -2,7 +2,6 @@
                         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                         xmlns:prism="http://prismlibrary.com/"
-                        xmlns:prism2="http://prismlibrary.com/"
                         Startup="PrismApplication_Startup">
     <prism:PrismApplication.Resources>
         <ResourceDictionary>
@@ -10,7 +9,7 @@
                 <ResourceDictionary Source="pack://application:,,,/KEI.UI.Wpf;component/Styles/Themes.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/KEI.UI.Wpf;component/Styles/Buttons.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/KEI.UI.Wpf;component/Styles/TextBoxes.xaml"/>
-                <ResourceDictionary Source="pack://application:,,,/KEI.Resources;component/VisualStudioIcons/Icons.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/KEI.Icons;component/VisualStudioIcons/Icons.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/Application.UI;component/Themes.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>

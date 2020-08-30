@@ -5,7 +5,7 @@
     <prism:PrismApplication.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/KEI.Resources;component/VisualStudioIcons/Icons.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/KEI.Icons;component/VisualStudioIcons/Icons.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </prism:PrismApplication.Resources>

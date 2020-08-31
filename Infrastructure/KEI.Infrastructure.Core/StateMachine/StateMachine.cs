@@ -8,7 +8,7 @@ namespace KEI.Infrastructure.StateMachine
     {
         private readonly Func<TState> _stateAccessor;
         private readonly Action<TState> _stateMutator;
-        private readonly Dictionary<TState, StateInfo<TState,TTrigger>> _states;
+        private readonly Dictionary<TState, StateInfo<TState,TTrigger>> _states = new Dictionary<TState, StateInfo<TState, TTrigger>>();
         private readonly ILogger _logger;
 
         public StateMachine(Func<TState> stateAccessor, Action<TState> stateMutator, ILogger logger)

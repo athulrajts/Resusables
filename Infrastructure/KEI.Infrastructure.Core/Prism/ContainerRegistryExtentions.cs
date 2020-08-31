@@ -4,7 +4,6 @@ using KEI.Infrastructure.Service;
 using KEI.Infrastructure.Localizer;
 using KEI.Infrastructure.Configuration;
 using KEI.Infrastructure.UserManagement;
-using KEI.Infrastructure.Logging;
 using System.Reflection;
 
 namespace KEI.Infrastructure.Prism

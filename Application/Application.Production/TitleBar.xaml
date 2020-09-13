@@ -5,8 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:ap="clr-namespace:KEI.UI.Wpf.AttachedProperties;assembly=KEI.UI.Wpf"
              mc:Ignorable="d" 
-             d:DesignHeight="110" d:DesignWidth="1920"
-             DataContext="{Binding RelativeSource={RelativeSource Self}}">
+             d:DesignHeight="110" d:DesignWidth="1920">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -192,21 +191,26 @@
                         </Grid.Resources>
 
                         <Button Grid.Row="0" Grid.Column="0"
-                                           ap:IconManager.Icon="User16x"
-                                           Command="{Binding SwitchUserCommand}"/>
+                                ap:IconManager.Icon="User16x"
+                                Command="{Binding SwitchUserCommand}"/>
+                        
                         <Button Grid.Row="0" Grid.Column="1"
-                                           ap:IconManager.Icon="SettingsGroup16x"
-                                           Command="{Binding AdvancedSetupCommand}"/>
+                                ap:IconManager.Icon="SettingsGroup16x"
+                                Command="{Binding AdvancedSetupCommand}"/>
+                        
                         <Button Grid.Row="1" Grid.Column="0"
-                                           ap:IconManager.Icon="SwitchSourceOrTarget16x"
+                                ap:IconManager.Icon="SwitchSourceOrTarget16x"
+                                UserAcess.EnabledForUserLevel="Engineer"
                                 Command="{Binding SwitchToEngineeringMode}"/>
+                        
                         <Button Grid.Row="1" Grid.Column="1"
-                                           ap:IconManager.Icon="InformationSymbol16x"
-                                           Command="{Binding InfoCommand}"/>
+                                ap:IconManager.Icon="InformationSymbol16x"
+                                Command="{Binding InfoCommand}"/>
+                        
                         <Button Grid.Row="2" Grid.ColumnSpan="2"
-                                           Foreground="Black"
+                                Foreground="Black"
                                 ap:IconManager.Icon="ShutDown16x"   
-                                           Command="{Binding ExitApplicationCommand}"/>
+                                Command="{Binding ExitApplicationCommand}"/>
 
                     </Grid>
                 </Border>

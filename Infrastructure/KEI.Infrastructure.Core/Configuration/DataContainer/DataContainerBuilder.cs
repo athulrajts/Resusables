@@ -167,5 +167,7 @@ namespace KEI.Infrastructure.Configuration
 
         public static IDataContainer FromFile(string path)
             => DataDictionary.FromFile(path);
+
+        public static DataContainerBuilder Create(string name) => new DataContainerBuilder(name);
     }
 }

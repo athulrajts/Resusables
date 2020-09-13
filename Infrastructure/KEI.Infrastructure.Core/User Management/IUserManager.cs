@@ -5,8 +5,8 @@ namespace KEI.Infrastructure.UserManagement
 {
     public interface IUserManager : INotifyPropertyChanged
     {
-        List<User> Users { get; set; }
-        User CurrentUser { get; set; }
+        List<IUser> Users { get; }
+        IUser CurrentUser { get; }
 
         bool ValidateLogin(string username, string password);
     }

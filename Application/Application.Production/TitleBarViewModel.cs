@@ -95,7 +95,7 @@ namespace Application.Production.ViewModels
         /// <summary>
         /// Currently Active User.
         /// </summary>
-        public User CurrentUser => _userManager?.CurrentUser;
+        public IUser CurrentUser => _userManager?.CurrentUser;
 
         /// <summary>
         /// Current Time

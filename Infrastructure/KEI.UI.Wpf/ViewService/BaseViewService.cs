@@ -37,9 +37,12 @@ namespace KEI.UI.Wpf.ViewService
                 { "buttons", PromptOptions.Ok },
             };
 
-            var host = new DialogWindowHost<GenericDialog>(parameters);
+            ThreadingHelper.DispatcherInvoke(() =>
+            {
+                var host = new DialogWindowHost<GenericDialog>(parameters);
 
-            host.ShowDialog(isModal);
+                host.ShowDialog(isModal);
+            });
         }
 
         public void Inform(string info, bool isModal = true)
@@ -53,9 +56,12 @@ namespace KEI.UI.Wpf.ViewService
                 { "buttons", PromptOptions.Ok },
             };
 
-            var host = new DialogWindowHost<GenericDialog>(parameters);
+            ThreadingHelper.DispatcherInvoke(() =>
+            {
+                var host = new DialogWindowHost<GenericDialog>(parameters);
 
-            host.ShowDialog(isModal);
+                host.ShowDialog(isModal);
+            });
         }
 
         public void Warn(string warning, bool isModal = true)
@@ -69,9 +75,13 @@ namespace KEI.UI.Wpf.ViewService
                 { "buttons", PromptOptions.Ok },
             };
 
-            var host = new DialogWindowHost<GenericDialog>(parameters);
+            ThreadingHelper.DispatcherInvoke(() =>
+            {
+                var host = new DialogWindowHost<GenericDialog>(parameters);
 
-            host.ShowDialog(isModal);
+                host.ShowDialog(isModal);
+            });
+
         }
 
 

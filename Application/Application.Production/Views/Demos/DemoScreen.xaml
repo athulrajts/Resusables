@@ -7,7 +7,7 @@
              xmlns:i="clr-namespace:KEI.Infrastructure;assembly=KEI.Infrastructure"
              xmlns:c="clr-namespace:Application.Core;assembly=Application.Core"
              xmlns:w="clr-namespace:KEI.UI.Wpf.Controls.Configuration;assembly=KEI.UI.Wpf"
-             xmlns:ctrl="clr-namespace:Application.UI.Controls;assembly=Application.UI"
+             xmlns:wpf="clr-namespace:KEI.UI.Wpf;assembly=KEI.UI.Wpf"
              xmlns:v="clr-namespace:Application.Production.ViewModels"
              prism:ViewModelLocator.AutoWireViewModel="True"
              mc:Ignorable="d" 

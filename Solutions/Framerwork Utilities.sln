@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Localizer", "..\Infrastruct
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceEditor", "..\Infrastructure\ServiceEditor\ServiceEditor.csproj", "{30BFF5A4-A8C6-40FC-AD76-892F59AE4544}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Deploy", "..\Infrastructure\Deploy\Deploy.csproj", "{82B2A846-2FDC-4940-8A80-464ACBF854B4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TCPIPClient", "..\Infrastructure\TCPIPClient\TCPIPClient.csproj", "{B26365E3-090D-4799-A1E9-59C3C94CA103}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,10 +35,10 @@ Global
 		{30BFF5A4-A8C6-40FC-AD76-892F59AE4544}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{30BFF5A4-A8C6-40FC-AD76-892F59AE4544}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{30BFF5A4-A8C6-40FC-AD76-892F59AE4544}.Release|Any CPU.Build.0 = Release|Any CPU
-		{82B2A846-2FDC-4940-8A80-464ACBF854B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{82B2A846-2FDC-4940-8A80-464ACBF854B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{82B2A846-2FDC-4940-8A80-464ACBF854B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{82B2A846-2FDC-4940-8A80-464ACBF854B4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B26365E3-090D-4799-A1E9-59C3C94CA103}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B26365E3-090D-4799-A1E9-59C3C94CA103}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B26365E3-090D-4799-A1E9-59C3C94CA103}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B26365E3-090D-4799-A1E9-59C3C94CA103}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

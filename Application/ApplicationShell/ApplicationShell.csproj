@@ -48,6 +48,7 @@
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Infrastructure\KEI.Infrastructure.CLR\KEI.Infrastructure.CLR.vcxproj" />
     <ProjectReference Include="..\..\Infrastructure\KEI.UI.Wpf\KEI.UI.Wpf.csproj" />
     <ProjectReference Include="..\Application.Core\Application.Core.csproj" />
     <ProjectReference Include="..\Application.UI\Application.UI.csproj" />
@@ -55,9 +56,6 @@
   <ItemGroup>
     <Reference Include="KEI.Icons">
       <HintPath>..\..\Build\Debug\KEI.Icons.dll</HintPath>
-    </Reference>
-    <Reference Include="KEI.Infrastructure.CLR">
-      <HintPath>..\..\Build\Debug\KEI.Infrastructure.CLR.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

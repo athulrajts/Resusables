@@ -208,12 +208,6 @@ std::vector<std::string> DataContainerNativeWrapper::GetKeys()
 DataContainerNativeWrapper* DataContainerNativeWrapper::Load(std::string path)
 {
 	KEI::Infrastructure::Configuration::IDataContainer^ dc = KEI::Infrastructure::Configuration::DataContainer::FromFile(gcnew String(path.c_str()));
-	
-	if (dc == nullptr)
-	{
-		std::cout << "null";
-	}
-	
 	return new DataContainerNativeWrapper(dc);
 }
 

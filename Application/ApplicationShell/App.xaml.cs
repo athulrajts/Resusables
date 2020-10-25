@@ -25,6 +25,7 @@ using Application.UI;
 using Application.UI.ViewService;
 using Application.UI.AdvancedSetup;
 using ApplicationShell.Commands;
+using KEI.Infrastructure.Server;
 
 #if DEBUG
 using KEI.Infrastructure.Localizer;
@@ -85,6 +86,7 @@ namespace ApplicationShell
             NativeInitializer.SetViewService(Container.Resolve<IViewService>());
 
             // Regster Application Related Services
+            containerRegistry.RegisterInstance<IServer>(new CommandServer(new ApplicationCommander(), Container.Resolve<IViewService>()));
             containerRegistry.RegisterSingleton<IDatabaseManager, DatabaseManager>();
             containerRegistry.RegisterSingleton<ISystemStatusManager, ApplicationViewModel>();
             containerRegistry.RegisterSingleton<IEquipment, Equipment>();
@@ -97,6 +99,7 @@ namespace ApplicationShell
             // Resolve necessary types
             Container.Resolve<IConfigManager>();
             Container.Resolve<IEquipment>();
+            Container.Resolve<IServer>().StartServer("127.0.0.1", 8000);
         }
 
 

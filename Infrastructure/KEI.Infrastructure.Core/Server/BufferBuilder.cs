@@ -27,7 +27,7 @@ namespace KEI.Infrastructure.Server
 
             int bytesCopied = buffer1.Length + buffer2.Length;
 
-            foreach (var buffer in buffern)
+            foreach (var buffer in buffern.Where(x => x != null))
             {
                 Buffer.BlockCopy(buffer, 0, combinedBuffer, bytesCopied, buffer.Length);
 

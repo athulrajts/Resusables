@@ -10,19 +10,23 @@ namespace KEI.Infrastructure.Server
 
         public abstract string ResponseName { get; }
 
-        protected abstract byte[] GetDataBuffer();
+        protected virtual byte[] GetDataBuffer() => null;
 
         public void ExecuteResponse(Socket client, bool addCRLF = false)
         {
-            if (client != null)
+            try
             {
-                client.Send(GetResponseBuffer());
-                if (addCRLF)
+                if (client != null)
                 {
-                    byte[] abCRLF = Encoding.ASCII.GetBytes("\r\n");
-                    client.Send(abCRLF);
+                    client.Send(GetResponseBuffer());
+                    if (addCRLF)
+                    {
+                        byte[] abCRLF = Encoding.ASCII.GetBytes("\r\n");
+                        client.Send(abCRLF);
+                    }
                 }
             }
+            catch { }
         }
 
         /// <summary>
@@ -37,6 +41,11 @@ namespace KEI.Infrastructure.Server
         public byte[] GetResponseBuffer()
         {
             var dataBuffer = GetDataBuffer();
+
+            if(dataBuffer == null)
+            {
+                return BitConverter.GetBytes(ResponseID);
+            }
 
             return BufferBuilder.Combine(BitConverter.GetBytes(ResponseID),
                 BitConverter.GetBytes((uint)dataBuffer.Length),

@@ -2,6 +2,7 @@
 using KEI.UI.Wpf.ViewService;
 using Prism.Ioc;
 using System.Windows;
+using TCPIPClient.ViewModels;
 using TCPIPClient.Views;
 
 namespace TCPIPClient
@@ -17,6 +18,13 @@ namespace TCPIPClient
         {
             containerRegistry.RegisterConsoleLogger();
             containerRegistry.RegisterUIServices();
+
+            containerRegistry.RegisterSingleton<TCPClientWindowViewModel>();
+        }
+
+        private void PrismApplication_Exit(object sender, ExitEventArgs e)
+        {
+            Container.Resolve<TCPClientWindowViewModel>().DisconnectCommand.Execute();
         }
     }
 }

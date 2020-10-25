@@ -26,6 +26,7 @@ using Application.UI.ViewService;
 using Application.UI.AdvancedSetup;
 using ApplicationShell.Commands;
 using KEI.Infrastructure.Server;
+using CommonServiceLocator;
 
 #if DEBUG
 using KEI.Infrastructure.Localizer;
@@ -241,6 +242,11 @@ namespace ApplicationShell
                     Name = "Database Writter"
                 },
             };
+        }
+
+        private void PrismApplication_Exit(object sender, ExitEventArgs e)
+        {
+            ServiceLocator.Current.TryResolve<IServer>().StopServer();
         }
     }
 }

@@ -46,6 +46,8 @@ namespace KEI.Infrastructure.Server
 
     public class CommandServer : BindableBase, IServer
     {
+        public const uint DISCONNECT_COMMAND = 10;
+
         #region Private Fields
 
         private Socket _listener;
@@ -157,6 +159,7 @@ namespace KEI.Infrastructure.Server
         {
             bool retValue = true;
             //shutdown the client & then the server
+            _commander.DisconnectServerFromClient();
             _client.DisconnectAndCleanup();
             _listener.DisconnectAndCleanup();
 
@@ -204,7 +207,7 @@ namespace KEI.Infrastructure.Server
                 
                 _client.BeginReceive(_incomingDataBuffer, 0, _incomingDataBuffer.Length, SocketFlags.None, new AsyncCallback(OnDataReceived), null);
             }
-            catch (SocketException e)
+            catch(Exception e)
             {
                 Logger.Error("Exception Thrown during WaitForData of TCP/IP Server", e);
                 SetupForReconnect();
@@ -265,7 +268,16 @@ namespace KEI.Infrastructure.Server
                                     {
                                         //reset the command bytes we are looking for
                                         _commandBytesLeft = 4;
-                                        _currentState = ReceiveState.Size;
+
+                                        if(BitConverter.ToUInt32(_commandBuffer) == DISCONNECT_COMMAND)
+                                        {
+                                            _currentState = ReceiveState.Complete;
+                                        }
+                                        else
+                                        {
+                                            _currentState = ReceiveState.Size;
+                                        }
+
                                     }
                                 }
                             }
@@ -342,7 +354,17 @@ namespace KEI.Infrastructure.Server
 
                     uint commandID = BitConverter.ToUInt32(_commandBuffer, 0);
 
-                    _commander.ExecuteCommand(commandID, _dataBuffer);
+                    if (commandID == DISCONNECT_COMMAND)
+                    {
+                        Logger.Info("Service recieved diconnect command");
+                        _client.Disconnect(true);
+                        SetupForReconnect();
+                    }
+                    else
+                    {
+                        _commander.ExecuteCommand(commandID, _dataBuffer);
+                    }
+
                 }
 
                 WaitForData();

@@ -32,18 +32,10 @@ namespace KEI.Infrastructure.Server
         {
             //if we have a reference to the client and we are connected, send the disconnect
             //server command
-            if (_client != null)
-            {
-                if (_client.Connected)
-                {
-                    //disconnect the client and do not allow commands until we are connected to something
-                    //ServerDisconnectingCommand dis = new ServerDisconnectingCommand();
-                    //dis.ExecuteCommand(MyInstrument.InstrumentStatus, this, null);
-                }
+            var disconnectResponse = new ServerDisconnectingResponse();
+            disconnectResponse.ExecuteResponse(_client);
 
-                //we no longer have a client so clear out the reference
-                _client = null;
-            }
+            _client.DisconnectAndCleanup();
         }
 
         public void ExecuteCommand(uint commandID, byte[] buffer)

@@ -2,7 +2,8 @@
                         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                         xmlns:prism="http://prismlibrary.com/"
-                        Startup="PrismApplication_Startup">
+                        Startup="PrismApplication_Startup"
+                        Exit="PrismApplication_Exit">
     <prism:PrismApplication.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

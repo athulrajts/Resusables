@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Prism.Ioc;
-using Prism.Unity;
 using KEI.Infrastructure.Service;
 using KEI.Infrastructure.Localizer;
 using KEI.Infrastructure.Configuration;
@@ -48,7 +47,7 @@ namespace KEI.Infrastructure.Prism
             registry.RegisterSingleton<IServer, TServer>();
             registry.RegisterSingleton<ICommander, TCommander>();
 
-            registry.GetContainer().TryResolve<ICommander>();
+            ContainerLocator.Container.Resolve<ICommander>();
 
             return registry;
         }

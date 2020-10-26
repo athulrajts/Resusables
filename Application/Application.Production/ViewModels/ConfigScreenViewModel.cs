@@ -3,7 +3,6 @@ using System.Linq;
 using System.Windows.Input;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using CommonServiceLocator;
 using Prism.Commands;
 using KEI.Infrastructure;
 using KEI.Infrastructure.Prism;
@@ -17,6 +16,7 @@ using KEI.UI.Wpf.Controls.ObjectEditors;
 using Application.Core;
 using Application.Production.Views;
 using Application.Production.Screen;
+using Prism.Ioc;
 
 namespace Application.Production.ViewModels
 {
@@ -63,7 +63,7 @@ namespace Application.Production.ViewModels
 
             SelectedConfig = _configManager.Configs.FirstOrDefault();
 
-            _validationImplementations = ServiceLocator.Current.GetInstance<ImplementationsProvider>().GetImplementations(typeof(ValidationRule));
+            _validationImplementations = ContainerLocator.Container.Resolve<ImplementationsProvider>().GetImplementations(typeof(ValidationRule));
         }
 
         #endregion

@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using Prism.Events;
 using Prism.Regions;
 using Prism.Commands;
-using CommonServiceLocator;
 using KEI.Infrastructure;
 using KEI.Infrastructure.Prism;
 using KEI.Infrastructure.Screen;
@@ -16,6 +15,7 @@ using KEI.UI.Wpf.Hotkey;
 using System.Reflection;
 using Application.Production.Screen;
 using System;
+using Prism.Ioc;
 
 namespace Application.Production
 {
@@ -132,7 +132,7 @@ namespace Application.Production
         {
             Screens.Clear();
 
-            var screenInfo = screens == null ? ServiceLocator.Current.GetInstance<ScreenConfig>().Config : screens;
+            var screenInfo = screens == null ? ContainerLocator.Container.Resolve<ScreenConfig>().Config : screens;
 
             foreach (var screen in screenInfo.Where(x => string.IsNullOrEmpty(x.ParentScreenName)))
             {

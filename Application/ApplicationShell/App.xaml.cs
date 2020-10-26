@@ -26,7 +26,6 @@ using Application.UI.ViewService;
 using Application.UI.AdvancedSetup;
 using ApplicationShell.Commands;
 using KEI.Infrastructure.Server;
-using CommonServiceLocator;
 
 #if DEBUG
 using KEI.Infrastructure.Localizer;
@@ -101,13 +100,6 @@ namespace ApplicationShell
             // Resolve necessary types
             Container.Resolve<IConfigManager>();
             Container.Resolve<IEquipment>();
-        }
-
-
-
-        protected override void ConfigureServiceLocator()
-        {
-            base.ConfigureServiceLocator();
         }
 
         protected override IModuleCatalog CreateModuleCatalog()
@@ -248,7 +240,7 @@ namespace ApplicationShell
 
         private void PrismApplication_Exit(object sender, ExitEventArgs e)
         {
-            ServiceLocator.Current.TryResolve<IServer>().StopServer();
+            Container.Resolve<IServer>().StopServer();
         }
     }
 }

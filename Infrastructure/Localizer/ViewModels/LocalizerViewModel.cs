@@ -1,6 +1,7 @@
 ﻿using Localizer.Core;
 using Prism.Commands;
 using Prism.Events;
+using Prism.Ioc;
 using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
@@ -47,7 +48,7 @@ namespace Localizer.ViewModels
 
         void ExecuteAddViewTranslationFileCommand(ResXLocalizationFile param)
         {
-            CommonServiceLocator.ServiceLocator.Current.GetInstance<IEventAggregator>()
+            ContainerLocator.Container.Resolve<IEventAggregator>()
                 .GetEvent<ViewTranslationFileEvent>()
                 .Publish(param);
         }

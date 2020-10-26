@@ -36,16 +36,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Prism.Core" Version="7.2.0.1422" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="Prism.Unity.Wpf">
-      <HintPath>..\..\Build\Debug\Prism.Unity.Wpf.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Abstractions">
-      <HintPath>..\..\Build\Debug\Unity.Abstractions.dll</HintPath>
-    </Reference>
+    <PackageReference Include="Prism.Core" Version="8.0.0.1909" />
   </ItemGroup>
 
 </Project>

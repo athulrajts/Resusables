@@ -1,5 +1,4 @@
-﻿using CommonServiceLocator;
-using KEI.Infrastructure;
+﻿using KEI.Infrastructure;
 using KEI.Infrastructure.Database;
 using KEI.Infrastructure.Types;
 using Prism.Commands;

@@ -2,7 +2,6 @@
 using System.Windows;
 using System.Reflection;
 using Microsoft.Win32;
-using CommonServiceLocator;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Prism.Ioc;
 using Prism.Unity;
@@ -173,7 +172,7 @@ namespace KEI.UI.Wpf.ViewService
             }
         }
 
-        public virtual void SwitchUser() => ServiceLocator.Current.GetInstance<LoginWindow>().ShowDialog();
+        public virtual void SwitchUser() => ContainerLocator.Container.Resolve<LoginWindow>().ShowDialog();
 
         public void EditObject(object o)
         {
@@ -263,7 +262,7 @@ namespace KEI.UI.Wpf.ViewService
             registry.RegisterDialog<ConfigsChangedDialog>();
             registry.RegisterInstance<IStringLocalizer>(new ResourceManagerStringLocalizer(Assembly.GetExecutingAssembly()), Assembly.GetExecutingAssembly().GetName().Name);
 
-            Infrastructure.ViewService.Service = registry.GetContainer().TryResolve<IViewService>();
+            Infrastructure.ViewService.Service = ContainerLocator.Container.Resolve<IViewService>();
         }
     }
 }

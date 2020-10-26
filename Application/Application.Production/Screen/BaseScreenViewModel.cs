@@ -5,14 +5,13 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Prism.Regions;
 using Prism.Commands;
-using CommonServiceLocator;
-using KEI.Infrastructure;
 using KEI.Infrastructure.Screen;
 using KEI.Infrastructure.Helpers;
 using KEI.UI.Wpf.Hotkey;
 using Application.UI;
 using Application.Production.Screen;
 using KEI.Infrastructure.Logging;
+using Prism.Ioc;
 
 namespace KEI.UI.Wpf
 {
@@ -26,7 +25,7 @@ namespace KEI.UI.Wpf
         /// <summary>
         /// Region Manager instance for navigation purposes
         /// </summary>
-        protected static IRegionManager _regionManager => ServiceLocator.Current.GetInstance<IRegionManager>();
+        protected static IRegionManager _regionManager => ContainerLocator.Container.Resolve<IRegionManager>();
 
         /// <summary>
         /// A Collection to keep track of all instances of this class which are bound to views

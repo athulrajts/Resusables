@@ -4,7 +4,7 @@
 #include "ViewServiceNativeWrapper.h"
 #include "Utils.h"
 
-using namespace CommonServiceLocator;
+using namespace Prism::Ioc;
 using namespace System;
 
 #pragma warning(push)
@@ -15,7 +15,7 @@ msclr::gcroot<KEI::Infrastructure::IViewService^> ViewServiceNativeWrapper::inst
 
 void ViewServiceNativeWrapper::AutoInitialize()
 {
-	instance = ServiceLocator::Current->GetInstance<KEI::Infrastructure::IViewService^>();
+	instance = ContainerLocator::Current->Resolve(KEI::Infrastructure::IViewService::typeid);
 }
 
 void ViewServiceNativeWrapper::InitializeBaseViewService()

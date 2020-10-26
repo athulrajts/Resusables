@@ -1,6 +1,7 @@
 ﻿using Application.Core;
 using Application.UI;
 using KEI.Infrastructure.Configuration;
+using Prism.Ioc;
 using System;
 using System.ComponentModel;
 using System.Windows;
@@ -12,7 +13,7 @@ namespace ApplicationShell.Themes
         IDataContainer generalPreferences;
         public ThemeManager()
         {
-            generalPreferences = CommonServiceLocator.ServiceLocator.Current.GetInstance<GeneralPreferences>().Config;
+            generalPreferences = ContainerLocator.Container.Resolve<GeneralPreferences>().Config;
 
             PropertyChangedEventManager.AddListener(generalPreferences, this, "Theme");
 

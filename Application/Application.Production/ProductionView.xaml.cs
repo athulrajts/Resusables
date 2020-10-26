@@ -1,9 +1,9 @@
 ﻿using Application.Core;
 using Application.Production.Screen;
 using Application.UI;
-using CommonServiceLocator;
 using KEI.Infrastructure.Localizer;
 using KEI.Infrastructure.Prism;
+using Prism.Ioc;
 using System;
 using System.ComponentModel;
 using System.Windows;
@@ -27,7 +27,7 @@ namespace Application.Production
             _systemStatusManager = systemStatusManager;
             _localizer = localizer.Provide();
 
-            DataContext = ServiceLocator.Current.GetInstance<ProductionViewModel>();
+            DataContext = ContainerLocator.Container.Resolve<ProductionViewModel>();
 
             PropertyChangedEventManager.AddListener((INotifyPropertyChanged)_systemStatusManager, this, string.Empty);
             PropertyChangedEventManager.AddListener((INotifyPropertyChanged)_localizer, this, string.Empty);

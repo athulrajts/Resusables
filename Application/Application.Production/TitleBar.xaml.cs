@@ -1,4 +1,5 @@
 ﻿using Application.Production.ViewModels;
+using Prism.Ioc;
 using System;
 using System.ComponentModel;
 using System.Windows.Controls;
@@ -16,7 +17,7 @@ namespace Application.Production.Views
 
             if (!DesignerProperties.GetIsInDesignMode(this))
             {
-                DataContext = CommonServiceLocator.ServiceLocator.Current.GetInstance<TitleBarViewModel>();
+                DataContext = ContainerLocator.Container.Resolve<TitleBarViewModel>();
             }
         }
     }

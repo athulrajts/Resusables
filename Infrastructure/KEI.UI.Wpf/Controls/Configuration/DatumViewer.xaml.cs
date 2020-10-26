@@ -1,5 +1,4 @@
-﻿using CommonServiceLocator;
-using KEI.Infrastructure.Configuration;
+﻿using KEI.Infrastructure.Configuration;
 using KEI.Infrastructure.Types;
 using KEI.Infrastructure.Validation;
 using KEI.UI.Wpf.Controls.Configuration;

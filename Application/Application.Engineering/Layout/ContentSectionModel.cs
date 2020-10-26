@@ -1,13 +1,7 @@
-﻿using CommonServiceLocator;
-using Prism.Events;
+﻿using Prism.Events;
+using Prism.Ioc;
 using Prism.Mvvm;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Controls;
 
 namespace Application.Engineering.Layout
@@ -63,11 +57,11 @@ namespace Application.Engineering.Layout
         {
             if (isChecked)
             {
-                ServiceLocator.Current.GetInstance<IEventAggregator>().GetEvent<SectionAdded>().Publish(this);
+                ContainerLocator.Container.Resolve<IEventAggregator>().GetEvent<SectionAdded>().Publish(this);
             }
             else
             {
-                ServiceLocator.Current.GetInstance<IEventAggregator>().GetEvent<SectionRemoved>().Publish(this);
+                ContainerLocator.Container.Resolve<IEventAggregator>().GetEvent<SectionRemoved>().Publish(this);
             }
         }
 

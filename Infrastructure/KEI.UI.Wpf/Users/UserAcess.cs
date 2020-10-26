@@ -1,5 +1,5 @@
-﻿using CommonServiceLocator;
-using KEI.Infrastructure.UserManagement;
+﻿using KEI.Infrastructure.UserManagement;
+using Prism.Ioc;
 using System;
 using System.Globalization;
 using System.Windows;
@@ -28,7 +28,7 @@ namespace KEI.UI.Wpf
             {
                 var binding = new Binding
                 {
-                    Source = ServiceLocator.Current.GetInstance<IUserManager>(),
+                    Source = ContainerLocator.Container.Resolve<IUserManager>(),
                     Path = new PropertyPath(nameof(IUserManager.CurrentUser)),
                     Mode = BindingMode.OneWay,
                     Converter = new UserLevelToEnabledConverter(),
@@ -59,7 +59,7 @@ namespace KEI.UI.Wpf
             {
                 var binding = new Binding
                 {
-                    Source = ServiceLocator.Current.GetInstance<IUserManager>(),
+                    Source = ContainerLocator.Container.Resolve<IUserManager>(),
                     Path = new PropertyPath(nameof(IUserManager.CurrentUser)),
                     Mode = BindingMode.OneWay,
                     Converter = new UserLevelToVisibleConverter(),

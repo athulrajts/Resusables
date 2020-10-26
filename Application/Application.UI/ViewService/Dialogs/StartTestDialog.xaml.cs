@@ -1,4 +1,5 @@
 ﻿using KEI.UI.Wpf.ViewService;
+using Prism.Ioc;
 using System.Windows.Controls;
 
 namespace Application.UI.ViewService
@@ -11,7 +12,7 @@ namespace Application.UI.ViewService
         public StartTestDialog()
         {
             InitializeComponent();
-            DataContext = CommonServiceLocator.ServiceLocator.Current.GetInstance<StartTestDialogViewModel>();
+            DataContext = ContainerLocator.Container.Resolve<StartTestDialogViewModel>();
 
             Loaded += StartTestDialog_Loaded;
         }

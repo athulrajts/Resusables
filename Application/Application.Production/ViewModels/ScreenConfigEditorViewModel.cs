@@ -4,7 +4,6 @@ using System.Windows.Input;
 using System.Collections.ObjectModel;
 using Prism.Events;
 using Prism.Commands;
-using CommonServiceLocator;
 using KEI.Infrastructure;
 using KEI.Infrastructure.Prism;
 using KEI.Infrastructure.Screen;
@@ -12,6 +11,7 @@ using KEI.UI.Wpf;
 using KEI.UI.Wpf.Hotkey;
 using Application.Production.Views;
 using Application.Production.Screen;
+using Prism.Ioc;
 
 namespace Application.Production.ViewModels
 {
@@ -149,7 +149,7 @@ namespace Application.Production.ViewModels
         private void ExecuteRefreshConfigCommand()
         {
             _screenConfig.Config = ActiveScreens;
-            ServiceLocator.Current.GetInstance<IEventAggregator>().GetEvent<ScreenConfigUpdatedEvent>().Publish(ActiveScreens);
+            ContainerLocator.Container.Resolve<IEventAggregator>().GetEvent<ScreenConfigUpdatedEvent>().Publish(ActiveScreens);
         }
 
         #endregion

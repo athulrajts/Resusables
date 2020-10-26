@@ -2,7 +2,7 @@
 using System.Windows;
 using System.ComponentModel;
 using System.Windows.Controls;
-using CommonServiceLocator;
+using Prism.Ioc;
 using Prism.Services.Dialogs;
 
 namespace KEI.UI.Wpf
@@ -13,11 +13,9 @@ namespace KEI.UI.Wpf
     {
         public DialogWindowHost(IDialogParameters parameters = null) : base(parameters)
         {
-            InitializeComponents(parameters);
+            InitializeComponents();
 
-            DataContext = ServiceLocator.IsLocationProviderSet
-                ? ServiceLocator.Current.GetInstance<TViewModel>()
-                : Activator.CreateInstance<TViewModel>();
+            DataContext = ContainerLocator.Container.Resolve<TViewModel>();
 
             (Content as UserControl).DataContext = DataContext;
         }
@@ -25,18 +23,16 @@ namespace KEI.UI.Wpf
 
         public DialogWindowHost(TViewModel viewModel, IDialogParameters parameters = null) : base(parameters)
         {
-            InitializeComponents(parameters);
+            InitializeComponents();
             
             DataContext = viewModel;
 
             (Content as UserControl).DataContext = DataContext;
         }
 
-        private void InitializeComponents(IDialogParameters parameters)
+        private void InitializeComponents()
         {
-            Content = ServiceLocator.IsLocationProviderSet
-                ? ServiceLocator.Current.GetInstance<TView>()
-                : Activator.CreateInstance<TView>();
+            Content = ContainerLocator.Container.Resolve<TView>();
 
             WindowStartupLocation = Dialog.GetWindowStartupLocation(Content as DependencyObject);
             if (Dialog.GetWindowStyle(Content as DependencyObject) is Style s)

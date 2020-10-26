@@ -1,6 +1,6 @@
-﻿using CommonServiceLocator;
-using KEI.Infrastructure;
+﻿using KEI.Infrastructure;
 using Prism.Events;
+using Prism.Ioc;
 using Prism.Regions;
 using System;
 using System.Threading.Tasks;
@@ -111,25 +111,31 @@ namespace Application.Engineering.Layout
 
         private void Edit_Click(object sender, RoutedEventArgs e)
         {
-            ServiceLocator.Current.GetInstance<IViewService>().EditObject(DataContext);
+            ContainerLocator.Container.Resolve<IViewService>().EditObject(DataContext);
         }
 
         private void Close_Click(object sender, RoutedEventArgs e)
         {
             if (DataContext is ContentSectionModel csm)
+            {
                 csm.IsChecked = false;
+            }
         }
 
         private void Expand_Click(object sender, RoutedEventArgs e)
         {
-            if(DataContext is ContentSectionModel csm)
-                ServiceLocator.Current.GetInstance<IEventAggregator>().GetEvent<SectionExpanded>().Publish(csm);
+            if (DataContext is ContentSectionModel csm)
+            {
+                ContainerLocator.Container.Resolve<IEventAggregator>().GetEvent<SectionExpanded>().Publish(csm);
+            }
         }
 
         private void Minimized_Click(object sender, RoutedEventArgs e)
         {
             if (DataContext is ContentSectionModel csm)
-                ServiceLocator.Current.GetInstance<IEventAggregator>().GetEvent<SectionMinimized>().Publish(csm);
+            {
+                ContainerLocator.Container.Resolve<IEventAggregator>().GetEvent<SectionMinimized>().Publish(csm);
+            }
         }
 
         private void Popout_Click(object sender, RoutedEventArgs e)

@@ -1,4 +1,5 @@
 ﻿using Application.Core;
+using Prism.Ioc;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -13,7 +14,7 @@ namespace Application.Engineering.Dialogs
         public ChangeLanguage()
         {
             InitializeComponent();
-            StatusManager = CommonServiceLocator.ServiceLocator.Current.GetInstance<ISystemStatusManager>();
+            StatusManager = ContainerLocator.Container.Resolve<ISystemStatusManager>();
             DataContext = this;
         }
 

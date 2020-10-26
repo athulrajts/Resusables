@@ -5,6 +5,7 @@
 #include "LoggerNativeWrapper.h"
 
 using namespace System;
+using namespace Prism::Ioc;
 using namespace KEI::Infrastructure;
 
 #pragma warning(push)
@@ -48,7 +49,7 @@ msclr::gcroot<KEI::Infrastructure::ILogManager^> LogManagerNativeWrapper::Manage
 
 void LogManagerNativeWrapper::AutoInitialize()
 {
-	ManagedLogManager = CommonServiceLocator::ServiceLocator::Current->GetInstance<ILogManager^>();
+	ManagedLogManager = ContainerLocator::Container->Resolve(ILogManager::typeid);
 }
 
 void LogManagerNativeWrapper::InitializeConsole()

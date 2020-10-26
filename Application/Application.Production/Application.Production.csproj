@@ -33,32 +33,6 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CommonServiceLocator">
-      <HintPath>..\..\3rdParty\Prism.7.2.0.1422\CommonServiceLocator.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Prism">
-      <HintPath>..\..\3rdParty\Prism.7.2.0.1422\Prism.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Prism.Unity.Wpf">
-      <HintPath>..\..\3rdParty\Prism.7.2.0.1422\Prism.Unity.Wpf.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Prism.Wpf">
-      <HintPath>..\..\3rdParty\Prism.7.2.0.1422\Prism.Wpf.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.Abstractions">
-      <HintPath>..\..\3rdParty\Prism.7.2.0.1422\Unity.Abstractions.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.Container">
-      <HintPath>..\..\3rdParty\Prism.7.2.0.1422\Unity.Container.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\Infrastructure\KEI.Infrastructure.Core\KEI.Infrastructure.Core.csproj">
       <Private>false</Private>
     </ProjectReference>

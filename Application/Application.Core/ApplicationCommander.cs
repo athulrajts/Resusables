@@ -1,5 +1,6 @@
 ﻿using KEI.Infrastructure;
 using KEI.Infrastructure.Server;
+using Prism.Ioc;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -33,7 +34,7 @@ namespace Application.Core
         {
             var message = inputs.ReadBody<CommandMessage>();
 
-            CommonServiceLocator.ServiceLocator.Current.GetInstance<IViewService>().Inform(message.Message);
+            ContainerLocator.Container.Resolve<IViewService>().Inform(message.Message);
         }
     }
 }

@@ -1,12 +1,9 @@
 ﻿using KEI.Infrastructure.Logging;
 using Prism.Mvvm;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading;
 
 namespace KEI.Infrastructure.Server
@@ -44,7 +41,8 @@ namespace KEI.Infrastructure.Server
         }
     }
 
-    public class CommandServer : BindableBase, IServer
+    [Obsolete("Use TcpServer")]
+    public class CommandServerBkp : BindableBase
     {
         public const uint DISCONNECT_COMMAND = 10;
 
@@ -74,7 +72,7 @@ namespace KEI.Infrastructure.Server
 
         #region Constructor
 
-        public CommandServer(Commander commander, IViewService viewService)
+        public CommandServerBkp(Commander commander, IViewService viewService)
         {
             _viewService = viewService;
             _commander = commander;
@@ -89,7 +87,7 @@ namespace KEI.Infrastructure.Server
 
         public bool IsRunning => _listener != null;
 
-        public bool StartServer(string ipAddress, ushort port)
+        public bool StartServer(ushort port)
         {
             bool isStarted = false;
 
@@ -102,32 +100,20 @@ namespace KEI.Infrastructure.Server
                     _commandBytesLeft = 4;
                     _sizeBytesLeft = 4;
                     
-                    if (string.IsNullOrEmpty(ipAddress))
+                    _listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp)
                     {
-                        ipAddress = "127.0.0.1";
-                    }
+                        SendBufferSize = _sendBufferSize,
+                        NoDelay = true
+                    };
 
-                    IPAddress default_ip;
-                    if (IPAddress.TryParse(ipAddress, out default_ip))
-                    {
-                        _currentIPAddress = default_ip;
-                        _listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp)
-                        {
-                            SendBufferSize = _sendBufferSize,
-                            NoDelay = true
-                        };
+                    IPEndPoint ipLocal = new IPEndPoint(IPAddress.Any, port);
 
-                        IPEndPoint ipLocal = new IPEndPoint(default_ip, port);
+                    _listener.Bind(ipLocal);
+                    _listener.Listen(1);
 
-                        _listener.Bind(ipLocal);
-                        _listener.Listen(1);
+                    _listener.BeginAccept(new AsyncCallback(OnClientConnected), null);
 
-                        _listener.BeginAccept(new AsyncCallback(OnClientConnected), null);
-
-                        //IsConnected = true;
-                        
-                        isStarted = true;
-                    }
+                    isStarted = true;
 
                     startMutex.ReleaseMutex();
                 }

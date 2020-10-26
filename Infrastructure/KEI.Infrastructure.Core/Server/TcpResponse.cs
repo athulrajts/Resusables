@@ -1,16 +1,17 @@
 ﻿using System;
+using System.IO;
 using System.Net.Sockets;
 using System.Text;
 
 namespace KEI.Infrastructure.Server
 {
-    public abstract class TcpIPResponse : ITcpIPResponse
+    public abstract class TcpResponse : ITcpResponse
     {
         public abstract uint ResponseID { get; }
 
         public abstract string ResponseName { get; }
 
-        protected virtual byte[] GetDataBuffer() => null;
+        public IMessageBody ResponseBody { get; set; }
 
         public void ExecuteResponse(Socket client, bool addCRLF = false)
         {
@@ -40,16 +41,26 @@ namespace KEI.Infrastructure.Server
         /// <returns>response array</returns> 
         public byte[] GetResponseBuffer()
         {
-            var dataBuffer = GetDataBuffer();
+            using var stream = new MemoryStream();
+            using var writer = new BinaryWriter(stream);
 
-            if(dataBuffer == null)
+            writer.Write(ResponseID);
+            
+            if(ResponseBody == null)
             {
-                return BitConverter.GetBytes(ResponseID);
+                writer.Write((uint)0);
+            }
+            else
+            {
+                var body = ResponseBody.GetBytes();
+
+                uint length = body == null ? 0 : (uint)body.Length;
+
+                writer.Write(length);
+                writer.Write(body);
             }
 
-            return BufferBuilder.Combine(BitConverter.GetBytes(ResponseID),
-                BitConverter.GetBytes((uint)dataBuffer.Length),
-                dataBuffer);
+            return stream.ToArray();
         }
 
     }

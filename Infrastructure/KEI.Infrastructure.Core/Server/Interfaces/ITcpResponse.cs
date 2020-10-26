@@ -5,7 +5,7 @@ using System.Text;
 
 namespace KEI.Infrastructure.Server
 {
-    public interface ITcpIPResponse
+    public interface ITcpResponse
     {
         public uint ResponseID { get; }
         public string ResponseName { get; }

@@ -1,29 +1,60 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net.Sockets;
-using System.Text;
+using System.Reflection;
 
 namespace KEI.Infrastructure.Server
 {
-    public abstract class Commander : ITcpIPCommander, ITcpIPResponder, IDisposable
+    public abstract class Commander : ICommander, IDisposable
     {
+        public const uint DISCONNECT_COMMAND = 10;
 
         private readonly CommandMap _commandMap = new CommandMap();
         private Socket _client;
+        private readonly IServer _server;
+
 
         public bool AddCRLF { get; set; }
 
-        public Commander(Socket client, bool addCRLF = false)
+        public Commander(IServer server)
         {
-            _client = client;
-            
-            AddCRLF = addCRLF;
+            _server = server;
+
+            _server.OnClientConnected += (s) => SetClient(s);
+            _server.OnClientDisconnected += () => _client.DisconnectAndCleanup();
+            _server.OnServerDisconnected += () => DisconnectServerFromClient();
+            _server.OnCommandReceived += OnCommandReceived;
+
             InitializeCommandMap(_commandMap);
         }
 
-        public Commander()
+        private void OnCommandReceived(IMessageHeader header, Stream bodyStream)
         {
-            InitializeCommandMap(_commandMap);
+            if(header is MessageHeader mh)
+            {
+                if(mh.CommandID == DISCONNECT_COMMAND)
+                {
+                    _server.SetupForReconnection();
+                }
+                else
+                {
+                    ExecuteCommand(mh.CommandID, bodyStream);
+                }
+            }
+            else if(header.GetType().GetProperty("CommandID") is PropertyInfo pi)
+            {
+                uint commandID = (uint)pi.GetValue(header);
+
+                if(commandID == DISCONNECT_COMMAND)
+                {
+                    _server.SetupForReconnection();
+                }
+                else
+                {
+                    ExecuteCommand(commandID, bodyStream);
+                }
+            }
         }
 
         protected abstract void InitializeCommandMap(CommandMap commandMap);
@@ -38,16 +69,11 @@ namespace KEI.Infrastructure.Server
             _client.DisconnectAndCleanup();
         }
 
-        public void ExecuteCommand(uint commandID, byte[] buffer)
+        public void ExecuteCommand(uint commandID, Stream stream)
         {
-            if(_client == null)
+            if (_commandMap.ContainsKey(commandID))
             {
-                return;
-            }
-
-            if(_commandMap.ContainsKey(commandID))
-            {
-                _commandMap[commandID].ExecuteCommand(this, buffer);
+                _commandMap[commandID].ExecuteCommand(this, stream);
             }
             else
             {
@@ -56,7 +82,7 @@ namespace KEI.Infrastructure.Server
             }
         }
 
-        public void SendResponse(ITcpIPResponse response)
+        public void SendResponse(ITcpResponse response)
         {
             response.ExecuteResponse(_client, AddCRLF);
         }
@@ -72,27 +98,44 @@ namespace KEI.Infrastructure.Server
         }
     }
 
-    public class CommandMap : Dictionary<uint, ITcpIPCommand>
+    public class CommandMap : Dictionary<uint, ITcpCommand>
     {
-        public void AddCommand(ITcpIPCommand command)
+        public void AddCommand(ITcpCommand command)
         {
             Add(command.MessageID, command);
         }
 
-        //public void AddCommand<T>()
-        //    where T : ITcpIPCommand, new()
-        //{
-        //    ITcpIPCommand command = new T();
-
-        //    Add(command.MessageID, command);
-        //}
-
         public void AddCommand<T>(params object[] args)
-            where T : ITcpIPCommand
+            where T : ITcpCommand
         {
-            ITcpIPCommand command = (ITcpIPCommand)Activator.CreateInstance(typeof(T), args);
+            ITcpCommand command = (ITcpCommand)Activator.CreateInstance(typeof(T), args);
 
             Add(command.MessageID, command);
+        }
+    }
+
+    public static class SocketExtensions
+    {
+        public static void DisconnectAndCleanup(this Socket s)
+        {
+            if (s != null)
+            {
+                //now we need to disconnect the client
+                try
+                {
+                    if (s.Connected)
+                    {
+                        s.Disconnect(false);
+                        s.Shutdown(SocketShutdown.Both);
+                    }
+                    s.Close();
+                    s = null;
+                }
+                catch
+                {
+                    s = null;
+                }
+            }
         }
     }
 }

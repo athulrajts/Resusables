@@ -87,11 +87,12 @@ namespace ApplicationShell
             NativeInitializer.SetViewService(Container.Resolve<IViewService>());
 
             // Regster Application Related Services
-            containerRegistry.RegisterInstance<IServer>(new CommandServer(new ApplicationCommander(), Container.Resolve<IViewService>()));
             containerRegistry.RegisterSingleton<IDatabaseManager, DatabaseManager>();
             containerRegistry.RegisterSingleton<ISystemStatusManager, ApplicationViewModel>();
             containerRegistry.RegisterSingleton<IEquipment, Equipment>();
             containerRegistry.RegisterSingleton<ApplicationCommands>();
+
+            containerRegistry.RegisterServer<CommandServer, ApplicationCommander>();
 
             // Register Dialogs
             containerRegistry.RegisterDialog<AdvancedSetupDialog>();
@@ -100,7 +101,6 @@ namespace ApplicationShell
             // Resolve necessary types
             Container.Resolve<IConfigManager>();
             Container.Resolve<IEquipment>();
-            Container.Resolve<IServer>().StartServer("127.0.0.1", 8000);
         }
 
 
@@ -122,6 +122,8 @@ namespace ApplicationShell
         protected override void OnInitialized()
         {
             SplashScreenLogger.Instance.Log("Application Initialized");
+
+            Container.Resolve<IServer>().StartServer(8000);
 
             Container.Resolve<ISystemStatusManager>().ApplicationMode = StartupApplicationMode;
 

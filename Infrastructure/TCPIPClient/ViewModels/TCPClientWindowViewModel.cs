@@ -3,6 +3,7 @@ using Prism.Commands;
 using Prism.Mvvm;
 using System;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -80,24 +81,32 @@ namespace TCPIPClient.ViewModels
 
         private void Send()
         {
-            var dataByteBuilder = BufferBuilder.Create();
+
+            using var paramStream = new MemoryStream();
+            using var commandStream = new MemoryStream();
 
             foreach (var input in Inputs)
             {
-                dataByteBuilder.InsertBytes(input.GetBytes());
+                input.WriteBytes(paramStream);
             }
 
-            var dataBytes = dataByteBuilder.GetBytes();
+            Inputs.Sum(x => x.Length);
 
-            var commandBytes = BufferBuilder.Combine(BitConverter.GetBytes(CommandID),
-                BitConverter.GetBytes((uint)dataBytes.Length), dataBytes);
 
+            using var writer = new BinaryWriter(commandStream);
+
+            writer.Write(commandID);
+            writer.Write((uint)paramStream.ToArray().Length);
+            writer.Write(paramStream.ToArray());
+
+            var bytes = commandStream.ToArray();
+            commandStream.Dispose();
 
             try
             {
-                _client.Send(commandBytes);
+                _client.Send(bytes);
 
-                TransferredBytesCollection.Add($"Sent({commandBytes.Length}) : {BitConverter.ToString(commandBytes)}");
+                TransferredBytesCollection.Add($"Sent({bytes.Length}) : {BitConverter.ToString(bytes.ToArray())}");
 
                 TransferredMessagesCollection.Add($"Command ({CommandID}) => {string.Join(" ", Inputs.Select(x => string.Format("\"{0}\"", x.Value)))}");
             }
@@ -178,7 +187,7 @@ namespace TCPIPClient.ViewModels
         {
             if (_client != null)
             {
-                _client.Send(BitConverter.GetBytes(CommandServer.DISCONNECT_COMMAND));
+                _client.Send(BitConverter.GetBytes(Commander.DISCONNECT_COMMAND));
                 _client.Disconnect(false);
                 _client.Shutdown(SocketShutdown.Both);
                 _client.Close();

@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
 using Prism.Ioc;
+using Prism.Unity;
 using KEI.Infrastructure.Service;
 using KEI.Infrastructure.Localizer;
 using KEI.Infrastructure.Configuration;
 using KEI.Infrastructure.UserManagement;
 using System.Reflection;
+using KEI.Infrastructure.Server;
 
 namespace KEI.Infrastructure.Prism
 {
@@ -36,6 +38,18 @@ namespace KEI.Infrastructure.Prism
 
                 registry.RegisterSingleton(service.ServiceType.GetUnderlyingType(), service.ImplementationType.GetUnderlyingType());
             }
+            return registry;
+        }
+
+        public static IContainerRegistry RegisterServer<TServer, TCommander>(this IContainerRegistry registry)
+            where TServer : IServer
+            where TCommander : ICommander
+        {
+            registry.RegisterSingleton<IServer, TServer>();
+            registry.RegisterSingleton<ICommander, TCommander>();
+
+            registry.GetContainer().TryResolve<ICommander>();
+
             return registry;
         }
     }

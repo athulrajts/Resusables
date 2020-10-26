@@ -2,6 +2,7 @@
 using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace TCPIPClient.Models
@@ -66,6 +67,67 @@ namespace TCPIPClient.Models
 
             return inputBytes;
           
+        }
+
+        public int Length
+        {
+            get
+            {
+                if (Type == typeof(uint))
+                {
+                    return sizeof(uint);
+                }
+                else if (Type == typeof(float))
+                {
+                    return sizeof(float);
+                }
+                else if (Type == typeof(double))
+                {
+                    return sizeof(double);
+                }
+                else if (Type == typeof(string))
+                {
+                    return Value.Length;
+                }
+                else 
+                {
+                    return 0;
+                }
+            }
+        }
+
+        public void WriteBytes(Stream stream)
+        {
+            using var writer = new BinaryWriter(stream);
+
+            if (Type == typeof(uint))
+            {
+                if (uint.TryParse(Value, out uint value))
+                {
+                    writer.Write(value);
+                }
+            }
+            else if (Type == typeof(float))
+            {
+                if (float.TryParse(Value, out float value))
+                {
+                    writer.Write(value);
+                }
+            }
+            else if (Type == typeof(double))
+            {
+                if (double.TryParse(Value, out double value))
+                {
+                    writer.Write(value);
+                }
+            }
+            else if (Type == typeof(string))
+            {
+                if (string.IsNullOrEmpty(Value) == false)
+                {
+                    writer.WriteUInt32PrefixedString(Value);
+                }
+            }
         }
 
         public bool IsValid()

@@ -31,9 +31,21 @@
     <OutputPath>..\..\Build\x86\Release\</OutputPath>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="Server\CommandServerBkp.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Prism.Core" Version="7.2.0.1422" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Prism.Unity.Wpf">
+      <HintPath>..\..\Build\Debug\Prism.Unity.Wpf.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Abstractions">
+      <HintPath>..\..\Build\Debug\Unity.Abstractions.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

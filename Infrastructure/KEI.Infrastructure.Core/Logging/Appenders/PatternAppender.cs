@@ -104,7 +104,7 @@ namespace KEI.Infrastructure.Logging
                 switch (token)
                 {
                     case LogToken.Message:
-                        string msg = logEvent.Message.Trim();
+                        string msg = logEvent.Message?.Trim();
                         if(string.IsNullOrEmpty(logEvent.Exception) == false)
                         {
                             msg = $"{msg}\t{EXECEPTION_SEPARATOR}{EXCEPTION_STRING}{logEvent.Exception}" +
@@ -119,7 +119,7 @@ namespace KEI.Infrastructure.Logging
                         logString.Add($"{LINE_NUMBER_PREFIX}{logEvent.LineNumber}");
                         break;
                     case LogToken.MethodName:
-                        logString.Add(logEvent.MethodName.ToString().PadRight(15));
+                        logString.Add(logEvent.MethodName?.PadRight(15));
                         break;
                     case LogToken.Level:
                         logString.Add($"[ {logEvent.Level.GetEnumDescription()} ]");

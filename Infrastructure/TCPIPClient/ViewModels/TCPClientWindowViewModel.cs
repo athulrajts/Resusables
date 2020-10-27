@@ -7,6 +7,8 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using InputParameter = TCPIPClient.Models.InputParameter;
+using InputParameterCollection = TCPIPClient.Models.InputParameterCollection;
 
 namespace TCPIPClient.ViewModels
 {
@@ -37,7 +39,7 @@ namespace TCPIPClient.ViewModels
         {
             ConnectCommand = new DelegateCommand(Connect, () => !IsConnected).ObservesProperty(() => IsConnected);
             DisconnectCommand = new DelegateCommand(Disconnect, () => IsConnected).ObservesProperty(() => IsConnected);
-            AddParameterCommand = new DelegateCommand(() => Inputs.Add(new Models.InputParameter()));
+            AddParameterCommand = new DelegateCommand(() => Inputs.Add(new InputParameter()));
             SendCommand = new DelegateCommand(Send, CanSend);
 
             Inputs.CollectionChanged += Inputs_CollectionChanged;
@@ -52,71 +54,6 @@ namespace TCPIPClient.ViewModels
             {
                 input.PropertyChanged -= Input_PropertyChanged;
             }
-        }
-
-        private void Inputs_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
-            {
-                foreach (var input in e.NewItems.Cast<Models.InputParameter>())
-                {
-                    input.PropertyChanged += Input_PropertyChanged;
-                }
-
-                SendCommand.RaiseCanExecuteChanged();
-            }
-            else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
-            {
-                foreach (var input in e.OldItems.Cast<Models.InputParameter>())
-                {
-                    input.PropertyChanged -= Input_PropertyChanged;
-                }
-            }
-        }
-
-        private void Input_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            SendCommand.RaiseCanExecuteChanged();
-        }
-
-        private void Send()
-        {
-
-            using var paramStream = new MemoryStream();
-            using var commandStream = new MemoryStream();
-
-            foreach (var input in Inputs)
-            {
-                input.WriteBytes(paramStream);
-            }
-
-            Inputs.Sum(x => x.Length);
-
-
-            using var writer = new BinaryWriter(commandStream);
-
-            writer.Write(commandID);
-            writer.Write((uint)paramStream.ToArray().Length);
-            writer.Write(paramStream.ToArray());
-
-            var bytes = commandStream.ToArray();
-            commandStream.Dispose();
-
-            try
-            {
-                _client.Send(bytes);
-
-                TransferredBytesCollection.Add($"Sent({bytes.Length}) : {BitConverter.ToString(bytes.ToArray())}");
-
-                TransferredMessagesCollection.Add($"Command ({CommandID}) => {string.Join(" ", Inputs.Select(x => string.Format("\"{0}\"", x.Value)))}");
-            }
-            catch { }
-
-        }
-
-        private bool CanSend()
-        {
-            return Inputs.Any(x => x.IsValid() == false) == false && _client != null;
         }
 
         private string ipAddress = "127.0.0.1";
@@ -148,7 +85,7 @@ namespace TCPIPClient.ViewModels
             set { SetProperty(ref isConnected, value, () => SendCommand.RaiseCanExecuteChanged()); }
         }
 
-        public ObservableCollection<Models.InputParameter> Inputs { get; set; } = new ObservableCollection<Models.InputParameter>();
+        public InputParameterCollection Inputs { get; set; } = new InputParameterCollection();
         public ObservableCollection<string> TransferredBytesCollection { get; set; } = new ObservableCollection<string>();
         public ObservableCollection<string> TransferredMessagesCollection { get; set; } = new ObservableCollection<string>();
 
@@ -194,6 +131,35 @@ namespace TCPIPClient.ViewModels
                 _client = null;
                 IsConnected = false;
             }
+        }
+
+        private void Send()
+        {
+            using var stream = new MemoryStream();
+            using var writer = new BinaryWriter(stream);
+
+            (var length, var bytes) = Inputs.GetBytesAndLength();
+
+            writer.Write(commandID);
+            writer.Write(length);
+            writer.Write(bytes);
+
+
+            try
+            {
+                _client.Send(bytes);
+
+                TransferredBytesCollection.Add($"Sent({bytes.Length}) : {BitConverter.ToString(bytes.ToArray())}");
+
+                TransferredMessagesCollection.Add($"Command ({CommandID}) => {string.Join(" ", Inputs.Select(x => string.Format("\"{0}\"", x.Value)))}");
+            }
+            catch { }
+
+        }
+
+        private bool CanSend()
+        {
+            return Inputs.IsValid() && _client != null;
         }
 
         private void WaitForData()
@@ -369,6 +335,31 @@ namespace TCPIPClient.ViewModels
                     return;
                 }
             }
+        }
+
+        private void Inputs_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
+            {
+                foreach (var input in e.NewItems.Cast<Models.InputParameter>())
+                {
+                    input.PropertyChanged += Input_PropertyChanged;
+                }
+
+                SendCommand.RaiseCanExecuteChanged();
+            }
+            else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
+            {
+                foreach (var input in e.OldItems.Cast<Models.InputParameter>())
+                {
+                    input.PropertyChanged -= Input_PropertyChanged;
+                }
+            }
+        }
+
+        private void Input_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            SendCommand.RaiseCanExecuteChanged();
         }
     }
 }

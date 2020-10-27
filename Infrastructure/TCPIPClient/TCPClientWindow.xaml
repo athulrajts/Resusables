@@ -29,14 +29,16 @@
                                               VerticalContentAlignment="Center"
                                               Text="{Binding IPAddress}"
                                               Margin="10"
-                                              Padding="5"/>
+                                              Padding="5"
+                                              Background="LightYellow"/>
 
                             <WatermarkTextBox Watermark="Port"
                                               VerticalContentAlignment="Center"
                                               Text="{Binding Port}"
                                               Grid.Column="1"
                                               Margin="10"
-                                              Padding="5"/>
+                                              Padding="5"
+                                              Background="LightYellow"/>
 
                         </Grid>
 
@@ -60,7 +62,8 @@
                     <TabControl x:Name="datflowTabs">
                         <TabItem Header="Bytes" Width="100">
                             <ListBox ItemsSource="{Binding TransferredBytesCollection}"
-                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                     Background="PowderBlue">
                                 <ListBox.ItemTemplate>
                                     <DataTemplate>
                                         <TextBlock Text="{Binding}"
@@ -72,7 +75,8 @@
                         </TabItem>
                         <TabItem Header="Messages" Width="100">
                             <ListBox ItemsSource="{Binding TransferredMessagesCollection}"
-                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                     Background="PowderBlue">
                                 <ListBox.ItemTemplate>
                                     <DataTemplate>
                                         <TextBlock Text="{Binding}"
@@ -97,7 +101,8 @@
                                               HorizontalAlignment="Left" 
                                               VerticalContentAlignment="Center"
                                               Height="25"
-                                              Margin="10"/>
+                                              Margin="10"
+                                              Background="LightYellow"/>
 
                             <Button Content="Add Param" Height="25" Width="70"
                                     Command="{Binding AddParameterCommand}"/>
@@ -113,7 +118,8 @@
                                   Height="200"
                                   HeadersVisibility="Column"
                                   SelectionUnit="FullRow"
-                                  Margin="10 0">
+                                  Margin="10 0"
+                                  Background="Gainsboro">
 
                             <DataGrid.Columns>
 

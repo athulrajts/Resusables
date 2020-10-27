@@ -1,8 +1,6 @@
-﻿using Application.Core.Models;
-using KEI.Infrastructure;
+﻿using KEI.Infrastructure;
 using KEI.Infrastructure.Configuration;
 using KEI.Infrastructure.Service;
-using Prism.Services.Dialogs;
 using System.Collections.Generic;
 
 namespace Application.Core
@@ -12,6 +10,6 @@ namespace Application.Core
     {
         PromptResult ShowUpdatedConfigs(Dictionary<string,Dictionary<string,ConfigHistoryItem>> history);
         void ShowAdvancedSetup();
-        ButtonResult StartTestDialog();
+        PromptResult StartTestDialog();
     }
 }

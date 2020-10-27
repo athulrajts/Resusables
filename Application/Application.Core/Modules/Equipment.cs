@@ -103,8 +103,10 @@ namespace Application.Core.Modules
 
         public void ExecuteTest()
         {
-            if (_viewService.StartTestDialog() == Prism.Services.Dialogs.ButtonResult.Cancel)
+            if (_viewService.StartTestDialog() == PromptResult.Cancel)
+            {
                 return;
+            }
 
 
             string imageName = $"{DateTime.Now.ToString("[dd-MMM-yyyy] hh_mm_ss")}.bmp";

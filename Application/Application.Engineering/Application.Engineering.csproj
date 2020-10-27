@@ -96,15 +96,6 @@
     <Resource Include="Resources\log.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Infrastructure\KEI.Infrastructure.Core\KEI.Infrastructure.Core.csproj">
-      <Private>false</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Infrastructure\KEI.UI.Wpf\KEI.UI.Wpf.csproj">
-      <Private>false</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\Application.Core\Application.Core.csproj">
-      <Private>false</Private>
-    </ProjectReference>
     <ProjectReference Include="..\Application.UI\Application.UI.csproj">
       <Private>false</Private>
     </ProjectReference>

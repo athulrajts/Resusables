@@ -10,7 +10,6 @@ using Prism.Events;
 using Prism.Regions;
 using Prism.Services.Dialogs;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Application.UI
 {
@@ -59,15 +58,15 @@ namespace Application.UI
 
         }
 
-        public ButtonResult StartTestDialog()
-        { 
-            ButtonResult result = ButtonResult.OK;
+        public PromptResult StartTestDialog()
+        {
+            PromptResult result = PromptResult.OK;
 
             var param = new DialogParameters();
             var spec = new TestSpecification();
             param.Add("Spec", spec);
 
-            _dialogService.ShowDialog(typeof(ViewService.StartTestDialog).Name, param, r => { result = r.Result; });
+            _dialogService.ShowDialog(typeof(ViewService.StartTestDialog).Name, param, r => { result = (PromptResult)(int)r.Result; });
 
             return result;
         }

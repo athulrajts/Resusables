@@ -52,7 +52,7 @@
                     <StackPanel>
                         <ContentControl IconManager.Icon="ConnectedServiceReferenceFolderOpen16x"
                                         Height="40"/>
-                        <TextBlock Text="{Localize Value='Open Configuration'}"/>
+                        <TextBlock Text="Open Configuration"/>
                     </StackPanel>
                 </Button>
 

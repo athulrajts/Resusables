@@ -5,9 +5,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:prism="http://prismlibrary.com/"
              xmlns:i="clr-namespace:KEI.Infrastructure;assembly=KEI.Infrastructure"
-             xmlns:c="clr-namespace:Application.Core;assembly=Application.Core"
              xmlns:w="clr-namespace:KEI.UI.Wpf.Controls.Configuration;assembly=KEI.UI.Wpf"
-             xmlns:wpf="clr-namespace:KEI.UI.Wpf;assembly=KEI.UI.Wpf"
+             xmlns:c="clr-namespace:Application.Core;assembly=Application.Core"
+             xmlns:wpf="http://gesinfotek.com/wpf"
              xmlns:v="clr-namespace:Application.Production.ViewModels"
              prism:ViewModelLocator.AutoWireViewModel="True"
              mc:Ignorable="d" 
@@ -59,42 +59,42 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <GroupBox Grid.Column="0" Header="{Localize Value='View Serivce'}" Padding="10" Margin="5">
+        <GroupBox Grid.Column="0" Header="{wpf:Localize Value='View Serivce'}" Padding="10" Margin="5">
             <StackPanel VerticalAlignment="Center">
-                <TitledTextBox Text="{Binding DialogText}" Margin="0 20"
+                <wpf:TitledTextBox Text="{Binding DialogText}" Margin="0 20"
                                Title="Message"/>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                     <Button Style="{StaticResource NormalButton}"
-                        Content="{Localize Value='Info'}"
+                        Content="{wpf:Localize Value='Info'}"
                         Command="{Binding ShowInfoCommand}"/>
                     <Button Style="{StaticResource NormalButton}"
-                        Content="{Localize Value='Warn'}"
+                        Content="{wpf:Localize Value='Warn'}"
                         Command="{Binding ShowWarningCommand}"/>
                     <Button Style="{StaticResource NormalButton}"
-                        Content="{Localize Value='Error'}"
+                        Content="{wpf:Localize Value='Error'}"
                         Command="{Binding ShowErrorCommand}"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                     <Button Style="{StaticResource NormalButton}"
-                            Content="{Localize Value='Yes No'}"
+                            Content="{wpf:Localize Value='Yes No'}"
                             Command="{Binding ShowPromptCommand}"
                             CommandParameter="{x:Static i:PromptOptions.YesNo}"/>
                     <Button Style="{StaticResource NormalButton}"
-                            Content="{Localize Value='Okay Cancel'}"
+                            Content="{wpf:Localize Value='Okay Cancel'}"
                             Command="{Binding ShowPromptCommand}"
                             CommandParameter="{x:Static i:PromptOptions.OkCancel}"/>
                     <Button Style="{StaticResource NormalButton}"
-                            Content="{Localize Value='Ignore Retry'}"
+                            Content="{wpf:Localize Value='Ignore Retry'}"
                             Command="{Binding ShowPromptCommand}"
                             CommandParameter="{x:Static i:PromptOptions.IgnoreRetry}"/>
                 </StackPanel>
                 <Button Style="{StaticResource NormalButton}"
-                        Content="{Localize Value='Set Busy'}"
+                        Content="{wpf:Localize Value='Set Busy'}"
                         Command="{Binding SetBusyCommand}"/>
             </StackPanel>
         </GroupBox>
 
-        <GroupBox Header="{Localize Value='Appearance'}" Margin="5"
+        <GroupBox Header="{wpf:Localize Value='Appearance'}" Margin="5"
                   Grid.Row="1">
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -106,15 +106,15 @@
                     <RowDefinition/>
                 </Grid.RowDefinitions>
 
-                <Label Content="{Localize Value='Theme'}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                <Label Content="{Localize Value='Language'}" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="1"/>
+                <Label Content="{wpf:Localize Value='Theme'}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <Label Content="{wpf:Localize Value='Language'}" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="1"/>
 
-                <ComboBox ItemsSource="{EnumBindingSource EnumType={x:Type c:Theme}}"
+                <ComboBox ItemsSource="{wpf:EnumBindingSource EnumType={x:Type c:Theme}}"
                         SelectedItem="{Binding Theme}" VerticalAlignment="Center" Margin="10"
                         HorizontalAlignment="Center" Width="100"
                         Grid.Column="1"/>
 
-                <ComboBox ItemsSource="{EnumBindingSource EnumType={x:Type c:Language}}"
+                <ComboBox ItemsSource="{wpf:EnumBindingSource EnumType={x:Type c:Language}}"
                         SelectedItem="{Binding Language}" VerticalAlignment="Center" Margin="10"
                         HorizontalAlignment="Center" Width="100"
                         Grid.Row = "1"  Grid.Column="1"/>
@@ -122,7 +122,7 @@
             </Grid>
         </GroupBox>
 
-        <GroupBox Header="{Localize Value='Validation'}" Margin="5" Grid.RowSpan="2"
+        <GroupBox Header="{wpf:Localize Value='Validation'}" Margin="5" Grid.RowSpan="2"
                   Grid.Column="2">
             <Grid>
                 <Grid.RowDefinitions>
@@ -130,8 +130,8 @@
                     <RowDefinition/>
                 </Grid.RowDefinitions>
 
-                <TitledTextBox Text="{Binding ValidatingText, UpdateSourceTrigger=PropertyChanged}" Margin="10"
-                                   Title="{Localize Value='Text'}"
+                <wpf:TitledTextBox Text="{Binding ValidatingText, UpdateSourceTrigger=PropertyChanged}" Margin="10"
+                                   Title="{wpf:Localize Value='Text'}"
                                    VerticalContentAlignment="Center"
                                    Padding="5"
                                    Height="50"/>
@@ -158,7 +158,7 @@
             </Grid>
         </GroupBox>
 
-        <GroupBox Header="{Localize Value='Binding'}" Grid.Column="1" Margin="5"
+        <GroupBox Header="{wpf:Localize Value='Binding'}" Grid.Column="1" Margin="5"
                   Padding="10" Grid.RowSpan="2">
             <Grid>
                 <Grid.RowDefinitions>

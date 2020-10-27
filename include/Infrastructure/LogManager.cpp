@@ -49,7 +49,7 @@ msclr::gcroot<KEI::Infrastructure::ILogManager^> LogManagerNativeWrapper::Manage
 
 void LogManagerNativeWrapper::AutoInitialize()
 {
-	ManagedLogManager = ContainerLocator::Container->Resolve(ILogManager::typeid);
+	ManagedLogManager = (ILogManager^)ContainerLocator::Container->Resolve(ILogManager::typeid);
 }
 
 void LogManagerNativeWrapper::InitializeConsole()

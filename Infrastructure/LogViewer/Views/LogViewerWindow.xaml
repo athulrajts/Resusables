@@ -5,10 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:prism="http://prismlibrary.com/"
         xmlns:vm="clr-namespace:LogViewer.ViewModels"
-        xmlns:c="clr-namespace:KEI.UI.Wpf.Converters;assembly=KEI.UI.Wpf"
         xmlns:lc="clr-namespace:LogViewer.Converters"
         xmlns:dt="clr-namespace:LogViewer.Models.DirectoryTree"
-        xmlns:w="clr-namespace:KEI.UI.Wpf;assembly=KEI.UI.Wpf"
+        xmlns:wpf="http://gesinfotek.com/wpf"
         mc:Ignorable="d"
         prism:ViewModelLocator.AutoWireViewModel="True"
         Title="LogViewer" Height="650" Width="1000"
@@ -88,7 +87,7 @@
                 <!--Browse Folder-->
                 <Button Command="{Binding BrowseFolderCommand}">
                     <StackPanel>
-                        <ContentControl IconManager.Icon="FolderOpen16x"
+                        <ContentControl wpf:IconManager.Icon="FolderOpen16x"
                                         Height="40"/>
                         <TextBlock Text="Open Folder"/>
                     </StackPanel>
@@ -97,7 +96,7 @@
                 <!--Browse File-->
                 <Button Command="{Binding BrowseFileCommand}">
                     <StackPanel>
-                        <ContentControl IconManager.Icon="TextFile16x"
+                        <ContentControl wpf:IconManager.Icon="TextFile16x"
                                         Height="40"/>
                         <TextBlock Text="Open File"/>
                     </StackPanel>
@@ -128,10 +127,10 @@
                             <ContentControl Height="14" Width="14">
                                 <ContentControl.Style>
                                     <Style TargetType="ContentControl">
-                                        <Setter Property="IconManager.Icon" Value="Folder16x"/>
+                                        <Setter Property="wpf:IconManager.Icon" Value="Folder16x"/>
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding HasLeafNodes}" Value="false">
-                                                <Setter Property="IconManager.Icon" Value="Foldergrey16x"/>
+                                                <Setter Property="wpf:IconManager.Icon" Value="Foldergrey16x"/>
                                             </DataTrigger>
                                             <MultiDataTrigger>
                                                 <MultiDataTrigger.Conditions>
@@ -139,7 +138,7 @@
                                                     <Condition Binding="{Binding HasLeafNodes}" Value="true"/>
                                                 </MultiDataTrigger.Conditions>
                                                 <MultiDataTrigger.Setters>
-                                                    <Setter Property="IconManager.Icon" Value="FolderOpen16x"/>
+                                                    <Setter Property="wpf:IconManager.Icon" Value="FolderOpen16x"/>
                                                 </MultiDataTrigger.Setters>
                                             </MultiDataTrigger>
                                             <MultiDataTrigger>
@@ -148,7 +147,7 @@
                                                     <Condition Binding="{Binding HasLeafNodes}" Value="false"/>
                                                 </MultiDataTrigger.Conditions>
                                                 <MultiDataTrigger.Setters>
-                                                    <Setter Property="IconManager.Icon" Value="FolderOpengrey16x"/>
+                                                    <Setter Property="wpf:IconManager.Icon" Value="FolderOpengrey16x"/>
                                                 </MultiDataTrigger.Setters>
                                             </MultiDataTrigger>
                                         </Style.Triggers>
@@ -161,7 +160,7 @@
 
                     <DataTemplate DataType="{x:Type dt:FileNode}">
                         <StackPanel Orientation="Horizontal">
-                            <ContentControl IconManager.Icon="TextFile16x"/>
+                            <ContentControl wpf:IconManager.Icon="TextFile16x"/>
                             <Label Content="{Binding Info.Name}">
                                 <Label.InputBindings>
                                     <MouseBinding MouseAction="LeftDoubleClick"
@@ -297,13 +296,13 @@
             <!--Filter Textboxes-->
             <StackPanel Orientation="Horizontal" Grid.Row="1">
                 <StackPanel.Resources>
-                    <Style TargetType="WatermarkTextBox" BasedOn="{StaticResource {x:Type WatermarkTextBox}}">
+                    <Style TargetType="{x:Type wpf:WatermarkTextBox}" BasedOn="{StaticResource {x:Type wpf:WatermarkTextBox}}">
                         <Setter Property="VerticalContentAlignment" Value="Center"/>
                         <Setter Property="HorizontalContentAlignment" Value="Center"/>
                         <Setter Property="HorizontalAlignment" Value="Center"/>
                         <Setter Property="Width" Value="{Binding ActualWidth,
                                                                  RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Border},
-                                                                 Converter={c:ScaleConverter},
+                                                                 Converter={wpf:ScaleConverter},
                                                                  ConverterParameter=0.88}"/>
                         <Setter Property="CornerRadius" Value="3"/>
                     </Style>
@@ -315,37 +314,37 @@
 
                 <Border Width="{Binding ActualWidth, ElementName=levelCol}"
                         Visibility="{Binding Visibility, ElementName=levelCol}">
-                    <WatermarkTextBox Text="{Binding LevelFilter, UpdateSourceTrigger=PropertyChanged}"
+                    <wpf:WatermarkTextBox Text="{Binding LevelFilter, UpdateSourceTrigger=PropertyChanged}"
                                       Watermark="Level"/>
                 </Border>
 
                 <Border Width="{Binding ActualWidth, ElementName=timeCol}"
                         Visibility="{Binding Visibility, ElementName=timeCol}">
-                    <WatermarkTextBox Text="{Binding TimeFilter, UpdateSourceTrigger=PropertyChanged}"
+                    <wpf:WatermarkTextBox Text="{Binding TimeFilter, UpdateSourceTrigger=PropertyChanged}"
                                       Watermark="Time"/>
                 </Border>
 
                 <Border Width="{Binding ActualWidth, ElementName=fileCol}"
                         Visibility="{Binding Visibility, ElementName=fileCol}">
-                    <WatermarkTextBox Text="{Binding FileFilter, UpdateSourceTrigger=PropertyChanged}"
+                    <wpf:WatermarkTextBox Text="{Binding FileFilter, UpdateSourceTrigger=PropertyChanged}"
                                       Watermark="File"/>
                 </Border>
 
                 <Border Width="{Binding ActualWidth, ElementName=lineCol}"
                         Visibility="{Binding Visibility, ElementName=lineCol}">
-                    <WatermarkTextBox Text="{Binding LineFilter, UpdateSourceTrigger=PropertyChanged}"
+                    <wpf:WatermarkTextBox Text="{Binding LineFilter, UpdateSourceTrigger=PropertyChanged}"
                                       Watermark="Line"/>
                 </Border>
 
                 <Border Width="{Binding ActualWidth, ElementName=methodCol}"
                         Visibility="{Binding Visibility, ElementName=methodCol}">
-                    <WatermarkTextBox Text="{Binding MethodFilter, UpdateSourceTrigger=PropertyChanged}"
+                    <wpf:WatermarkTextBox Text="{Binding MethodFilter, UpdateSourceTrigger=PropertyChanged}"
                                       Watermark="Method"/>
                 </Border>
 
                 <Border Width="{Binding ActualWidth, ElementName=messageCol}"
                         Visibility="{Binding Visibility, ElementName=messageCol}">
-                    <WatermarkTextBox Text="{Binding MessageFilter, UpdateSourceTrigger=PropertyChanged}"
+                    <wpf:WatermarkTextBox Text="{Binding MessageFilter, UpdateSourceTrigger=PropertyChanged}"
                                       Watermark="Message"/>
                 </Border>
 
@@ -368,12 +367,12 @@
                       ColumnHeaderStyle="{StaticResource ColumnHeaderStyle}"
                       RowStyle="{StaticResource RowStyle}">
                 <DataGrid.Resources>
-                    <w:BindingProxy x:Key="LineNumberChecked" Data="{Binding ViewLineNumber}"/>
-                    <w:BindingProxy x:Key="LogLevelChecked" Data="{Binding ViewLogLevel}"/>
-                    <w:BindingProxy x:Key="DateTimeChecked" Data="{Binding ViewDateTime}"/>
-                    <w:BindingProxy x:Key="FileNameChecked" Data="{Binding ViewFileName}"/>
-                    <w:BindingProxy x:Key="MethodNameChecked" Data="{Binding ViewMethod}"/>
-                    <w:BindingProxy x:Key="MessageChecked" Data="{Binding ViewMessage}"/>
+                    <wpf:BindingProxy x:Key="LineNumberChecked" Data="{Binding ViewLineNumber}"/>
+                    <wpf:BindingProxy x:Key="LogLevelChecked" Data="{Binding ViewLogLevel}"/>
+                    <wpf:BindingProxy x:Key="DateTimeChecked" Data="{Binding ViewDateTime}"/>
+                    <wpf:BindingProxy x:Key="FileNameChecked" Data="{Binding ViewFileName}"/>
+                    <wpf:BindingProxy x:Key="MethodNameChecked" Data="{Binding ViewMethod}"/>
+                    <wpf:BindingProxy x:Key="MessageChecked" Data="{Binding ViewMessage}"/>
                 </DataGrid.Resources>
                 <DataGrid.ContextMenu>
                     <ContextMenu>
@@ -400,7 +399,7 @@
                                         Width="50"
                                         CanUserResize="False"
                                         CellStyle="{StaticResource CenteredContent}"
-                                        Visibility="{Binding Data, Converter={c:BooleanToVisibilityConverter}, Source={StaticResource LogLevelChecked}}"/>
+                                        Visibility="{Binding Data, Converter={wpf:BooleanToVisibilityConverter}, Source={StaticResource LogLevelChecked}}"/>
 
                     <DataGridTextColumn x:Name="timeCol" 
                                         Header="Time"
@@ -409,13 +408,13 @@
                                         Width="140"
                                         CanUserResize="False"
                                         CellStyle="{StaticResource CenteredContent}"
-                                        Visibility="{Binding Data, Converter={c:BooleanToVisibilityConverter}, Source={StaticResource DateTimeChecked}}"/>
+                                        Visibility="{Binding Data, Converter={wpf:BooleanToVisibilityConverter}, Source={StaticResource DateTimeChecked}}"/>
 
                     <DataGridTextColumn x:Name="fileCol"
                                         Header="File"
                                         Binding="{Binding FileName}"
                                         IsReadOnly="True"
-                                        Visibility="{Binding Data, Converter={c:BooleanToVisibilityConverter}, Source={StaticResource FileNameChecked}}"/>
+                                        Visibility="{Binding Data, Converter={wpf:BooleanToVisibilityConverter}, Source={StaticResource FileNameChecked}}"/>
 
                     <DataGridTextColumn x:Name="lineCol"
                                         Header="Line"
@@ -423,20 +422,20 @@
                                         IsReadOnly="True"
                                         MinWidth="50"
                                         CellStyle="{StaticResource CenteredContent}"
-                                        Visibility="{Binding Data, Converter={c:BooleanToVisibilityConverter}, Source={StaticResource LineNumberChecked}}"/>
+                                        Visibility="{Binding Data, Converter={wpf:BooleanToVisibilityConverter}, Source={StaticResource LineNumberChecked}}"/>
 
                     <DataGridTextColumn x:Name="methodCol"
                                         Header="Method"
                                         Binding="{Binding MethodName}"
                                         IsReadOnly="True"
-                                        Visibility="{Binding Data, Converter={c:BooleanToVisibilityConverter}, Source={StaticResource MethodNameChecked}}"/>
+                                        Visibility="{Binding Data, Converter={wpf:BooleanToVisibilityConverter}, Source={StaticResource MethodNameChecked}}"/>
 
                     <DataGridTextColumn x:Name="messageCol"
                                         Header="Message"
                                         Binding="{Binding Message}"
                                         IsReadOnly="True"
                                         Width="*"
-                                        Visibility="{Binding Data, Converter={c:BooleanToVisibilityConverter}, Source={StaticResource MessageChecked}}"/>
+                                        Visibility="{Binding Data, Converter={wpf:BooleanToVisibilityConverter}, Source={StaticResource MessageChecked}}"/>
                 </DataGrid.Columns>
             </DataGrid>
         </Grid>
@@ -444,7 +443,7 @@
         <!--Selected Log Details-->
         <Border Grid.Row="2" BorderBrush="Black" BorderThickness="0 2 0 0"
                 Grid.ColumnSpan="2" MinHeight="200" MaxHeight="250"
-                Visibility="{Binding SelectedLog, Converter={c:ObjectToVisibilityConverter}}">
+                Visibility="{Binding SelectedLog, Converter={wpf:ObjectToVisibilityConverter}}">
             <Border.Resources>
                 <Style TargetType="Label">
                     <Setter Property="BorderBrush" Value="Black"/>
@@ -505,13 +504,13 @@
                     <ScrollViewer>
                         <StackPanel>
                             <Label Content="Throwables"/>
-                            <TextBlock TextWrapping="Wrap" Visibility="{Binding SelectedLog.Exception, Converter={c:ObjectToVisibilityConverter}}">
+                            <TextBlock TextWrapping="Wrap" Visibility="{Binding SelectedLog.Exception, Converter={wpf:ObjectToVisibilityConverter}}">
                             <Run Text="Exception" TextDecorations="Underline" Style="{StaticResource TitleText}"/>
                             <LineBreak/>
                             <Run Text="{Binding SelectedLog.Exception}" FontWeight="Normal"/>
                             </TextBlock>
                             <Separator Height="3"/>
-                            <TextBlock TextWrapping="Wrap" Visibility="{Binding SelectedLog.StackTrace, Converter={c:ObjectToVisibilityConverter}}">
+                            <TextBlock TextWrapping="Wrap" Visibility="{Binding SelectedLog.StackTrace, Converter={wpf:ObjectToVisibilityConverter}}">
                             <Run Text="StackTrace" TextDecorations="Underline" Style="{StaticResource TitleText}"/>
                             <LineBreak/>
                             <Run Text="{Binding SelectedLog.StackTrace}" FontWeight="Normal"/>

@@ -3,17 +3,15 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:controls="clr-namespace:KEI.UI.Wpf.Controls;assembly=KEI.UI.Wpf"
-             xmlns:converters="clr-namespace:KEI.UI.Wpf.Converters;assembly=KEI.UI.Wpf"
-             xmlns:ap="clr-namespace:KEI.UI.Wpf.AttachedProperties;assembly=KEI.UI.Wpf"
              xmlns:prism="http://prismlibrary.com/"
+             xmlns:wpf="http://gesinfotek.com/wpf"
              prism:ViewModelLocator.AutoWireViewModel="True"
              mc:Ignorable="d" 
              d:DesignHeight="720" d:DesignWidth="1280">
     <UserControl.Resources>
         <DataTemplate x:Key="LockedTemplate">
             <StackPanel>
-                <ContentControl ap:IconManager.Icon="Lock16x" Height="10" Width="10"/>
+                <ContentControl wpf:IconManager.Icon="Lock16x" Height="10" Width="10"/>
             </StackPanel>
         </DataTemplate>
     </UserControl.Resources>
@@ -43,7 +41,7 @@
                     <ToggleButton Grid.Column="1" x:Name="reorderToggleBtn" 
                                   Margin="10"
                                   Background="White"
-                                  ap:IconManager.Icon="HamburgerMenu16x"/>
+                                  wpf:IconManager.Icon="HamburgerMenu16x"/>
                 </Grid>
                 
                 <DataGrid ItemsSource="{Binding ActiveScreens, FallbackValue=ab}" 
@@ -52,7 +50,7 @@
                           CanUserDeleteRows="False"
                           CanUserSortColumns="False"
                           x:Name="activeScreens"
-                          ap:VisualHelper.EnableRowsMove="{Binding IsChecked, ElementName=reorderToggleBtn}">
+                          wpf:VisualHelper.EnableRowsMove="{Binding IsChecked, ElementName=reorderToggleBtn}">
                     <DataGrid.Resources>
                         <Style TargetType="DataGridRow">
                             <Style.Triggers>
@@ -127,7 +125,7 @@
 
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <controls:IconPicker Icon="{Binding Icon, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="50"/>
+                                    <wpf:IconPicker Icon="{Binding Icon, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="50"/>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
 
@@ -145,11 +143,11 @@
                     Margin="0 0 0 19"  
                     CommandParameter="{Binding SelectedItems, ElementName=inactiveScreens, Mode=OneWay}"
                     Command="{Binding AddScreenCommand}"
-                    ap:IconManager.Icon="CollapseChevronLeft16x"/>
+                    wpf:IconManager.Icon="CollapseChevronLeft16x"/>
             <Button Width="40" Height="40" 
                     CommandParameter="{Binding SelectedItems, ElementName=activeScreens, Mode=OneWay}"
                     Command="{Binding RemoveScreenCommand}"
-                    ap:IconManager.Icon="ExpandChevronRight16x"/>
+                    wpf:IconManager.Icon="ExpandChevronRight16x"/>
         </StackPanel>
 
 
@@ -167,7 +165,7 @@
                                Padding="10"/>
 
                 <DataGrid ItemsSource="{Binding InactiveScreens}"
-                          Visibility="{Binding InactiveScreens, Converter={ObjectToVisibilityConverter}}"
+                          Visibility="{Binding InactiveScreens, Converter={wpf:ObjectToVisibilityConverter}}"
                           AutoGenerateColumns="False"
                           CanUserAddRows="False"
                           CanUserDeleteRows="False"
@@ -237,7 +235,7 @@
 
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <controls:IconPicker Icon="{Binding Icon, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="50"/>
+                                    <wpf:IconPicker Icon="{Binding Icon, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="50"/>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
 

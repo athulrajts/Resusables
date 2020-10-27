@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Text;
 
 namespace KEI.UI.Wpf.Converters
 {
@@ -9,10 +7,10 @@ namespace KEI.UI.Wpf.Converters
     {
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if(double.TryParse(value?.ToString(), out double v) &&
-                double.TryParse(parameter?.ToString(), out double p))
+            if(double.TryParse(value?.ToString(), out double number) &&
+                double.TryParse(parameter?.ToString(), out double offset))
             {
-                return p + v;
+                return number + offset;
             }
 
             return value;

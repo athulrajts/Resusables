@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:ap="clr-namespace:KEI.UI.Wpf.AttachedProperties;assembly=KEI.UI.Wpf"
+             xmlns:wpf="http://gesinfotek.com/wpf"
              mc:Ignorable="d" 
              d:DesignHeight="110" d:DesignWidth="1920">
     <UserControl.Resources>
@@ -54,7 +54,7 @@
             <StackPanel>
                 <TextBlock>
                     <Run Text="["/>
-                    <Run Text="{Localize Value='Machine'}"/>
+                    <Run Text="{wpf:Localize Value='Machine'}"/>
                     <Run Text="]"/>
                 </TextBlock>
                 <TextBlock Text="{Binding MachineName, Mode=OneWay}"/>
@@ -65,7 +65,7 @@
             <StackPanel>
                 <TextBlock>
                     <Run Text="["/>
-                    <Run Text="{Localize Value='Version'}"/>
+                    <Run Text="{wpf:Localize Value='Version'}"/>
                     <Run Text="]"/>
                 </TextBlock>
                 <TextBlock Text="{Binding Version, Mode=OneWay}"/>
@@ -76,7 +76,7 @@
             <StackPanel>
                 <TextBlock>
                     <Run Text="["/>
-                    <Run Text="{Localize Value='User'}"/>
+                    <Run Text="{wpf:Localize Value='User'}"/>
                     <Run Text="]"/>
                 </TextBlock>
                 <TextBlock>
@@ -191,25 +191,25 @@
                         </Grid.Resources>
 
                         <Button Grid.Row="0" Grid.Column="0"
-                                ap:IconManager.Icon="User16x"
+                                wpf:IconManager.Icon="User16x"
                                 Command="{Binding SwitchUserCommand}"/>
                         
                         <Button Grid.Row="0" Grid.Column="1"
-                                ap:IconManager.Icon="SettingsGroup16x"
+                                wpf:IconManager.Icon="SettingsGroup16x"
                                 Command="{Binding AdvancedSetupCommand}"/>
                         
                         <Button Grid.Row="1" Grid.Column="0"
-                                ap:IconManager.Icon="SwitchSourceOrTarget16x"
-                                UserAcess.EnabledForUserLevel="Engineer"
+                                wpf:IconManager.Icon="SwitchSourceOrTarget16x"
+                                wpf:UserAcess.EnabledForUserLevel="Engineer"
                                 Command="{Binding SwitchToEngineeringMode}"/>
                         
                         <Button Grid.Row="1" Grid.Column="1"
-                                ap:IconManager.Icon="InformationSymbol16x"
+                                wpf:IconManager.Icon="InformationSymbol16x"
                                 Command="{Binding InfoCommand}"/>
                         
                         <Button Grid.Row="2" Grid.ColumnSpan="2"
                                 Foreground="Black"
-                                ap:IconManager.Icon="ShutDown16x"   
+                                wpf:IconManager.Icon="ShutDown16x"   
                                 Command="{Binding ExitApplicationCommand}"/>
 
                     </Grid>

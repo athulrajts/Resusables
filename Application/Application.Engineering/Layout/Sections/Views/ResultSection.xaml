@@ -5,11 +5,12 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:converters="clr-namespace:Application.UI.Converters;assembly=Application.UI"
              xmlns:prism="http://prismlibrary.com/"
+             xmlns:wpf="http://gesinfotek.com/wpf"
              prism:ViewModelLocator.AutoWireViewModel="True"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <StackPanel Visibility="{Binding Results, Converter={ObjectToVisibilityConverter}}">
+        <StackPanel Visibility="{Binding Results, Converter={wpf:ObjectToVisibilityConverter}}">
 
             <Border Margin="10" Background="{Binding IsPass, Converter={converters:BooleanToPassFailBrushConverter}}"
                         CornerRadius="3" Height="30">

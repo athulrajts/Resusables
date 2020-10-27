@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:ConfigEditor.Dialogs"
+        xmlns:wpf="http://gesinfotek.com/wpf"
         mc:Ignorable="d"
         Title="Select Files" Height="300" Width="600">
     <Window.Resources>
@@ -29,13 +29,13 @@
 
             <StackPanel>
                 <TextBlock Text="Left"/>
-                <BrowseTextBox Path="{Binding LeftFile, Mode=TwoWay}"
+                <wpf:BrowseTextBox Path="{Binding LeftFile, Mode=TwoWay}"
                                  Type="File"/>
             </StackPanel>
 
             <StackPanel Grid.Row="1">
                 <TextBlock Text="Right"/>
-                <BrowseTextBox Path="{Binding RightFile, Mode=TwoWay}"
+                <wpf:BrowseTextBox Path="{Binding RightFile, Mode=TwoWay}"
                                Type="File"/>
             </StackPanel>
 

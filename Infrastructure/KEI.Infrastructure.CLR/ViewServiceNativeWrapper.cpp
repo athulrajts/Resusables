@@ -15,7 +15,7 @@ msclr::gcroot<KEI::Infrastructure::IViewService^> ViewServiceNativeWrapper::inst
 
 void ViewServiceNativeWrapper::AutoInitialize()
 {
-	instance = ContainerLocator::Current->Resolve(KEI::Infrastructure::IViewService::typeid);
+	instance = (KEI::Infrastructure::IViewService^)ContainerLocator::Current->Resolve(KEI::Infrastructure::IViewService::typeid);
 }
 
 void ViewServiceNativeWrapper::InitializeBaseViewService()

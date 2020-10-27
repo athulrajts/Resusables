@@ -9,10 +9,10 @@ namespace KEI.UI.Wpf.Converters
     {
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if(double.TryParse(value?.ToString(), out double v) &&
-                double.TryParse(parameter?.ToString(), out double p))
+            if(double.TryParse(value?.ToString(), out double number) &&
+                double.TryParse(parameter?.ToString(), out double factor))
             {
-                return v * p;
+                return number * factor;
             }
 
             return value;

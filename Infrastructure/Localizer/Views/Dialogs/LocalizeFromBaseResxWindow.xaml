@@ -3,10 +3,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:vm="clr-namespace:Localizer.ViewModels"
         xmlns:cor="clr-namespace:Localizer.Core"
         xmlns:prism="http://prismlibrary.com/"
-        xmlns:local="clr-namespace:Localizer.Views.Dialogs"
+        xmlns:wpf="http://gesinfotek.com/wpf"
         prism:ViewModelLocator.AutoWireViewModel="True"
         mc:Ignorable="d"
         Title="LocalizeFromBaseResxWindow" Height="550" Width="900">
@@ -27,7 +26,7 @@
             <DockPanel Margin="10 0">
                 <TextBlock Text="Base Resx"
                            VerticalAlignment="Center" Padding="0 0 10 0"/>
-                <BrowseTextBox Path="{Binding BaseResXPath,Mode=TwoWay}"
+                <wpf:BrowseTextBox Path="{Binding BaseResXPath,Mode=TwoWay}"
                                Type="File"/>
             </DockPanel>
 
@@ -48,10 +47,10 @@
                   CanUserDeleteRows="False"
                   SelectionUnit="FullRow"
                   ItemsSource="{Binding ResourceFile.Resources}"
-                  AlternatingRowBackground="{StaticResource AlternatingRowBrush}">
+                  AlternatingRowBackground="{StaticResource AlternatingRowBrush}" Margin="292,25,-292,25" Grid.RowSpan="2">
             <DataGrid.Resources>
-                <BindingProxy x:Key="SourceLang" Data="{Binding BaseLang}"/>
-                <BindingProxy x:Key="DestLang" Data="{Binding Lang}"/>
+                <wpf:BindingProxy x:Key="SourceLang" Data="{Binding BaseLang}"/>
+                <wpf:BindingProxy x:Key="DestLang" Data="{Binding Lang}"/>
             </DataGrid.Resources>
             <DataGrid.Columns>
                 

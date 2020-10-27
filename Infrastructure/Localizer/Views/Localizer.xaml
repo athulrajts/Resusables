@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:core="clr-namespace:Localizer.Core"
         xmlns:prism="http://prismlibrary.com/"
+        xmlns:wpf="http://gesinfotek.com/wpf"
         mc:Ignorable="d"
         Title="Localizer" Height="550" Width="900">
     <Grid>
@@ -43,7 +44,7 @@
                 <!--Browse Folder-->
                 <Button Command="{Binding OpenSolutionFolderCommand}">
                     <StackPanel>
-                        <ContentControl IconManager.Icon="ProjectFolderOpen16x"
+                        <ContentControl wpf:IconManager.Icon="ProjectFolderOpen16x"
                                         Height="40"/>
                         <TextBlock Text="Open Solution"/>
                     </StackPanel>
@@ -52,7 +53,7 @@
                 <!--Browse File-->
                 <Button Command="{Binding OpenResXGeneratorCommand}">
                     <StackPanel>
-                        <ContentControl IconManager.Icon="WPFResourceDictionary16x"
+                        <ContentControl wpf:IconManager.Icon="WPFResourceDictionary16x"
                                         Height="40"/>
                         <TextBlock Text="Create Localization"/>
                     </StackPanel>
@@ -69,7 +70,7 @@
                 <HierarchicalDataTemplate DataType="{x:Type core:Project}"
                                   ItemsSource="{Binding TranslationFiles}">
                     <StackPanel Orientation="Horizontal" Margin="0 3">
-                        <ContentControl IconManager.Icon="XMLProject16x"
+                        <ContentControl wpf:IconManager.Icon="XMLProject16x"
                                         Margin="0 0 5 0" Height="16" Width="16"/>
                         <TextBlock Text="{Binding ProjectName}" FontSize="13">
                             <TextBlock.ContextMenu>
@@ -83,7 +84,7 @@
 
                 <DataTemplate DataType="{x:Type core:ResXLocalizationFile}">
                     <StackPanel Orientation="Horizontal">
-                        <ContentControl IconManager.Icon="TranslateDocument16x"
+                        <ContentControl wpf:IconManager.Icon="TranslateDocument16x"
                                         Margin="0 0 5 0" Height="16" Width="16"/>
                         <TextBlock Text="{Binding Name}" FontSize="13">
                             <TextBlock.InputBindings>

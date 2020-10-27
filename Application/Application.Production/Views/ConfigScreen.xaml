@@ -3,13 +3,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:keiUI="clr-namespace:KEI.UI.Wpf.Configuration;assembly=KEI.UI.Wpf"
-             xmlns:cofigs="clr-namespace:KEI.Infrastructure.Configuration;assembly=KEI.Infrastructure"
              xmlns:inf="clr-namespace:KEI.Infrastructure.Configuration;assembly=KEI.Infrastructure"
-             xmlns:ap="clr-namespace:KEI.UI.Wpf.AttachedProperties;assembly=KEI.UI.Wpf"
-             xmlns:converters="clr-namespace:Application.UI.Converters;assembly=Application.UI"
-             xmlns:converters1="clr-namespace:KEI.UI.Wpf.Converters;assembly=KEI.UI.Wpf"
              xmlns:prism="http://prismlibrary.com/"
+             xmlns:wpf="http://gesinfotek.com/wpf" 
+             xmlns:config="clr-namespace:KEI.UI.Wpf.Configuration;assembly=KEI.UI.Wpf"
              prism:ViewModelLocator.AutoWireViewModel="True"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
@@ -110,7 +107,7 @@
                       x:Name="treeView"
                       Background="Transparent"
                       BorderBrush="Transparent"
-                      ap:TreeViewBehaviours.TreeViewSelectedItem="{Binding SelectedConfig, Mode=TwoWay}"
+                      wpf:TreeViewBehaviours.TreeViewSelectedItem="{Binding SelectedConfig, Mode=TwoWay}"
                       Loaded="TreeView_Loaded">
                 <TreeView.ItemContainerStyle>
                     <Style TargetType="TreeViewItem">
@@ -176,14 +173,14 @@
                              ItemContainerStyle="{StaticResource ListBoxItemStyle}">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
-                                <keiUI:DatumViewer Data="{Binding}"/>
+                                <config:DatumViewer Data="{Binding}"/>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
                     </ListBox>
 
                     <Border Grid.Row="1" DataContext="{Binding SelectedItem, ElementName=listbox}"
                             Background="White" BorderBrush="Black" BorderThickness="1"
-                            Visibility="{Binding Converter={ObjectToVisibilityConverter}}">
+                            Visibility="{Binding Converter={wpf:ObjectToVisibilityConverter}}">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="4*"/>

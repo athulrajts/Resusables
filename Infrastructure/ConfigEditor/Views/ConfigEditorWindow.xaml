@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:prism="http://prismlibrary.com/"
-        xmlns:ap="clr-namespace:KEI.UI.Wpf.AttachedProperties;assembly=KEI.UI.Wpf"
+        xmlns:wpf="http://gesinfotek.com/wpf"
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
         Title="Config Editor" Height="600" Width="900">
@@ -40,9 +40,9 @@
 
                 <!--Browse File-->
                 <Button Command="{Binding OpenFileCommand}"
-                        ToolTip="{Localize Value='Open File'}">
+                        ToolTip="{wpf:Localize Value='Open File'}">
                     <StackPanel>
-                        <ContentControl IconManager.Icon="OpenFile16x"
+                        <ContentControl wpf:IconManager.Icon="OpenFile16x"
                                         Height="40"/>
                         <TextBlock Text="Open File"/>
                     </StackPanel>
@@ -50,9 +50,9 @@
 
                 <!--Compare Files-->
                 <Button Command="{Binding OpenFileSelectorWindow}"
-                        ToolTip="{Localize Value='Compare File'}">
+                        ToolTip="{wpf:Localize Value='Compare File'}">
                     <StackPanel>
-                        <ContentControl IconManager.Icon="Compare16x"
+                        <ContentControl wpf:IconManager.Icon="Compare16x"
                                         Height="40"/>
                         <TextBlock Text="Copmare"/>
                     </StackPanel>
@@ -80,12 +80,12 @@
                 <Button Command="{Binding NavigateCommand}"
                         CommandParameter="ConfigViewerTabs"
                         ToolTip="View Opened Config"
-                        ap:IconManager.Icon="ViewFull16x"/>
+                        wpf:IconManager.Icon="ViewFull16x"/>
                 
                 <Button Command="{Binding NavigateCommand}"
                         CommandParameter="MergeView"
                         ToolTip="Merge"
-                        ap:IconManager.Icon="TXMergeJoin16x"/>
+                        wpf:IconManager.Icon="TXMergeJoin16x"/>
 
             </StackPanel>
         </Border>

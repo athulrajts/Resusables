@@ -15,6 +15,7 @@ namespace KEI.UI.Wpf.Hotkey
         public string DisplayName { get; set; }
 
         public Key Key { get; set; }
+        
         public ModifierKeys ModifierKeys { get; set; }
 
         public string ID { get; set; }

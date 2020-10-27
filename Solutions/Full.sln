@@ -8,6 +8,7 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KEI.UI.Wpf", "..\Infrastructure\KEI.UI.Wpf\KEI.UI.Wpf.csproj", "{47CD9EE0-000E-4987-93F4-87E5BD7A7442}"
 	ProjectSection(ProjectDependencies) = postProject
 		{B5ACED0B-6D76-4E0A-B255-E6B09B7A01A0} = {B5ACED0B-6D76-4E0A-B255-E6B09B7A01A0}
+		{40DCEED3-94E2-4312-99FF-373B0DC9CE07} = {40DCEED3-94E2-4312-99FF-373B0DC9CE07}
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Application.Core", "..\Application\Application.Core\Application.Core.csproj", "{AF6ED55B-D973-453F-926C-6BC56D054918}"

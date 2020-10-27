@@ -8,7 +8,9 @@
              xmlns:converters="clr-namespace:KEI.UI.Wpf.Converters;assembly=KEI.UI.Wpf"
              xmlns:Themes="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Classic"
              xmlns:System="clr-namespace:System;assembly=mscorlib"
-             xmlns:ribbon="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:Primitives="clr-namespace:System.Windows.Controls.Ribbon.Primitives;assembly=System.Windows.Controls.Ribbon"
+             xmlns:ribbon="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:Primitives="clr-namespace:System.Windows.Controls.Ribbon.Primitives;assembly=System.Windows.Controls.Ribbon"
+             xmlns:wpf="http://gesinfotek.com/wpf"
              prism:ViewModelLocator.AutoWireViewModel="True"
              mc:Ignorable="d" 
              d:DesignHeight="1080" d:DesignWidth="1900">
@@ -347,39 +349,39 @@
 
             <ribbon:RibbonTab Header="General">
                 <ribbon:RibbonGroup>
-                    <ribbon:RibbonButton Label="{Localize Value='Start'}"
-                                         ToolTip="{Localize Value='Execute Test'}"
+                    <ribbon:RibbonButton Label="{wpf:Localize Value='Start'}"
+                                         ToolTip="{wpf:Localize Value='Execute Test'}"
                                          Command="{Binding StartTestCommand}"
                                          LargeImageSource="Resources/start.png"/>
 
-                    <ribbon:RibbonSplitButton Label="{Localize Value='Open'}"
+                    <ribbon:RibbonSplitButton Label="{wpf:Localize Value='Open'}"
                                               Command="{Binding OpenRecipeCommand}"
                                               LargeImageSource="Resources/open.png">
-                        <ribbon:RibbonMenuItem Header="{Localize Value='Open Recipe'}"
+                        <ribbon:RibbonMenuItem Header="{wpf:Localize Value='Open Recipe'}"
                                                Command="{Binding OpenRecipeCommand}"
                                                ImageSource="Resources/recipe.png"/>
-                        <ribbon:RibbonMenuItem Header="{Localize Value='Open Layout'}"
+                        <ribbon:RibbonMenuItem Header="{wpf:Localize Value='Open Layout'}"
                                                Command="{Binding OpenLayoutCommand}"
                                                ImageSource="Resources/layout.png"/>
-                        <ribbon:RibbonMenuItem Header="{Localize Value='Open Database'}"
+                        <ribbon:RibbonMenuItem Header="{wpf:Localize Value='Open Database'}"
                                                Command="{Binding OpenDatabaseCommand}"
                                                ImageSource="Resources/database.png"/>
                     </ribbon:RibbonSplitButton>
 
-                    <ribbon:RibbonSplitButton Label="{Localize Value='Save'}"
+                    <ribbon:RibbonSplitButton Label="{wpf:Localize Value='Save'}"
                                               Command="{Binding SaveRecipeCommand}"
                                               LargeImageSource="Resources/save.png">
-                        <ribbon:RibbonMenuItem Header="{Localize Value='Save Recipe'}"
+                        <ribbon:RibbonMenuItem Header="{wpf:Localize Value='Save Recipe'}"
                                                Command="{Binding SaveRecipeCommand}"
                                                ImageSource="Resources/recipe.png"/>
-                        <ribbon:RibbonMenuItem Header="{Localize Value='Save View'}"
+                        <ribbon:RibbonMenuItem Header="{wpf:Localize Value='Save View'}"
                                                Command="{Binding SaveLayoutCommand}"
                                                ImageSource="Resources/layout.png"/>
                     </ribbon:RibbonSplitButton>
                     
                 </ribbon:RibbonGroup>
 
-                <ribbon:RibbonGroup Header="{Localize Value='Section'}"
+                <ribbon:RibbonGroup Header="{wpf:Localize Value='Section'}"
                                     ItemsSource="{Binding Sections}">
                     <ribbon:RibbonGroup.ItemTemplate>
                         <DataTemplate>
@@ -390,44 +392,44 @@
                     </ribbon:RibbonGroup.ItemTemplate>
                 </ribbon:RibbonGroup>
 
-                <ribbon:RibbonGroup Header="{Localize Value='Setup'}">
+                <ribbon:RibbonGroup Header="{wpf:Localize Value='Setup'}">
 
-                    <ribbon:RibbonButton Label="{Localize Value='Advanced Setup'}"
+                    <ribbon:RibbonButton Label="{wpf:Localize Value='Advanced Setup'}"
                                          ToolTip="Advanced Setup"
                                          Command="{Binding ShowAdvancedSetupCommand}"
                                          LargeImageSource="Resources/advanced_setup.png"/>
 
-                    <ribbon:RibbonButton Label="{Localize Value='Layout Setup'}"
+                    <ribbon:RibbonButton Label="{wpf:Localize Value='Layout Setup'}"
                                          ToolTip="Layout Setup"
                                          Command="{Binding EditObjectCommand}"
                                          CommandParameter="{Binding Sections}"
                                          LargeImageSource="Resources/layout.png"/>
 
-                    <ribbon:RibbonButton Label="{Localize Value='Language'}"
+                    <ribbon:RibbonButton Label="{wpf:Localize Value='Language'}"
                                          Command="{Binding ChangeLanugageCommand}"
                                          LargeImageSource="Resources/save.png"/>
 
                 </ribbon:RibbonGroup>
 
-                <ribbon:RibbonGroup Header="{Localize Value='Folders'}">
+                <ribbon:RibbonGroup Header="{wpf:Localize Value='Folders'}">
 
-                    <ribbon:RibbonButton Label="{Localize Value='Database'}"
+                    <ribbon:RibbonButton Label="{wpf:Localize Value='Database'}"
                                          ToolTip="Go to database folder"
                                          Command="{Binding OpenFolderCommand}"
                                          CommandParameter="Database"
                                          LargeImageSource="Resources/database.png"/>
 
-                    <ribbon:RibbonSplitButton Label="{Localize Value='Logs'}"
+                    <ribbon:RibbonSplitButton Label="{wpf:Localize Value='Logs'}"
                                               Command="{Binding OpenFolderCommand}"
                                               CommandParameter="Logs"
                                               LargeImageSource="Resources/log.png">
 
-                        <ribbon:RibbonMenuItem Header="{Localize Value='Logs Folder'}"
+                        <ribbon:RibbonMenuItem Header="{wpf:Localize Value='Logs Folder'}"
                                                ToolTip="Go to Logs folder"
                                                Command="{Binding OpenFolderCommand}"
                                                CommandParameter="Logs"
                                                ImageSource="Resources/log.png"/>
-                        <ribbon:RibbonMenuItem Header="{Localize Value='View Logs'}"
+                        <ribbon:RibbonMenuItem Header="{wpf:Localize Value='View Logs'}"
                                                ToolTip="View current Log file"
                                                Command="{Binding OpenLogFileCommand}"
                                                IsEnabled="{Binding HasLogViewer}"
@@ -435,7 +437,7 @@
                         
                     </ribbon:RibbonSplitButton>
 
-                    <ribbon:RibbonButton Label="{Localize Value='Images'}"
+                    <ribbon:RibbonButton Label="{wpf:Localize Value='Images'}"
                                          ToolTip="Go to image folder"
                                          Command="{Binding OpenFolderCommand}"
                                          CommandParameter="Images"

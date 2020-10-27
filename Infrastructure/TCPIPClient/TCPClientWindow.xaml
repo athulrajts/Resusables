@@ -3,9 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:prism="http://prismlibrary.com/"
         xmlns:models="clr-namespace:TCPIPClient.Models"
-        prism:ViewModelLocator.AutoWireViewModel="True"
+        xmlns:wpf="http://gesinfotek.com/wpf"
         WindowStartupLocation="CenterScreen"
         mc:Ignorable="d"
         Title="TCP IP" Height="800" Width="650">
@@ -25,14 +24,14 @@
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
 
-                            <WatermarkTextBox Watermark="IP Address"
+                            <wpf:WatermarkTextBox Watermark="IP Address"
                                               VerticalContentAlignment="Center"
                                               Text="{Binding IPAddress}"
                                               Margin="10"
                                               Padding="5"
                                               Background="LightYellow"/>
 
-                            <WatermarkTextBox Watermark="Port"
+                            <wpf:WatermarkTextBox Watermark="Port"
                                               VerticalContentAlignment="Center"
                                               Text="{Binding Port}"
                                               Grid.Column="1"
@@ -63,7 +62,7 @@
                         <TabItem Header="Bytes" Width="100">
                             <ListBox ItemsSource="{Binding TransferredBytesCollection}"
                                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                                     Background="PowderBlue">
+                                     Background="WhiteSmoke">
                                 <ListBox.ItemTemplate>
                                     <DataTemplate>
                                         <TextBlock Text="{Binding}"
@@ -95,7 +94,7 @@
 
                         <StackPanel Orientation="Horizontal">
                             
-                            <WatermarkTextBox Watermark="Command ID"
+                            <wpf:WatermarkTextBox Watermark="Command ID"
                                               Width="300"
                                               Text="{Binding CommandID, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                               HorizontalAlignment="Left" 
@@ -119,7 +118,7 @@
                                   HeadersVisibility="Column"
                                   SelectionUnit="FullRow"
                                   Margin="10 0"
-                                  Background="Gainsboro">
+                                  Background="WhiteSmoke">
 
                             <DataGrid.Columns>
 

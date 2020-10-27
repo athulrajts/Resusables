@@ -6,6 +6,7 @@
         xmlns:service="clr-namespace:KEI.Infrastructure.Service;assembly=KEI.Infrastructure"
         xmlns:c="clr-namespace:ServiceEditor.Converters"
         xmlns:t="clr-namespace:KEI.Infrastructure.Types;assembly=KEI.Infrastructure"
+        xmlns:wpf="http://gesinfotek.com/wpf"
         mc:Ignorable="d"
         Title="Service Editor" Height="550" Width="850">
     <Window.Resources>
@@ -50,7 +51,7 @@
                 <!--Browse Folder-->
                 <Button Command="{Binding LoadServiceConfigCommand}">
                     <StackPanel>
-                        <ContentControl IconManager.Icon="ConnectedServiceReferenceFolderOpen16x"
+                        <ContentControl wpf:IconManager.Icon="ConnectedServiceReferenceFolderOpen16x"
                                         Height="40"/>
                         <TextBlock Text="Open Configuration"/>
                     </StackPanel>
@@ -59,7 +60,7 @@
                 <!--Browse File-->
                 <Button Command="{Binding SaveServiceConfigCommand}">
                     <StackPanel>
-                        <ContentControl IconManager.Icon="StoreVirtualMachine16x"
+                        <ContentControl wpf:IconManager.Icon="StoreVirtualMachine16x"
                                         Height="40"/>
                         <TextBlock Text="Save Configuration"/>
                     </StackPanel>

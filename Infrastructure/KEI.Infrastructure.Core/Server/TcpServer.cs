@@ -155,9 +155,12 @@ namespace KEI.Infrastructure.Server
 
         public void SetupForReconnection()
         {
-            _client.Close();
-            _client.Dispose();
-            _client = null;
+            if (_client != null)
+            {
+                _client.Close();
+                _client.Dispose();
+                _client = null; 
+            }
 
             OnClientDisconnected?.Invoke();
 

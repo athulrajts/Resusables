@@ -1,11 +1,9 @@
-﻿using KEI.Infrastructure.Localizer;
-using System;
-using System.ComponentModel;
+﻿using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Markup;
-using System.Windows.Media;
+using KEI.Infrastructure.Localizer;
 
 namespace KEI.UI.Wpf
 {

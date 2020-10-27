@@ -144,12 +144,13 @@ namespace TCPIPClient.ViewModels
             writer.Write(length);
             writer.Write(bytes);
 
+            byte[] message = stream.ToArray();
 
             try
             {
-                _client.Send(bytes);
+                _client.Send(message);
 
-                TransferredBytesCollection.Add($"Sent({bytes.Length}) : {BitConverter.ToString(bytes.ToArray())}");
+                TransferredBytesCollection.Add($"Sent({message.Length}) : {BitConverter.ToString(message)}");
 
                 TransferredMessagesCollection.Add($"Command ({CommandID}) => {string.Join(" ", Inputs.Select(x => string.Format("\"{0}\"", x.Value)))}");
             }

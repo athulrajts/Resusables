@@ -10,6 +10,5 @@ namespace KEI.UI.Wpf.Hotkey
         void AddGesture(GestureCommand command);
         void AddReadonlyGesture(GestureCommand command);
         void RemoveGesture(string uid);
-
     }
 }

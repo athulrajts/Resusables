@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:c="clr-namespace:Localizer.Converters"
+             xmlns:wpf="http://gesinfotek.com/wpf"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
@@ -41,7 +42,7 @@
                   AlternatingRowBackground="{StaticResource AlternatingRowBrush}"
                   x:Name="dataGrid">
             <DataGrid.Resources>
-                <BindingProxy x:Key="Lang" Data="{Binding File.Lang}"/>
+                <wpf:BindingProxy x:Key="Lang" Data="{Binding File.Lang}"/>
             </DataGrid.Resources>
             <DataGrid.Columns>
                 <DataGridTextColumn Header="English" Binding="{Binding Key,Mode=OneWay, Converter={c:ResourceKeyToValueConverter}}" Width="*"/>

@@ -13,10 +13,10 @@ using System.Windows.Markup;
 [assembly: AssemblyCopyright("Copyright ©  2020")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
-[assembly: XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml/presentation", "KEI.UI.Wpf")]
-[assembly: XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml/presentation", "KEI.UI.Wpf.AttachedProperties")]
-[assembly: XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml/presentation", "KEI.UI.Wpf.Controls")]
-[assembly: XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml/presentation", "KEI.UI.Wpf.Converters")]
+[assembly: XmlnsDefinition("http://gesinfotek.com/wpf", "KEI.UI.Wpf")]
+[assembly: XmlnsDefinition("http://gesinfotek.com/wpf", "KEI.UI.Wpf.AttachedProperties")]
+[assembly: XmlnsDefinition("http://gesinfotek.com/wpf", "KEI.UI.Wpf.Controls")]
+[assembly: XmlnsDefinition("http://gesinfotek.com/wpf", "KEI.UI.Wpf.Converters")]
 
 
 // Setting ComVisible to false makes the types in this assembly not visible

@@ -29,11 +29,11 @@ namespace ApplicationShell
 
         private Language GetLang()
         {
-            switch(CultureInfo.DefaultThreadCurrentUICulture?.Name)
+            return (CultureInfo.DefaultThreadCurrentUICulture?.Name) switch
             {
-                case "ja-JP": return Language.Japanese;
-                default: return Language.English;
-            }
+                "ja-JP" => Language.Japanese,
+                _ => Language.English,
+            };
         }
 
         private ApplicationMode appMode = ApplicationMode.Production;

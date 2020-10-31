@@ -7,14 +7,14 @@ using KEI.Infrastructure.Validation;
 using KEI.Infrastructure.Validation.Attributes;
 using KEI.UI.Wpf.Hotkey;
 
-namespace KEI.UI.Wpf.Screens
+namespace Application.Production
 {
-    public abstract class BaseValidatingScreenViewModel<T> : BaseScreenViewModel<T>, IDataErrorInfo
+    public abstract class BaseValidatingScreenViewModel : BaseScreenViewModel, IDataErrorInfo
     {
         #region Private Fields
 
-        private Dictionary<string, bool> _errors = new Dictionary<string, bool>();
-        private Dictionary<string, ValidatorGroup> _validators = new Dictionary<string, ValidatorGroup>();
+        protected Dictionary<string, bool> _errors = new Dictionary<string, bool>();
+        protected Dictionary<string, ValidatorGroup> _validators = new Dictionary<string, ValidatorGroup>();
         private PropertyInfo[] _props;
 
         #endregion
@@ -39,7 +39,26 @@ namespace KEI.UI.Wpf.Screens
             }
         }
 
-        public bool HasError => _errors.Count > 0;
+        public bool HasError
+        {
+            get
+            {
+                if (_errors.Count == 0)
+                {
+                    return true;
+                }
+
+                foreach (var item in _errors)
+                {
+                    if (item.Value == false)
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+        }
 
         private ValidationResult Validate(string name)
         {
@@ -57,7 +76,7 @@ namespace KEI.UI.Wpf.Screens
 
         #region Protected Functions
 
-        protected ValidationBuilder ValidationRuleFor<TProperty>(Expression<Func<T, TProperty>> expr)
+        protected ValidationBuilder ValidationRuleFor<T>(Expression<Func<T>> expr)
         {
             var member = ParseMemberName(expr);
 
@@ -93,7 +112,6 @@ namespace KEI.UI.Wpf.Screens
         }
         #endregion
 
-
         #region IDataErrorInfo Members
         public string this[string name]
         {
@@ -104,23 +122,29 @@ namespace KEI.UI.Wpf.Screens
                 if (result.IsValid)
                 {
                     if (_errors.ContainsKey(name))
+                    {
                         _errors.Remove(name);
+                    }
                 }
                 else
                 {
                     if (_errors.ContainsKey(name))
+                    {
                         _errors[name] = result.IsValid;
+                    }
                     else
+                    {
                         _errors.Add(name, result.IsValid);
+                    }
                 }
-
 
                 RaisePropertyChanged(nameof(HasError));
 
                 return result.ErrorMessage;
             }
         }
-        public string Error => string.Join(";", _errors.Keys);
+
+        public virtual string Error => null;
 
         #endregion
     }

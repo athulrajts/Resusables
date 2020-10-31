@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:Application.UI"
              xmlns:prism="http://prismlibrary.com/"
-             xmlns:coverters="clr-namespace:KEI.UI.Wpf.Converters;assembly=KEI.UI.Wpf"
+             xmlns:wpf="http://gesinfotek.com/wpf"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
 
@@ -20,7 +20,7 @@
         <TabControl TabStripPlacement="Left" prism:RegionManager.RegionName="{x:Static local:RegionNames.AdvancedSetup}">
             <TabControl.ItemContainerStyle>
                 <Style TargetType="TabItem">
-                    <Setter Property="Visibility" Value="{Binding DataContext.IsAvailable, Converter={coverters:BooleanToVisibilityConverter}}"/>
+                    <Setter Property="Visibility" Value="{Binding DataContext.IsAvailable, Converter={wpf:BooleanToVisibilityConverter}}"/>
                     <Setter Property="Header" Value="{Binding DataContext.Name}"/>
                 </Style>
             </TabControl.ItemContainerStyle>

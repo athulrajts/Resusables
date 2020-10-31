@@ -6,6 +6,8 @@
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>Oxygen-Icons.org-Oxygen-Apps-internet-web-browser.ico</ApplicationIcon>
+    <AssemblyName>TCPClient</AssemblyName>
+    <RootNamespace>TCPClient</RootNamespace>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">

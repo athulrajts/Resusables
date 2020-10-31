@@ -6,11 +6,10 @@ using Prism.Regions;
 using Prism.Commands;
 using KEI.Infrastructure;
 using KEI.Infrastructure.Prism;
-using KEI.Infrastructure.Screen;
 using KEI.Infrastructure.Configuration;
-using KEI.UI.Wpf;
 using Application.Core;
 using Application.UI;
+using KEI.UI.Wpf;
 using KEI.UI.Wpf.Hotkey;
 using System.Reflection;
 using Application.Production.Screen;
@@ -20,7 +19,7 @@ using Prism.Ioc;
 namespace Application.Production
 {
     [RegisterSingleton(NeedResolve = false)]
-    public class ProductionViewModel : BaseViewModel<ProductionView>, INavigationAware
+    public class ProductionViewModel : BaseViewModel, INavigationAware
     {
         #region Injected Members
 
@@ -132,7 +131,7 @@ namespace Application.Production
         {
             Screens.Clear();
 
-            var screenInfo = screens == null ? ContainerLocator.Container.Resolve<ScreenConfig>().Config : screens;
+            var screenInfo = screens ?? ContainerLocator.Container.Resolve<ScreenConfig>().Config;
 
             foreach (var screen in screenInfo.Where(x => string.IsNullOrEmpty(x.ParentScreenName)))
             {
@@ -160,9 +159,13 @@ namespace Application.Production
             }
 
             if (Screens.FirstOrDefault((x) => x.IsSelected) is IScreenViewModel si)
+            {
                 CurrentScreen = si.ScreenName;
+            }
             else
+            {
                 CurrentScreen = Screens.ElementAtOrDefault(0)?.ScreenName;
+            }
 
             RegisterNavigationHotkeys();
         }
@@ -247,6 +250,11 @@ namespace Application.Production
         {
             //Register Main Navigation Hotkeys
             RegisterNavigationHotkeys();
+
+            if (CurrentScreenViewModel == null)
+            {
+                return;
+            }
 
             //Register Subviews
             if (CurrentScreenViewModel.SubViews.Count > 0)

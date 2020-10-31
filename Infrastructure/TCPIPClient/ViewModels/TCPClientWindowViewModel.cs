@@ -7,10 +7,10 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using InputParameter = TCPIPClient.Models.InputParameter;
-using InputParameterCollection = TCPIPClient.Models.InputParameterCollection;
+using InputParameter = TCPClient.Models.InputParameter;
+using InputParameterCollection = TCPClient.Models.InputParameterCollection;
 
-namespace TCPIPClient.ViewModels
+namespace TCPClient.ViewModels
 {
     enum ReceiveState
     {
@@ -342,7 +342,7 @@ namespace TCPIPClient.ViewModels
         {
             if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
             {
-                foreach (var input in e.NewItems.Cast<Models.InputParameter>())
+                foreach (var input in e.NewItems.Cast<InputParameter>())
                 {
                     input.PropertyChanged += Input_PropertyChanged;
                 }
@@ -351,7 +351,7 @@ namespace TCPIPClient.ViewModels
             }
             else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
             {
-                foreach (var input in e.OldItems.Cast<Models.InputParameter>())
+                foreach (var input in e.OldItems.Cast<InputParameter>())
                 {
                     input.PropertyChanged -= Input_PropertyChanged;
                 }

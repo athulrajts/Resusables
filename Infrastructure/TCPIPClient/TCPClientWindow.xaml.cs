@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace TCPIPClient.Views
+namespace TCPClient.Views
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

@@ -67,7 +67,7 @@ namespace KEI.Infrastructure.PeriodicTasks
         public async Task Start()
         {
             _timer = new Timer((int)Period * MINUTE_TO_MS_FACTOR);
-            _timer.Elapsed += timer_Elapsed;
+            _timer.Elapsed += Timer_Elapsed;
 
             InitializeParameters();
 
@@ -101,10 +101,10 @@ namespace KEI.Infrastructure.PeriodicTasks
 
         public void Dispose()
         {
-            _timer.Elapsed -= timer_Elapsed;
+            _timer.Elapsed -= Timer_Elapsed;
         }
 
-        private async void timer_Elapsed(object sender, ElapsedEventArgs e) => await Task.Run(() => Execute());
+        private async void Timer_Elapsed(object sender, ElapsedEventArgs e) => await Task.Run(() => Execute());
 
     }
 }

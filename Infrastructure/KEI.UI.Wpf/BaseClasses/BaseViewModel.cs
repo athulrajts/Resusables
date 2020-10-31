@@ -3,12 +3,10 @@ using System;
 using System.ComponentModel;
 using System.Windows;
 
-namespace KEI.Infrastructure.Screen
+namespace KEI.UI.Wpf
 {
     public abstract class BaseViewModel : BindableBase, IWeakEventListener
     {
-        public virtual string ScreenName { get; }
-
         public BaseViewModel()
         {
 
@@ -32,13 +30,11 @@ namespace KEI.Infrastructure.Screen
             return;
         }
 
-        protected void AddPropertyObserver(INotifyPropertyChanged source, string property = "") => PropertyChangedEventManager.AddListener(source, this, property);
+        protected void AddPropertyObserver(INotifyPropertyChanged source, string property = "") 
+            => PropertyChangedEventManager.AddListener(source, this, property);
 
-        protected void RemovePropertyObserver(INotifyPropertyChanged source, string property = "") => PropertyChangedEventManager.RemoveListener(source, this, property);
+        protected void RemovePropertyObserver(INotifyPropertyChanged source, string property = "")
+            => PropertyChangedEventManager.RemoveListener(source, this, property);
     }
 
-    public abstract class BaseViewModel<TView> : BaseViewModel
-    {
-        public override string ScreenName => typeof(TView).Name;
-    }
 }

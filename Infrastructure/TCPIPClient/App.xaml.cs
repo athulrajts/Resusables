@@ -2,10 +2,10 @@
 using KEI.UI.Wpf.ViewService;
 using Prism.Ioc;
 using System.Windows;
-using TCPIPClient.ViewModels;
-using TCPIPClient.Views;
+using TCPClient.ViewModels;
+using TCPClient.Views;
 
-namespace TCPIPClient
+namespace TCPClient
 {
     /// <summary>
     /// Interaction logic for App.xaml

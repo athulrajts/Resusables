@@ -68,6 +68,12 @@ namespace Application.Production
                 var icon = attribute.Icon;
                 var screenName = attribute.ScreenName;
 
+                var screenObj = ContainerLocator.Container.Resolve(t);
+                if(screenObj is BaseScreenViewModel vm)
+                {
+                    vm.ScreenName = screenName;
+                }
+
                 if (!config.ContainsScreen(screenName))
                 {
                     config.InactiveScreens.Add(new ScreenInfo

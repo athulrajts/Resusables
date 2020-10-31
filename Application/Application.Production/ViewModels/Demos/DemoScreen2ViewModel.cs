@@ -1,4 +1,10 @@
-﻿using Application.Core.Interfaces;
+﻿using System.IO;
+using System.Data;
+using System.Linq;
+using System.Diagnostics;
+using System.Windows.Input;
+using Prism.Commands;
+using Application.Core.Interfaces;
 using Application.Production.Views;
 using Application.UI.AdvancedSetup.ViewModels;
 using KEI.Infrastructure;
@@ -9,23 +15,14 @@ using KEI.Infrastructure.Screen;
 using KEI.Infrastructure.Utils;
 using KEI.UI.Wpf;
 using KEI.UI.Wpf.Hotkey;
-using Prism.Commands;
-using System.Data;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Windows.Input;
 
 namespace Application.Production.ViewModels
 {
     [Screen(DisplayName = "Demos 2",
          Icon = Icon.AzureSQLDatabase16x,
          ScreenName = nameof(DemoScreen2))]
-    public class DemoScreen2ViewModel : BaseScreenViewModel<DemoScreen2>
+    public class DemoScreen2ViewModel : BaseScreenViewModel
     {
-        public override string DisplayName { get; set; }
-        public override Icon Icon { get; set; }
-
         private DatabaseSetup setup;
 
         private readonly IDatabaseManager _databaseManager;

@@ -18,11 +18,8 @@ namespace Application.Production.ViewModels
     [Screen(DisplayName = "Demos",
              Icon = Icon.ShowAllCode16x,
              ScreenName = nameof(DemoScreen))]
-    public class DemoScreenViewModel : BaseScreenViewModel<DemoScreen>
+    public class DemoScreenViewModel : BaseScreenViewModel
     {
-        public override string DisplayName { get; set; } = "Demos";
-        public override Icon Icon { get; set; } = Icon.ShowAllCode16x;
-
         private readonly IViewService _viewService;
         private readonly ISystemStatusManager _statusManager;
         public DemoScreenViewModel(IHotkeyService hotkeyService, IViewService viewService,

@@ -1,7 +1,5 @@
 ﻿using Application.Core;
 using Application.Core.Interfaces;
-using KEI.Infrastructure;
-using KEI.Infrastructure.Prism;
 using Prism.Events;
 using Prism.Mvvm;
 using System.Data;

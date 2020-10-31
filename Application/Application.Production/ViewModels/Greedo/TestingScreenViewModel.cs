@@ -4,28 +4,22 @@ using Prism.Events;
 using Prism.Commands;
 using KEI.Infrastructure.Prism;
 using KEI.Infrastructure.Screen;
+using KEI.Infrastructure.Events;
 using KEI.Infrastructure.Database;
 using KEI.Infrastructure.Configuration;
-using KEI.UI.Wpf;
 using KEI.UI.Wpf.Hotkey;
 using Application.Core;
 using Application.Core.Interfaces;
 using Application.Production.Views;
 using Application.Production.Screen;
-using KEI.Infrastructure.Events;
 
 namespace Application.Production.ViewModels
 {
     [Screen(DisplayName = ScreenDisplayNames.TestingScreen,
             Icon = Icon.Test16x,
             ScreenName = nameof(TestingScreen))]
-    public class TestingScreenViewModel : BaseScreenViewModel<TestingScreen>
+    public class TestingScreenViewModel : BaseScreenViewModel
     {
-        #region BaseScreenViewModel Members
-        public override string DisplayName { get; set; } = "Testing";
-        public override Icon Icon { get; set; } = Icon.Test16x;
-
-        #endregion
 
         private IPropertyContainer _currentRecipe;
         private IDatabase _mainDatabase;

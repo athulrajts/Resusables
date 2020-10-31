@@ -3,19 +3,13 @@ using System.IO;
 using System.Linq;
 using System.IO.Compression;
 using System.Collections.Generic;
-using KEI.Infrastructure.Types;
+using KEI.Infrastructure.Logging;
 
 namespace KEI.Infrastructure.PeriodicTasks
 {
     public class DirectoryBackupTask : PeriodicTask
     {
         private DirectoryInfo _dir;
-        private readonly ILogger _logger;
-
-        public DirectoryBackupTask(ILogManager logManager)
-        {
-            _logger = logManager.GetLogger();
-        }
 
         private string directory;
         public string Directory
@@ -71,7 +65,7 @@ namespace KEI.Infrastructure.PeriodicTasks
                     }
                     catch (Exception ex)
                     {
-                        _logger.Error($"Exception when deleting file {file.Name}", ex);
+                        Logger.Error($"Exception when deleting file {file.Name}", ex);
                     }
                 });
 

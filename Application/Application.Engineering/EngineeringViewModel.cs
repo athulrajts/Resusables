@@ -3,11 +3,13 @@ using System.Linq;
 using System.Windows;
 using System.Diagnostics;
 using System.Collections.ObjectModel;
+using Prism.Mvvm;
 using Prism.Events;
 using Prism.Commands;
 using KEI.Infrastructure;
 using KEI.Infrastructure.Prism;
-using KEI.Infrastructure.Screen;
+using KEI.Infrastructure.Utils;
+using KEI.Infrastructure.Events;
 using KEI.Infrastructure.Database;
 using KEI.UI.Wpf.Hotkey;
 using Application.Core;
@@ -16,14 +18,11 @@ using Application.UI.Controls;
 using Application.UI.Converters;
 using Application.Engineering.Layout;
 using Application.Engineering.Dialogs;
-using KEI.Infrastructure.Events;
-using System;
-using KEI.Infrastructure.Utils;
 
 namespace Application.Engineering
 {
     [RegisterSingleton(NeedResolve = false)]
-    public class EngineeringViewModel : BaseViewModel<EngineeringView>
+    public class EngineeringViewModel : BindableBase
     {
         private readonly ISystemStatusManager _statusManager;
         private readonly IApplicationViewService _viewService;
@@ -339,7 +338,7 @@ namespace Application.Engineering
 
         #endregion
 
-        #region ChangeLanugage
+        #region Change Lanugage
 
         private DelegateCommand changeLanguageCommand;
         public DelegateCommand ChangeLanugageCommand =>

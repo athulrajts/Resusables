@@ -2,7 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
-using KEI.Infrastructure.Types;
+using KEI.Infrastructure.Logging;
 
 namespace KEI.Infrastructure.PeriodicTasks
 {
@@ -10,12 +10,6 @@ namespace KEI.Infrastructure.PeriodicTasks
     {
 
         private DirectoryInfo _dir;
-        private readonly ILogger _logger;
-
-        public DirectoryCleanupTask(ILogManager logManager)
-        {
-            _logger = logManager.GetLogger();
-        }
 
         private string directory;
         public string Directory
@@ -59,7 +53,7 @@ namespace KEI.Infrastructure.PeriodicTasks
                     }
                     catch (Exception ex)
                     {
-                        _logger.Error($"Exception when deleting file {file.Name}", ex);
+                        Logger.Error($"Exception when deleting file {file.Name}", ex);
                     }
                 });
             }

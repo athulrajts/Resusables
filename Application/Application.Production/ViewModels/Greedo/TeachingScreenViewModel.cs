@@ -6,7 +6,6 @@ using KEI.Infrastructure;
 using KEI.Infrastructure.Configuration;
 using KEI.Infrastructure.Prism;
 using KEI.Infrastructure.Screen;
-using KEI.UI.Wpf;
 using KEI.UI.Wpf.Hotkey;
 using Application.Core;
 using Application.Core.Camera;
@@ -19,13 +18,8 @@ namespace Application.Production.ViewModels
     [Screen(DisplayName = ScreenDisplayNames.TeachingScreen,
             Icon = Icon.TestConfiguration16x,
             ScreenName = nameof(TeachingScreen))]
-    public class TeachingScreenViewModel : BaseScreenViewModel<TeachingScreen>
+    public class TeachingScreenViewModel : BaseScreenViewModel
     {
-        #region BaseScreenViewModel Members
-        public override string DisplayName { get; set; } = "Teaching";
-        public override Icon Icon { get; set; } = Icon.TestConfiguration16x;
-
-        #endregion
 
         #region Injected Instances
 

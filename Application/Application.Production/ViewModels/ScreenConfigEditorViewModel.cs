@@ -2,16 +2,15 @@
 using System.Collections;
 using System.Windows.Input;
 using System.Collections.ObjectModel;
+using Prism.Ioc;
 using Prism.Events;
 using Prism.Commands;
 using KEI.Infrastructure;
 using KEI.Infrastructure.Prism;
 using KEI.Infrastructure.Screen;
-using KEI.UI.Wpf;
 using KEI.UI.Wpf.Hotkey;
 using Application.Production.Views;
 using Application.Production.Screen;
-using Prism.Ioc;
 
 namespace Application.Production.ViewModels
 {
@@ -19,14 +18,8 @@ namespace Application.Production.ViewModels
             Icon = Icon.None16x,
             ScreenName = nameof(ScreenConfigEditor),
             ParentName = nameof(ConfigScreen))]
-    public class ScreenConfigEditorViewModel : BaseScreenViewModel<ScreenConfigEditor>
+    public class ScreenConfigEditorViewModel : BaseScreenViewModel
     {
-        #region BaseScreenViewModel Members
-        public override string DisplayName { get; set; } = @"Manage Screens";
-        public override Icon Icon { get; set; } = Icon.None16x;
-
-        #endregion
-
         #region Injected Members
 
         private readonly ScreenConfig _screenConfig;

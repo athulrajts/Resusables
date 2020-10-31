@@ -3,17 +3,17 @@ using System.Linq;
 using System.Windows.Input;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Prism.Ioc;
 using Prism.Regions;
 using Prism.Commands;
 using KEI.Infrastructure.Screen;
-using KEI.Infrastructure.Helpers;
+using KEI.UI.Wpf;
 using KEI.UI.Wpf.Hotkey;
 using Application.UI;
 using Application.Production.Screen;
 using KEI.Infrastructure.Logging;
-using Prism.Ioc;
 
-namespace KEI.UI.Wpf
+namespace Application.Production
 {
     /// <summary>
     /// Base class for ViewModels
@@ -42,12 +42,10 @@ namespace KEI.UI.Wpf
             _hotkeyService = hotkeyService;
             _assemblyName = GetType().Assembly.GetName().Name;
 
-            /// Keeps a collection of All instances of type <see cref="BaseScreenViewModel{TView}"/>
+            /// Keeps a collection of All instances of type <see cref="BaseScreenViewModel"/>
             /// This is done to populate Navigation bars.
-            if (GetType().IsSubclassOfRawGeneric(typeof(BaseScreenViewModel<>)))
-            {
-                Instances.Add(this);
-            }
+            Instances.Add(this);
+
             CurrentSubViewModel = this;
         }
 
@@ -85,18 +83,20 @@ namespace KEI.UI.Wpf
         /// <summary>
         /// Name to be displayed in Navigation bar
         /// </summary>
-        public abstract string DisplayName { get; set; }
+        public string DisplayName { get; set; }
 
         /// <summary>
         /// Icon to be displayed in Navigation bar
         /// </summary>
-        public abstract Icon Icon { get; set; }
+        public Icon Icon { get; set; }
 
         public IScreenViewModel CurrentSubViewModel { get; set; }
 
         public IScreenViewModel ParentScreenViewModel { get; set; }
 
         public bool IsChildScreen { get; set; }
+
+        public string ScreenName { get; set; }
 
         #endregion
 
@@ -228,17 +228,5 @@ namespace KEI.UI.Wpf
             return;
         }
 
-    }
-
-    /// <summary>
-    /// Absctract class for ViewModels which are tightly coupled with views
-    /// This View-ViewModel pair is automatically registered for navigation.
-    /// </summary>
-    /// <typeparam name="TView"></typeparam>
-    public abstract class BaseScreenViewModel<TView> : BaseScreenViewModel
-    {
-        public BaseScreenViewModel(IHotkeyService hotkeyService) : base(hotkeyService) { }
-
-        public override string ScreenName => typeof(TView).Name;
     }
 }

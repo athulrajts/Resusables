@@ -1,17 +1,14 @@
 ﻿using System.Windows.Input;
 using Prism.Commands;
 using KEI.Infrastructure.Configuration;
-using KEI.Infrastructure.Screen;
+using KEI.UI.Wpf;
 using Application.Core;
 using Application.Core.Interfaces;
-using Application.UI.AdvancedSetup.Views;
 
 namespace Application.UI.AdvancedSetup.ViewModels
 {
     public class AppearanceViewModel : BaseViewModel, IAdvancedSetup
     {
-        public override string ScreenName => typeof(Appearance).Name;
-
         private readonly IConfigManager _configManager;
         private readonly ISystemStatusManager _statusManager;
         private readonly IPropertyContainer _generalPreferences;

@@ -1,13 +1,12 @@
 ﻿using Application.Core.Models;
 using KEI.Infrastructure.Validation.Attributes;
-using KEI.UI.Wpf.Screens;
 using Prism.Commands;
 using Prism.Services.Dialogs;
 using System;
 
 namespace KEI.UI.Wpf.ViewService
 {
-    public class StartTestDialogViewModel : BaseViewModelWithValidation<StartTestDialogViewModel>, IDialogAware
+    public class StartTestDialogViewModel : BaseValidatingViewModel, IDialogAware
     {
 
         private DelegateCommand submitDialogCommand;

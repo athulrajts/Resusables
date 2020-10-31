@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 
-namespace TCPIPClient.Models
+namespace TCPClient.Models
 {
     public class InputParameterCollection : ObservableCollection<InputParameter>
     {

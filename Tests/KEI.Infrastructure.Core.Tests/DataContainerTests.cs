@@ -254,7 +254,7 @@ namespace KEI.Infrastructure.Core.Tests
             const int VALUE = 42;
             const int NEW_VALUE = 14;
 
-            IPropertyContainer property = PropertyContainerBuilder.Create()
+            IPropertyContainer pc = PropertyContainerBuilder.Create()
                 .WithProperty(PROP_NAME, VALUE)
                 .Build();
 
@@ -262,20 +262,20 @@ namespace KEI.Infrastructure.Core.Tests
 
             Assert.NotEqual(VALUE, bindingTarget.IntProperty);
 
-            property.SetBinding(PROP_NAME, () => bindingTarget.IntProperty, BindingMode.OneWay);
+            pc.SetBinding(PROP_NAME, () => bindingTarget.IntProperty, BindingMode.OneWay);
 
             Assert.Equal(VALUE, bindingTarget.IntProperty);
 
-            property.Set(PROP_NAME, NEW_VALUE);
+            pc.Set(PROP_NAME, NEW_VALUE);
 
             Assert.Equal(NEW_VALUE, bindingTarget.IntProperty);
 
             bindingTarget.IntProperty = 32;
 
             int propertyValue = 0;
-            property.Get(PROP_NAME, ref propertyValue);
+            pc.Get(PROP_NAME, ref propertyValue);
 
-            property.RemoveBinding(PROP_NAME, () => bindingTarget.IntProperty);
+            pc.RemoveBinding(PROP_NAME, () => bindingTarget.IntProperty);
             
             Assert.NotEqual(32, propertyValue);
             Assert.Equal(NEW_VALUE, propertyValue);

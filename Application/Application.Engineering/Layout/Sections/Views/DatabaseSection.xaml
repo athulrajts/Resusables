@@ -5,12 +5,12 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:prism="http://prismlibrary.com/"
              xmlns:controls="clr-namespace:Application.UI.Controls;assembly=Application.UI"
-             xmlns:conv1="clr-namespace:KEI.UI.Wpf.Converters;assembly=KEI.UI.Wpf"
+             xmlns:wpf="http://gesinfotek.com/wpf"
              prism:ViewModelLocator.AutoWireViewModel="True"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <controls:DatabaseViewer Data="{Binding Data}"
-                                 Visibility="{Binding Data, Converter={conv1:ObjectToVisibilityConverter}}" Loaded="DatabaseViewer_Loaded"/>
+                                 Visibility="{Binding Data, Converter={wpf:ObjectToVisibilityConverter}}" Loaded="DatabaseViewer_Loaded"/>
     </Grid>
 </UserControl>

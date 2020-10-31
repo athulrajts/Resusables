@@ -45,5 +45,10 @@ namespace KEI.Infrastructure.Prism
         public string DisplayName { get; set; }
         public string ScreenName { get; set; }
         public Icon Icon { get; set; } = Icon.None16x;
+
+        public ScreenAttribute()
+        {
+            NeedResolve = false;
+        }
     }
 }

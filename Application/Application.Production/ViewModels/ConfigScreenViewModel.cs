@@ -3,6 +3,7 @@ using System.Linq;
 using System.Windows.Input;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Prism.Ioc;
 using Prism.Commands;
 using KEI.Infrastructure;
 using KEI.Infrastructure.Prism;
@@ -10,13 +11,11 @@ using KEI.Infrastructure.Types;
 using KEI.Infrastructure.Screen;
 using KEI.Infrastructure.Validation;
 using KEI.Infrastructure.Configuration;
-using KEI.UI.Wpf;
 using KEI.UI.Wpf.Hotkey;
 using KEI.UI.Wpf.Controls.ObjectEditors;
 using Application.Core;
 using Application.Production.Views;
 using Application.Production.Screen;
-using Prism.Ioc;
 
 namespace Application.Production.ViewModels
 {
@@ -24,14 +23,8 @@ namespace Application.Production.ViewModels
     [Screen(DisplayName = "Configs",
             Icon = Icon.Settings16x,
             ScreenName = nameof(ConfigScreen))]
-    public class ConfigScreenViewModel : BaseScreenViewModel<ConfigScreen>
+    public class ConfigScreenViewModel : BaseScreenViewModel
     {
-        #region BaseScreenViewModel Members
-        public override Icon Icon { get; set; } = Icon.Settings16x;
-        public override string DisplayName { get; set; } = @"Configs";
-
-        #endregion
-
         #region Injected Members
 
         private readonly IConfigManager _configManager;

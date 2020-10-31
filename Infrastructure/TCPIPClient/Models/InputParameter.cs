@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace TCPIPClient.Models
+namespace TCPClient.Models
 {
     public class InputParameter : BindableBase
     {

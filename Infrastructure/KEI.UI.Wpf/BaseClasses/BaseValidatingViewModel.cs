@@ -1,25 +1,24 @@
-﻿using KEI.Infrastructure.Screen;
-using KEI.Infrastructure.Validation;
-using KEI.Infrastructure.Validation.Attributes;
-using System;
-using System.Collections.Generic;
+﻿using System;
+using System.Reflection;
 using System.ComponentModel;
 using System.Linq.Expressions;
-using System.Reflection;
+using System.Collections.Generic;
+using KEI.Infrastructure.Validation;
+using KEI.Infrastructure.Validation.Attributes;
 
-namespace KEI.UI.Wpf.Screens
+namespace KEI.UI.Wpf
 {
-    public abstract class BaseViewModelWithValidation<T> : BaseViewModel, IDataErrorInfo
+    public abstract class BaseValidatingViewModel : BaseViewModel, IDataErrorInfo
     {
         #region Private Fields
 
-        private Dictionary<string, bool> _errors = new Dictionary<string, bool>();
-        private Dictionary<string, ValidatorGroup> _validators = new Dictionary<string, ValidatorGroup>();
+        protected Dictionary<string, bool> _errors = new Dictionary<string, bool>();
+        protected Dictionary<string, ValidatorGroup> _validators = new Dictionary<string, ValidatorGroup>();
         private PropertyInfo[] _props;
 
         #endregion
 
-        public BaseViewModelWithValidation()
+        public BaseValidatingViewModel()
         {
             _props = GetType().GetProperties();
 
@@ -56,14 +55,16 @@ namespace KEI.UI.Wpf.Screens
             }
         }
 
-        private ValidationResult Validate(string name)
+        protected ValidationResult Validate(string name)
         {
             foreach (var prop in _props)
             {
                 if (prop.Name == name)
                 {
                     if (_validators.ContainsKey(name))
+                    {
                         return _validators[name].Validate(prop.GetValue(this));
+                    }
                 }
             }
 
@@ -72,7 +73,7 @@ namespace KEI.UI.Wpf.Screens
 
         #region Protected Functions
 
-        protected ValidationBuilder ValidationRuleFor<TProperty>(Expression<Func<T,TProperty>> expr)
+        protected ValidationBuilder ValidationRuleFor<T>(Expression<Func<T>> expr)
         {
             var member = ParseMemberName(expr);
 
@@ -114,6 +115,7 @@ namespace KEI.UI.Wpf.Screens
 
 
         #region IDataErrorInfo Members
+        
         public string this[string name]
         {
             get
@@ -121,16 +123,21 @@ namespace KEI.UI.Wpf.Screens
                 ValidationResult result = Validate(name);
 
                 if (_errors.ContainsKey(name))
+                {
                     _errors[name] = result.IsValid;
+                }
                 else
+                {
                     _errors.Add(name, result.IsValid);
+                }
 
                 RaisePropertyChanged(nameof(HasError));
 
                 return result.ErrorMessage;
             }
         }
-        public string Error => null;
+        
+        public virtual string Error => null;
 
         #endregion
     }

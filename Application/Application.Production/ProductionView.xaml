@@ -7,6 +7,7 @@
              xmlns:prism="http://prismlibrary.com/"
              xmlns:wpf="http://gesinfotek.com/wpf"
              xmlns:local="clr-namespace:Application.Production.Views"
+             xmlns:controls="clr-namespace:Application.Production.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -40,7 +41,7 @@
             </Border.Effect>
             <StackPanel Margin="0 10 0 0">
 
-                <wpf:NavigationButton DataContext="{Binding CurrentScreenViewModel}"
+                <controls:NavigationButton DataContext="{Binding CurrentScreenViewModel}"
                                            Content="{wpf:Localize {Binding DisplayName}}"
                                            GroupName="subViews"
                                            Margin="5" Padding="3"
@@ -56,17 +57,17 @@
                 <ItemsControl ItemsSource="{Binding CurrentScreenViewModel.SubViews}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <wpf:NavigationButton Content="{wpf:Localize {Binding DisplayName}}"
-                                                  GroupName="subViews"
-                                                  Background="White"
-                                                  Margin="5" Padding="3"
-                                                  Icon="{Binding Icon}"
-                                                  IsChecked="{Binding IsSelected}"
-                                                  Height="40" FontWeight="Black" FontSize="13"
-                                                  Command="{Binding NavigateSubViewCommand}" 
-                                                  CommandParameter="{Binding ScreenName}"/>
+                            <controls:NavigationButton Content="{wpf:Localize {Binding DisplayName}}"
+                                                       GroupName="subViews"
+                                                       Background="White"
+                                                       Margin="5" Padding="3"
+                                                       Icon="{Binding Icon}"
+                                                       IsChecked="{Binding IsSelected}"
+                                                       Height="40" FontWeight="Black" FontSize="13"
+                                                       Command="{Binding NavigateSubViewCommand}" 
+                                                       CommandParameter="{Binding ScreenName}"/>
                         </DataTemplate>
-                        
+
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
             </StackPanel>
@@ -85,7 +86,7 @@
             <ItemsControl ItemsSource="{Binding CurrentScreenViewModel.CurrentSubViewModel.Commands}" Margin="0 10 0 0">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <wpf:CommandButton Content="{wpf:Localize {Binding DisplayName}}" Margin="5" 
+                        <controls:CommandButton Content="{wpf:Localize {Binding DisplayName}}" Margin="5" 
                                                 HorizontalContentAlignment="Center"
                                                 Icon="{Binding Icon}"
                                                 Background="White"
@@ -96,7 +97,7 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </Border>
-        
+
         <!--TitleBar-->
         <Border Grid.Row="0" Grid.ColumnSpan="3" Background="{DynamicResource Theme.Accent}">
             <Border.Effect>
@@ -104,7 +105,7 @@
             </Border.Effect>
             <local:TitleBar Height="120"/>
         </Border>
-        
+
         <!--Naviation-->
         <Border Grid.Row="2" Grid.ColumnSpan="3" Padding="5" BorderThickness="0 1 0 0"
                 BorderBrush="Gray"
@@ -120,7 +121,7 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <wpf:NavigationButton Content="{wpf:Localize {Binding DisplayName}}"
+                        <controls:NavigationButton Content="{wpf:Localize {Binding DisplayName}}"
                                                    Command="{Binding DataContext.SwitchScreenCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ItemsControl}}"
                                                    CommandParameter="{Binding ScreenName}"
                                                    GroupName="Views"

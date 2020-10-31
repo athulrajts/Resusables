@@ -41,11 +41,6 @@
     <ProjectReference Include="..\KEI.UI.Wpf\KEI.UI.Wpf.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="KEI.Icons">
-      <HintPath>..\..\Build\Debug\KEI.Icons.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Resources\file.png" />
     <Resource Include="Resources\folder.png" />
     <Resource Include="Resources\yellow-file.png" />

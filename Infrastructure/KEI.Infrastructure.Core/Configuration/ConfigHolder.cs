@@ -61,7 +61,7 @@ namespace KEI.Infrastructure.Configuration
 
         public bool LoadConfig()
         {
-            Config = PropertyContainer.FromFile(ConfigPath);
+            Config = PropertyContainerBuilder.FromFile(ConfigPath);
 
             if (Config == null)
             {

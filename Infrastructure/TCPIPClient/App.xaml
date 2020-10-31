@@ -3,11 +3,4 @@
                         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                         xmlns:prism="http://prismlibrary.com/"
                         Exit="PrismApplication_Exit">
-    <prism:PrismApplication.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/KEI.UI.Wpf;component/Styles/TextBoxes.xaml"/>
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
-    </prism:PrismApplication.Resources>
 </prism:PrismApplication>

@@ -5,7 +5,12 @@ using KEI.Infrastructure.Configuration;
 
 namespace KEI.UI.Wpf.Converters
 {
-    public class ObjectToNameConverter : ValueConverterExtension<ObjectToNameConverter>
+    /// <summary>
+    /// Taskes in <see cref="object"/>
+    /// Returns <see cref="object.ToString" of <see cref="object.GetType()"/>
+    /// If Object is Generic type, returns in readable format
+    /// </summary>
+    public class ObjectToNameConverter : BaseValueConverter<ObjectToNameConverter>
     {
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
@@ -34,7 +39,12 @@ namespace KEI.UI.Wpf.Converters
         }
     }
 
-    public class TypeToNameConverter : ValueConverterExtension<TypeToNameConverter>
+    /// <summary>
+    /// Taskes in <see cref="Type"/>
+    /// Returns <see cref="object.ToString" of <see cref="object.GetType()"/>
+    /// If it is a Generic type, returns in readable format
+    /// </summary>
+    public class TypeToNameConverter : BaseValueConverter<TypeToNameConverter>
     {
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

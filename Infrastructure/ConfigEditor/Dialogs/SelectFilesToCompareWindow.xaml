@@ -22,21 +22,23 @@
         <Grid VerticalAlignment="Center"
               Margin="10">
             <Grid.RowDefinitions>
-                <RowDefinition/>
-                <RowDefinition/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <StackPanel>
                 <TextBlock Text="Left"/>
-                <wpf:BrowseTextBox Path="{Binding LeftFile, Mode=TwoWay}"
-                                 Type="File"/>
+                <wpf:BrowseTextBox Text="{Binding LeftFile, Mode=TwoWay}"
+                                   Height="40"
+                                   Type="File"/>
             </StackPanel>
 
             <StackPanel Grid.Row="1">
                 <TextBlock Text="Right"/>
-                <wpf:BrowseTextBox Path="{Binding RightFile, Mode=TwoWay}"
-                               Type="File"/>
+                <wpf:BrowseTextBox Text="{Binding RightFile, Mode=TwoWay}"
+                                   Height="40"
+                                   Type="File"/>
             </StackPanel>
 
             <StackPanel Grid.Row="2">

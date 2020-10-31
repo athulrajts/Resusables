@@ -67,7 +67,7 @@ namespace Application.Production.ViewModels
             SamplePropertyContainer.SetBinding("PropertyOne", () => TwoWayBinding, BindingMode.TwoWay);
             SamplePropertyContainer.SetBinding("PropertyOne", () => OneWayToSourceBinding, BindingMode.OneWayToSource);
 
-            generalPerferences.SetBinding("Theme", () => Theme, BindingMode.OneWayToSource);
+            generalPerferences.SetBinding("Theme", () => Theme, BindingMode.TwoWay);
 
             ValidationRule.Validate(ValidatingText);
             

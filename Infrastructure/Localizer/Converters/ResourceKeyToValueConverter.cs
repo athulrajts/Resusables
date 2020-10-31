@@ -4,7 +4,7 @@ using System.Globalization;
 
 namespace Localizer.Converters
 {
-    public class ResourceKeyToValueConverter : ValueConverterExtension<ResourceKeyToValueConverter>
+    public class ResourceKeyToValueConverter : BaseValueConverter<ResourceKeyToValueConverter>
     {
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

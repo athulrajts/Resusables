@@ -1,9 +1,9 @@
-﻿using KEI.Infrastructure.UserManagement;
-using Prism.Ioc;
-using System;
+﻿using System;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
+using Prism.Ioc;
+using KEI.Infrastructure.UserManagement;
 
 namespace KEI.UI.Wpf
 {

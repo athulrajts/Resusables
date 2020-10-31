@@ -26,8 +26,8 @@
             <DockPanel Margin="10 0">
                 <TextBlock Text="Base Resx"
                            VerticalAlignment="Center" Padding="0 0 10 0"/>
-                <wpf:BrowseTextBox Path="{Binding BaseResXPath,Mode=TwoWay}"
-                               Type="File"/>
+                <wpf:BrowseTextBox Text="{Binding BaseResXPath,Mode=TwoWay}"
+                                   Type="File"/>
             </DockPanel>
 
             <Button Content="Generate" Grid.Column="1"

@@ -55,11 +55,14 @@ namespace KEI.Infrastructure.Server
         {
             try
             {
-                _client = _listener.EndAcceptTcpClient(ar);
-                
-                Task.Factory.StartNew(() => WaitForData(), TaskCreationOptions.LongRunning);
+                _client = _listener?.EndAcceptTcpClient(ar);
 
-                OnClientConnected?.Invoke(_client.Client);
+                if (_client != null)
+                {
+                    Task.Factory.StartNew(() => WaitForData(), TaskCreationOptions.LongRunning);
+
+                    OnClientConnected?.Invoke(_client.Client); 
+                }
 
                 RaisePropertyChanged(nameof(IsRunning));
             }
@@ -75,8 +78,11 @@ namespace KEI.Infrastructure.Server
                 _client = null; 
             }
 
-            _listener.Stop();
-            _listener = null;
+            if (_listener != null)
+            {
+                _listener.Stop();
+                _listener = null; 
+            }
 
             OnServerDisconnected?.Invoke();
 

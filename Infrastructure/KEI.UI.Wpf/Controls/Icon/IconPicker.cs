@@ -1,9 +1,10 @@
-﻿using KEI.UI.Wpf.Controls.Icon;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
+using KEI.UI.Wpf.Controls.Icon;
 
 namespace KEI.UI.Wpf.Controls
 {
+
     public class IconPicker : Button
     {
         public Infrastructure.Screen.Icon Icon

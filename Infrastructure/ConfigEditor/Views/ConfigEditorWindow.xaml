@@ -40,11 +40,10 @@
 
                 <!--Browse File-->
                 <Button Command="{Binding OpenFileCommand}"
-                        ToolTip="{wpf:Localize Value='Open File'}">
+                        ToolTip="Open File">
                     <StackPanel>
-                        <ContentControl wpf:IconManager.Icon="OpenFile16x"
-                                        Height="40"/>
-                        <TextBlock Text="Open File"/>
+                        <wpf:IconControl Icon="OpenFile16x" Height="40"/>
+                        <TextBlock Text="{wpf:Localize Value='Open File'}"/>
                     </StackPanel>
                 </Button>
 
@@ -52,8 +51,7 @@
                 <Button Command="{Binding OpenFileSelectorWindow}"
                         ToolTip="{wpf:Localize Value='Compare File'}">
                     <StackPanel>
-                        <ContentControl wpf:IconManager.Icon="Compare16x"
-                                        Height="40"/>
+                        <wpf:IconControl Icon="Compare16x" Height="40"/>
                         <TextBlock Text="Copmare"/>
                     </StackPanel>
                 </Button>

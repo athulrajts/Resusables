@@ -7,6 +7,13 @@ using KEI.Infrastructure.Localizer;
 
 namespace KEI.UI.Wpf
 {
+    /// <summary>
+    /// Makes Localization easier
+    /// Searches for the key in the Resource files of calling assembly
+    /// If it's not present it'll return the key iteself.
+    /// When <see cref="LocalizationManager.Reload(string)"/> is called, it refreshes all
+    /// it's binding to update language.
+    /// </summary>
     public class Localize : MarkupExtension
     {
         public string Value { get; set; }

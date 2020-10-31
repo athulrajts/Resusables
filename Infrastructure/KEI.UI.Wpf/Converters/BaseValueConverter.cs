@@ -5,7 +5,8 @@ using System.Windows.Markup;
 
 namespace KEI.UI.Wpf
 {
-    public abstract class ValueConverterExtension<T> : MarkupExtension, IValueConverter where T: new()
+    public abstract class BaseValueConverter<T> : MarkupExtension, IValueConverter
+        where T: new()
     {
         private T instance = default(T);
         public T Instance

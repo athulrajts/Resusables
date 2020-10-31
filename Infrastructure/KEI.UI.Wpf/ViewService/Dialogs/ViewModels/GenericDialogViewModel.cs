@@ -103,7 +103,7 @@ namespace KEI.UI.Wpf.ViewService.ViewModels
         Other
     }
 
-    public class TitleToBackgroundConverter : ValueConverterExtension<TitleToBackgroundConverter>
+    public class TitleToBackgroundConverter : BaseValueConverter<TitleToBackgroundConverter>
     {
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
@@ -125,7 +125,7 @@ namespace KEI.UI.Wpf.ViewService.ViewModels
         }
     }
 
-    public class DialogButtonVisibilityConverter : ValueConverterExtension<DialogButtonVisibilityConverter>
+    public class DialogButtonVisibilityConverter : BaseValueConverter<DialogButtonVisibilityConverter>
     {
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

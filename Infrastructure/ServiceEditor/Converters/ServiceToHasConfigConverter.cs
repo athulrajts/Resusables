@@ -8,7 +8,7 @@ using System.Runtime.Serialization;
 
 namespace ServiceEditor.Converters
 {
-    public class ServiceToHasConfigConverter : ValueConverterExtension<ServiceToHasConfigConverter>
+    public class ServiceToHasConfigConverter : BaseValueConverter<ServiceToHasConfigConverter>
     {
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

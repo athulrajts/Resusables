@@ -4,7 +4,7 @@ using System.Globalization;
 
 namespace Application.UI.Converters
 {
-    public class TranslateConverter : ValueConverterExtension<TranslateConverter>
+    public class TranslateConverter : BaseValueConverter<TranslateConverter>
     {
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

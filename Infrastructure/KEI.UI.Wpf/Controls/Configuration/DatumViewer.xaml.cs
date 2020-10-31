@@ -1,17 +1,14 @@
-﻿using KEI.Infrastructure.Configuration;
-using KEI.Infrastructure.Types;
-using KEI.Infrastructure.Validation;
-using KEI.UI.Wpf.Controls.Configuration;
-using KEI.UI.Wpf.Controls.ObjectEditors;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System;
 using System.Globalization;
+using System.ComponentModel;
+using System.Collections.Generic;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
-using System.Windows.Media;
+using System.Windows.Controls;
+using KEI.Infrastructure.Validation;
+using KEI.Infrastructure.Configuration;
+using KEI.UI.Wpf.Controls.ObjectEditors;
 using ValidationResult = KEI.Infrastructure.Validation.ValidationResult;
 using ValidationRule = KEI.Infrastructure.Validation.ValidationRule;
 
@@ -41,10 +38,9 @@ namespace KEI.UI.Wpf.Configuration
 
                 template.typeValidator = Validators.Type(data.Type);
 
-                template.stringValue = data.ValueString;
+                template.StringValue = data.ValueString;
 
                 template.RaisePropertyChanged(nameof(Editor));
-                template.RaisePropertyChanged(nameof(StringValue));
 
                 if (data.Value is Selector s)
                 {

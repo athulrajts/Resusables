@@ -8,7 +8,7 @@ namespace KEI.UI.Wpf
     /// Returns <see cref="Brushes.OrangeRed"/> if bound value is false
     /// Otherwise returns <see cref="Brushes.Transparent"/>
     /// </summary>
-    class BooleanToErrorBrushConverter : ValueConverterExtension<BooleanToErrorBrushConverter>
+    class BooleanToErrorBrushConverter : BaseValueConverter<BooleanToErrorBrushConverter>
     {
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

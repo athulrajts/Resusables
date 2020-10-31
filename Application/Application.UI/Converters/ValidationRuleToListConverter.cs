@@ -5,7 +5,7 @@ using System.Globalization;
 
 namespace Application.UI.Converters
 {
-    public class ValidationRuleToListConverter : ValueConverterExtension<ValidationRuleToListConverter>
+    public class ValidationRuleToListConverter : BaseValueConverter<ValidationRuleToListConverter>
     {
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

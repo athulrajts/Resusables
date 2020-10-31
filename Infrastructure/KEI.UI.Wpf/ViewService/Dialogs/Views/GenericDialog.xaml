@@ -16,7 +16,7 @@
     <w:DialogWindow.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/KEI.UI.Wpf;component/Styles/Buttons.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/KEI.UI.Wpf;component/Themes/Buttons.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </w:DialogWindow.Resources>

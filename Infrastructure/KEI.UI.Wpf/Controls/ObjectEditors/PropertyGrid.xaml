@@ -11,7 +11,7 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/KEI.UI.Wpf;component/Styles/CheckBoxes.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/KEI.UI.Wpf;component/Themes/CheckBoxes.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             <local:DataTypeToEditorTypeConverter x:Key="DataTypeToEditorTypeConverter"/>
 
@@ -94,12 +94,13 @@
             <!--For Folder Path-->
             <DataTemplate x:Key="FolderTemplate">
                 <wc:BrowseTextBox DataContext="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContentControl}}" 
-                                        Type="Folder"
-                                        Path="{Binding PropertyValue,
-                                                       Mode=TwoWay,
-                                                       ValidatesOnDataErrors=True, 
-                                                       UpdateSourceTrigger=PropertyChanged}"
-                                        Validation.ErrorTemplate="{StaticResource ErrorTemplate}">
+                                  Type="Folder"
+                                  Text="{Binding PropertyValue,
+                                                 Mode=TwoWay,
+                                                 ValidatesOnDataErrors=True, 
+                                                 UpdateSourceTrigger=PropertyChanged}"
+                                  Validation.ErrorTemplate="{StaticResource ErrorTemplate}"
+                                  VerticalContentAlignment="Center">
                     <wc:BrowseTextBox.Style>
                         <Style TargetType="wc:BrowseTextBox">
                             <Style.Triggers>
@@ -115,12 +116,13 @@
             <!--For File Path-->
             <DataTemplate x:Key="FileTemplate">
                 <wc:BrowseTextBox DataContext="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContentControl}}" 
-                                        Type="File"
-                                        Path="{Binding PropertyValue,
-                                                       Mode=TwoWay,
-                                                       ValidatesOnDataErrors=True, 
-                                                       UpdateSourceTrigger=PropertyChanged}"
-                                        Validation.ErrorTemplate="{StaticResource ErrorTemplate}">
+                                  Type="File"
+                                  Text="{Binding PropertyValue,
+                                                 Mode=TwoWay,
+                                                 ValidatesOnDataErrors=True, 
+                                                 UpdateSourceTrigger=PropertyChanged}"
+                                  Validation.ErrorTemplate="{StaticResource ErrorTemplate}"
+                                  VerticalContentAlignment="Center">
                     <wc:BrowseTextBox.Style>
                         <Style TargetType="wc:BrowseTextBox">
                             <Style.Triggers>

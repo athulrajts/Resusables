@@ -5,7 +5,7 @@ using System.Windows.Media;
 
 namespace Application.UI.Converters
 {
-    public class BooleanToPassFailBrushConverter : ValueConverterExtension<BooleanToPassFailBrushConverter>
+    public class BooleanToPassFailBrushConverter : BaseValueConverter<BooleanToPassFailBrushConverter>
     {
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

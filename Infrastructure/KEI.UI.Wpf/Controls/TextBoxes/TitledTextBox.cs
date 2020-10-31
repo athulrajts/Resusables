@@ -42,5 +42,10 @@ namespace KEI.UI.Wpf.Controls
         public static readonly DependencyProperty TitleWeightProperty =
             DependencyProperty.Register("TitleWeight", typeof(FontWeight), typeof(TitledTextBox), new PropertyMetadata(FontWeights.DemiBold));
 
+        static TitledTextBox()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(TitledTextBox), new FrameworkPropertyMetadata(typeof(TitledTextBox)));
+        }
+
     }
 }

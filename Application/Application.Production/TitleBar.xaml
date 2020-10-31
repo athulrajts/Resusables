@@ -9,7 +9,7 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/KEI.UI.Wpf;component/Styles/Buttons.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/KEI.UI.Wpf;component/Themes/Buttons.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             <Style TargetType="Border">
                 <Setter Property="CornerRadius" Value="3"/>

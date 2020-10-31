@@ -2,6 +2,10 @@
 
 namespace KEI.UI.Wpf
 {
+    /// <summary>
+    /// Proxy class to support binding for items that are not in the VisualTree
+    /// For example DataGridColumns
+    /// </summary>
     public class BindingProxy : Freezable
     {
         public static readonly DependencyProperty DataProperty =

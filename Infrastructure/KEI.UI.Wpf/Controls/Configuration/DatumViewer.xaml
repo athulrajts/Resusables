@@ -5,7 +5,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:KEI.UI.Wpf"
              xmlns:config="clr-namespace:KEI.UI.Wpf.Configuration"
-             xmlns:fa="http://schemas.fontawesome.io/icons/"
              xmlns:controls="clr-namespace:KEI.UI.Wpf.Controls"
              xmlns:converters="clr-namespace:KEI.UI.Wpf.Converters"
              mc:Ignorable="d" 
@@ -14,7 +13,7 @@
        
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/KEI.UI.Wpf;component/Styles/CheckBoxes.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/KEI.UI.Wpf;component/Themes/CheckBoxes.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             <local:BooleanToErrorBrushConverter x:Key="BooleanToErrorBrushConverter"/>
             <config:DataTypeToEditorTypeConverter x:Key="DataTypeToEditorTypeConverter"/>
@@ -76,11 +75,12 @@
             <DataTemplate x:Key="FolderTemplate">
                 <controls:BrowseTextBox DataContext="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContentControl}}" 
                                         Type="Folder"
-                                        Path="{Binding StringValue,
+                                        Text="{Binding StringValue,
                                                        Mode=TwoWay,
                                                        ValidatesOnDataErrors=True, 
                                                        UpdateSourceTrigger=PropertyChanged}"
-                                        Validation.ErrorTemplate="{StaticResource ErrorTemplate}">
+                                        Validation.ErrorTemplate="{StaticResource ErrorTemplate}"
+                                        VerticalContentAlignment="Center">
                     <controls:BrowseTextBox.Style>
                         <Style TargetType="controls:BrowseTextBox">
                             <Style.Triggers>
@@ -97,11 +97,12 @@
             <DataTemplate x:Key="FileTemplate">
                 <controls:BrowseTextBox DataContext="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContentControl}}" 
                                         Type="File"
-                                        Path="{Binding StringValue,
+                                        Text="{Binding StringValue,
                                                        Mode=TwoWay,
                                                        ValidatesOnDataErrors=True, 
                                                        UpdateSourceTrigger=PropertyChanged}"
-                                        Validation.ErrorTemplate="{StaticResource ErrorTemplate}">
+                                        Validation.ErrorTemplate="{StaticResource ErrorTemplate}"
+                                        VerticalContentAlignment="Center">
                     <controls:BrowseTextBox.Style>
                         <Style TargetType="controls:BrowseTextBox">
                             <Style.Triggers>

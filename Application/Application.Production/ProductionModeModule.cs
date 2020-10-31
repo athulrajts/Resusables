@@ -36,6 +36,11 @@ namespace Application.Production
 
         public override void RegisterTypes(IContainerRegistry containerRegistry)
         {
+            System.Windows.Application.Current.Resources.MergedDictionaries.Add(new System.Windows.ResourceDictionary
+            {
+                Source = new System.Uri("pack://application:,,,/Application.Production;component/Themes/ThemeStyles.xaml")
+            });
+
             containerRegistry.RegisterSingleton<GeneralPreferences>();
             containerRegistry.RegisterSingleton<ThemeManager>();
             containerRegistry.RegisterSingleton<ScreenConfig>();

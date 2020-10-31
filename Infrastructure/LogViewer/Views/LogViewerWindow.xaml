@@ -87,8 +87,7 @@
                 <!--Browse Folder-->
                 <Button Command="{Binding BrowseFolderCommand}">
                     <StackPanel>
-                        <ContentControl wpf:IconManager.Icon="FolderOpen16x"
-                                        Height="40"/>
+                        <wpf:IconControl Icon="FolderOpen16x" Height="40"/>
                         <TextBlock Text="Open Folder"/>
                     </StackPanel>
                 </Button>
@@ -96,8 +95,7 @@
                 <!--Browse File-->
                 <Button Command="{Binding BrowseFileCommand}">
                     <StackPanel>
-                        <ContentControl wpf:IconManager.Icon="TextFile16x"
-                                        Height="40"/>
+                        <wpf:IconControl Icon="TextFile16x" Height="40"/>
                         <TextBlock Text="Open File"/>
                     </StackPanel>
                 </Button>
@@ -304,6 +302,7 @@
                                                                  RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Border},
                                                                  Converter={wpf:ScaleConverter},
                                                                  ConverterParameter=0.88}"/>
+                        <Setter Property="WatermarkHorizontalAlignment" Value="Center"/>
                         <Setter Property="CornerRadius" Value="3"/>
                     </Style>
                     <Style TargetType="Border">
@@ -321,31 +320,31 @@
                 <Border Width="{Binding ActualWidth, ElementName=timeCol}"
                         Visibility="{Binding Visibility, ElementName=timeCol}">
                     <wpf:WatermarkTextBox Text="{Binding TimeFilter, UpdateSourceTrigger=PropertyChanged}"
-                                      Watermark="Time"/>
+                                          Watermark="Time"/>
                 </Border>
 
                 <Border Width="{Binding ActualWidth, ElementName=fileCol}"
                         Visibility="{Binding Visibility, ElementName=fileCol}">
                     <wpf:WatermarkTextBox Text="{Binding FileFilter, UpdateSourceTrigger=PropertyChanged}"
-                                      Watermark="File"/>
+                                          Watermark="File"/>
                 </Border>
 
                 <Border Width="{Binding ActualWidth, ElementName=lineCol}"
                         Visibility="{Binding Visibility, ElementName=lineCol}">
                     <wpf:WatermarkTextBox Text="{Binding LineFilter, UpdateSourceTrigger=PropertyChanged}"
-                                      Watermark="Line"/>
+                                          Watermark="Line"/>
                 </Border>
 
                 <Border Width="{Binding ActualWidth, ElementName=methodCol}"
                         Visibility="{Binding Visibility, ElementName=methodCol}">
                     <wpf:WatermarkTextBox Text="{Binding MethodFilter, UpdateSourceTrigger=PropertyChanged}"
-                                      Watermark="Method"/>
+                                          Watermark="Method"/>
                 </Border>
 
                 <Border Width="{Binding ActualWidth, ElementName=messageCol}"
                         Visibility="{Binding Visibility, ElementName=messageCol}">
                     <wpf:WatermarkTextBox Text="{Binding MessageFilter, UpdateSourceTrigger=PropertyChanged}"
-                                      Watermark="Message"/>
+                                          Watermark="Message"/>
                 </Border>
 
             </StackPanel>

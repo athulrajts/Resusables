@@ -9,7 +9,7 @@ using System.Windows.Media.Imaging;
 
 namespace Application.UI.Converters
 {
-    public class PathToImageBrushConverter : ValueConverterExtension<PathToImageBrushConverter>
+    public class PathToImageBrushConverter : BaseValueConverter<PathToImageBrushConverter>
     {
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
@@ -19,7 +19,7 @@ namespace Application.UI.Converters
         }
     }
 
-    public class PathToImageSourceConverter : ValueConverterExtension<PathToImageSourceConverter>
+    public class PathToImageSourceConverter : BaseValueConverter<PathToImageSourceConverter>
     {
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

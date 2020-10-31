@@ -44,8 +44,7 @@
                 <!--Browse Folder-->
                 <Button Command="{Binding OpenSolutionFolderCommand}">
                     <StackPanel>
-                        <ContentControl wpf:IconManager.Icon="ProjectFolderOpen16x"
-                                        Height="40"/>
+                        <wpf:IconControl Icon="ProjectFolderOpen16x" Height="40"/>
                         <TextBlock Text="Open Solution"/>
                     </StackPanel>
                 </Button>
@@ -53,8 +52,7 @@
                 <!--Browse File-->
                 <Button Command="{Binding OpenResXGeneratorCommand}">
                     <StackPanel>
-                        <ContentControl wpf:IconManager.Icon="WPFResourceDictionary16x"
-                                        Height="40"/>
+                        <wpf:IconControl Icon="WPFResourceDictionary16x" Height="40"/>
                         <TextBlock Text="Create Localization"/>
                     </StackPanel>
                 </Button>

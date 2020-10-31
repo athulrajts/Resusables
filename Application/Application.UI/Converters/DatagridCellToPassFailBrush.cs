@@ -10,7 +10,7 @@ using KEI.UI.Wpf;
 
 namespace Application.UI.Converters
 {
-    public class DatagridCellToPassFailBrush : ValueConverterExtension<DatagridCellToPassFailBrush>
+    public class DatagridCellToPassFailBrush : BaseValueConverter<DatagridCellToPassFailBrush>
     {
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

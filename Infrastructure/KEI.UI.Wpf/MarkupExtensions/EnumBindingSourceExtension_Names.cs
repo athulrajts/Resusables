@@ -5,16 +5,20 @@ using System.Windows.Markup;
 
 namespace KEI.UI.Wpf
 {
+    /// <summary>
+    /// Markup extensions to bind an <see cref="Enum"/> to a <see cref="System.Windows.Controls.ComboBox"/>
+    /// Combobox items will be popuplated with <see cref="Enum.GetNames(Type)(Type)"/>
+    /// </summary>
     public class EnumNameBindingSourceExtension : MarkupExtension
     {
         private readonly BindingBase _binding;
         private Type _enumType;
         public Type EnumType
         {
-            get { return this._enumType; }
+            get { return _enumType; }
             set
             {
-                if (value != this._enumType)
+                if (value != _enumType)
                 {
                     if (null != value)
                     {
@@ -23,7 +27,7 @@ namespace KEI.UI.Wpf
                             return;
                     }
 
-                    this._enumType = value;
+                    _enumType = value;
                 }
             }
         }

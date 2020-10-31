@@ -3,7 +3,11 @@ using System.Globalization;
 
 namespace KEI.UI.Wpf.Converters
 {
-    public class TransformConverter : ValueConverterExtension<TransformConverter>
+    /// <summary>
+    /// Takes in anything that can be parsed to <see cref="double"/>
+    /// Returns input + parameter
+    /// </summary>
+    public class TransformConverter : BaseValueConverter<TransformConverter>
     {
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

@@ -5,7 +5,7 @@ using System.Windows.Controls;
 
 namespace Application.UI.Converters
 {
-    class DatagridRowToIndexConverter : ValueConverterExtension<DatagridRowToIndexConverter>
+    class DatagridRowToIndexConverter : BaseValueConverter<DatagridRowToIndexConverter>
     {
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

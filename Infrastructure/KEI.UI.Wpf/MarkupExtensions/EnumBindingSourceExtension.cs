@@ -1,11 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Markup;
 
 namespace KEI.UI.Wpf
 {
+    /// <summary>
+    /// Markup extensions to bind an <see cref="Enum"/> to a <see cref="System.Windows.Controls.ComboBox"/>
+    /// Combobox items will be popuplated with <see cref="Enum.GetValues(Type)"/>
+    /// </summary>
     public class EnumBindingSourceExtension : MarkupExtension
     {
         private readonly BindingBase _binding;

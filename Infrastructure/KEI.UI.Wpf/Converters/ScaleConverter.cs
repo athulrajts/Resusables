@@ -1,11 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Text;
 
 namespace KEI.UI.Wpf.Converters
 {
-    public class ScaleConverter : ValueConverterExtension<ScaleConverter>
+    /// <summary>
+    /// Takes in anything that can be parsed to <see cref="double"/>
+    /// Returns input * parameter
+    /// </summary>
+    public class ScaleConverter : BaseValueConverter<ScaleConverter>
     {
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

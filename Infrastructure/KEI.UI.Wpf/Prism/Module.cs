@@ -10,6 +10,16 @@ using KEI.Infrastructure.Localizer;
 
 namespace KEI.Infrastructure.Prism
 {
+    /// <summary>
+    /// Deafult implementation for <see cref="IModule"/> that automagically registers
+    /// types to the container based on
+    /// <see cref="RegisterSingletonAttribute"/>
+    /// <see cref="RegisterForNavigationAttribute"/>
+    /// <see cref="RegisterTypeAttribute"/>
+    /// <see cref="RegisterWithRegionAttribute"/>
+    /// Also does a named registration a <see cref="ResourceManagerStringLocalizer"/> as an implementation for <see cref="IStringLocalizer"/> which
+    /// will be used by <see cref="LocalizationManager"/>
+    /// </summary>
     public class Module : IModule
     {
         private readonly IEnumerable<Type> _typesForNavigation;

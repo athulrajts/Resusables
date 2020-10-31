@@ -261,7 +261,7 @@ namespace KEI.Infrastructure.Configuration
                 }
 
                 /// Read <see cref="PropertyObject.Validation"/>
-                else if (reader.NodeType == XmlNodeType.Element && reader.Name == nameof(ValidatorGroup))
+                else if (reader.NodeType == XmlNodeType.Element && reader.Name == "Validations")
                 {
                     obj.Validation = reader.ReadObjectXML<ValidatorGroup>();
                 }

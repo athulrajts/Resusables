@@ -9,7 +9,7 @@ namespace KEI.UI.Wpf.Converters
     /// Returns <see cref="Visibility.Collapsed"/> otherwise
     /// Add Parameter of any value to invert the above logic
     /// </summary>
-    public class BooleanToVisibilityConverter : ValueConverterExtension<BooleanToVisibilityConverter>
+    public class BooleanToVisibilityConverter : BaseValueConverter<BooleanToVisibilityConverter>
     {
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
@@ -17,7 +17,9 @@ namespace KEI.UI.Wpf.Converters
             {
                 bool invert = false;
                 if (parameter != null)
+                {
                     invert = true;
+                }
 
                 return (invert) ? (val) ? Visibility.Collapsed : Visibility.Visible : (val) ? Visibility.Visible : Visibility.Collapsed;
             }

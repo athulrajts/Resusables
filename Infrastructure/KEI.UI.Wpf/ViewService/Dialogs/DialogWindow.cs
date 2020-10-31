@@ -27,7 +27,7 @@ namespace KEI.UI.Wpf
         {
             if (WindowLess)
             {
-                var resourceDictionary = new ResourceDictionary { Source = new Uri("pack://application:,,,/KEI.UI.Wpf;component/Styles/Windows.xaml") };
+                var resourceDictionary = new ResourceDictionary { Source = new Uri("pack://application:,,,/KEI.UI.Wpf;component/Themes/Windows.xaml") };
                 Dialog.SetWindowStyle(this, resourceDictionary["FramelessWindow"] as Style);
             }
 

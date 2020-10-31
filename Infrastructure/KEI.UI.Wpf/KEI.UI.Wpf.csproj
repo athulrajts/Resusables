@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\KEI.Infrastructure.Core\KEI.Infrastructure.Core.csproj" />
+    <ProjectReference Include="..\KEI.Resources\KEI.Icons.csproj" />
   </ItemGroup>
   <PropertyGroup>
     <PostBuildEvent>del /f "Prism.Wpf.xml" 2&gt;nul

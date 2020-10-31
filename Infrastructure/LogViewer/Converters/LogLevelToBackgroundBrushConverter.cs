@@ -6,7 +6,7 @@ using System.Windows.Media;
 
 namespace LogViewer.Converters
 {
-    public class LogLevelToBackgroundBrushConverter : ValueConverterExtension<LogLevelToBackgroundBrushConverter>
+    public class LogLevelToBackgroundBrushConverter : BaseValueConverter<LogLevelToBackgroundBrushConverter>
     {
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

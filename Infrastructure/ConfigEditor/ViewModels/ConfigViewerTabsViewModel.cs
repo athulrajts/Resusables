@@ -24,7 +24,7 @@ namespace ConfigEditor.ViewModels
         public ConfigViewerTabsViewModel(IEventAggregator eventAggregator, IViewService viewService)
         {
             _viewService = viewService;
-            eventAggregator.GetEvent<DataContainerOpened>().Subscribe(dc => 
+            eventAggregator.GetEvent<DataContainerOpened>().Subscribe(dc =>
             {
                 var newTab = new ConfigViewerViewModel(dc.Item2, dc.Item1, _viewService);
 
@@ -43,21 +43,24 @@ namespace ConfigEditor.ViewModels
                 SelectedTab = newTab;
             });
 
-            eventAggregator.GetEvent<ConfigCompareRequest>().Subscribe(c => 
+            eventAggregator.GetEvent<ConfigCompareRequest>().Subscribe(c =>
             {
                 (string left, string right) = c;
 
-                var newTab = new MergeViewModel(_viewService, left , right);
+                if (string.IsNullOrEmpty(left) == false && string.IsNullOrEmpty(right) == false)
+                {
+                    var newTab = new MergeViewModel(_viewService, left, right);
 
-                Tabs.Add(newTab);
+                    Tabs.Add(newTab);
 
-                SelectedTab = newTab;
+                    SelectedTab = newTab;
+                }
 
             });
         }
 
         private DelegateCommand<object> closeTabCommand;
-        public DelegateCommand<object> CloseTabCommand 
+        public DelegateCommand<object> CloseTabCommand
             => closeTabCommand ??= new DelegateCommand<object>(ExecuteCloseTabCommand);
 
         void ExecuteCloseTabCommand(object parameter)

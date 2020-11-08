@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using Prism.Mvvm;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -15,7 +16,7 @@ namespace KEI.Infrastructure.Server
         public byte[] GetBytes();
     }
 
-    public abstract class MessageBody : IMessageBody
+    public abstract class MessageBody : BindableBase, IMessageBody
     {
         public virtual void ReadBytes(Stream stream)
         {
@@ -54,7 +55,7 @@ namespace KEI.Infrastructure.Server
         {
             var writer = new BinaryWriter(stream);
 
-            foreach (var prop in GetType().GetProperties(BindingFlags.Public).Where(p => p.CanRead && p.CanWrite))
+            foreach (var prop in GetType().GetProperties())
             {
                 if (prop.PropertyType == typeof(uint))
                 {

@@ -1,13 +1,9 @@
 ﻿using KEI.Infrastructure.Logging;
 using Prism.Mvvm;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace KEI.Infrastructure.Server
@@ -71,8 +67,14 @@ namespace KEI.Infrastructure.Server
 
         public bool StopServer()
         {
+            OnServerDisconnected?.Invoke();
+
             if (_client != null)
             {
+                var stream = _client.GetStream();
+                stream.Write(BitConverter.GetBytes(Commander.DISCONNECT_COMMAND + 1));
+                stream.Write(BitConverter.GetBytes((uint)4));
+
                 _client.Close();
                 _client.Dispose();
                 _client = null; 
@@ -84,7 +86,6 @@ namespace KEI.Infrastructure.Server
                 _listener = null; 
             }
 
-            OnServerDisconnected?.Invoke();
 
             RaisePropertyChanged(nameof(IsRunning));
             RaisePropertyChanged(nameof(IsConnected));
@@ -155,7 +156,6 @@ namespace KEI.Infrastructure.Server
 
                     Logger.Error("Unhandled exception", ex);
                 }
-
             }
         }
 

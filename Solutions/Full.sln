@@ -55,7 +55,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KEI.Infrastructure.CLR", ".
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KEI.Icons", "..\Infrastructure\KEI.Resources\KEI.Icons.csproj", "{40DCEED3-94E2-4312-99FF-373B0DC9CE07}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TCPIPClient", "..\Infrastructure\TCPIPClient\TCPIPClient.csproj", "{FA526FB1-B4DD-4019-84DA-CAED4AD4CD5F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TCPClient", "..\Infrastructure\TCPIPClient\TCPClient.csproj", "{FA526FB1-B4DD-4019-84DA-CAED4AD4CD5F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

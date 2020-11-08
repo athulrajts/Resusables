@@ -33,13 +33,13 @@ namespace KEI.Infrastructure.Server
         {
             if(header is MessageHeader mh)
             {
-                if(mh.CommandID == DISCONNECT_COMMAND)
+                if(mh.ID == DISCONNECT_COMMAND)
                 {
                     _server.SetupForReconnection();
                 }
                 else
                 {
-                    ExecuteCommand(mh.CommandID, bodyStream);
+                    ExecuteCommand(mh.ID, bodyStream);
                 }
             }
             else if(header.GetType().GetProperty("CommandID") is PropertyInfo pi)

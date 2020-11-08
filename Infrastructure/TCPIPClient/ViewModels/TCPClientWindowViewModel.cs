@@ -138,11 +138,9 @@ namespace TCPClient.ViewModels
             using var stream = new MemoryStream();
             using var writer = new BinaryWriter(stream);
 
-            (var length, var bytes) = Inputs.GetBytesAndLength();
-
             writer.Write(commandID);
-            writer.Write(length);
-            writer.Write(bytes);
+            writer.Write(Inputs.MessageLength);
+            Inputs.WriteBytes(stream);
 
             byte[] message = stream.ToArray();
 
@@ -152,7 +150,7 @@ namespace TCPClient.ViewModels
 
                 TransferredBytesCollection.Add($"Sent({message.Length}) : {BitConverter.ToString(message)}");
 
-                TransferredMessagesCollection.Add($"Command ({CommandID}) => {string.Join(" ", Inputs.Select(x => string.Format("\"{0}\"", x.Value)))}");
+                TransferredMessagesCollection.Add($"Command ({CommandID}) => {Inputs}");
             }
             catch { }
 

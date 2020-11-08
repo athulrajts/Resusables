@@ -27,7 +27,13 @@ namespace KEI.Infrastructure.Validation
         {
             CurrentResult = new ValidationResult(true);
 
-            string str = value.ToString();
+            string str = value as string;
+
+            if(str == null)
+            {
+                CurrentResult = new ValidationResult(false, $"Value must be string");
+                return CurrentResult;
+            }
 
             if(Max == Min && str.Length != Max)
             {

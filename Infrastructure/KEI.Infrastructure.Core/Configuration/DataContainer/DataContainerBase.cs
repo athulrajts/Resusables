@@ -241,7 +241,7 @@ namespace KEI.Infrastructure.Configuration
                         }
                         else if (di.Value is Selector s)
                         {
-                            prop.SetValue(result, Enum.Parse(prop.PropertyType, s.SelectedItem));
+                            prop.SetValue(result, Enum.Parse(s.Type.GetUnderlyingType(), s.SelectedItem));
                         }
                     }
 

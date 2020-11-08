@@ -80,6 +80,8 @@ namespace KEI.Infrastructure.Configuration
                 RaisePropertyChanged(Name);
             }
         }
+
+        public override string ToString() => ValueString;
     }
 
 

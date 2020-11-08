@@ -1,6 +1,8 @@
-﻿using System;
+﻿using KEI.Infrastructure.Server;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 
 namespace KEI.Infrastructure.Configuration
 {
@@ -85,15 +87,7 @@ namespace KEI.Infrastructure.Configuration
             }
             else
             {
-                if (dc is IDataContainer d)
-                {
-                    d.Add(new DataObject
-                    {
-                        Name = key,
-                        Value = value,
-                    });
-                }
-                else if(dc is IPropertyContainer p)
+                if (dc is IPropertyContainer p)
                 {
                     p.Add(new PropertyObject
                     {
@@ -102,6 +96,15 @@ namespace KEI.Infrastructure.Configuration
                         Editor = value.GetType().GetEditorType(),
                     });
                 }
+                else if (dc is IDataContainer d)
+                {
+                    d.Add(new DataObject
+                    {
+                        Name = key,
+                        Value = value,
+                    });
+                }
+
             }
         }
 
@@ -140,7 +143,7 @@ namespace KEI.Infrastructure.Configuration
         public static IDataContainer ToDataContainer<T>(this T obj, string name = "Untitled")
             where T : class
         {
-            return DataContainerBuilder.CreateObject(name, obj as IEnumerable);
+            return DataContainerBuilder.CreateObject(name, obj);
         }
 
         public static IPropertyContainer ToPropertyContainer<T>(this T obj, string name = "Untitled")
@@ -185,6 +188,44 @@ namespace KEI.Infrastructure.Configuration
             }
 
             return pc;
+        }
+
+        public static void WriteBytes(this IDataContainer container, Stream stream)
+        {
+            var writer = new BinaryWriter(stream);
+
+            foreach (var prop in container)
+            {
+                if (prop.Type == typeof(string))
+                {
+                    writer.WriteUInt32PrefixedString(prop.Value as string);
+                }
+                else if (prop.Type == typeof(uint))
+                {
+                    writer.Write((uint)prop.Value);
+                }
+                else if (prop.Type == typeof(int))
+                {
+                    writer.Write((int)prop.Value);
+                }
+                else if (prop.Type == typeof(double))
+                {
+                    writer.Write((double)prop.Value);
+                }
+                else if (prop.Type == typeof(float))
+                {
+                    writer.Write((float)prop.Value);
+                }
+                else if (prop.Type == typeof(bool))
+                {
+                    writer.Write((bool)prop.Value);
+                }
+                else if (prop.Type == typeof(byte))
+                {
+                    writer.Write((byte)prop.Value);
+                }
+            }
+        
         }
     }
 }

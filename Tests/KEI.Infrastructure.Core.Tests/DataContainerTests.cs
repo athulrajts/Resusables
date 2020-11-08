@@ -1,7 +1,6 @@
 ﻿using System;
-using System.IO;
-using KEI.Infrastructure.Configuration;
 using Xunit;
+using KEI.Infrastructure.Configuration;
 
 namespace KEI.Infrastructure.Core.Tests
 {
@@ -48,7 +47,16 @@ namespace KEI.Infrastructure.Core.Tests
             {
                 var expected = t.GetProperty(item.Name).GetValue(obj);
                 var actual = item.Value;
-                Assert.Equal(expected, actual);
+
+                if (expected is Enum && item.Value is Selector s)
+                {
+                    var enumValue = Enum.Parse(expected.GetType(), s.SelectedItem);
+                    Assert.Equal(expected, enumValue);
+                }
+                else
+                {
+                    Assert.Equal(expected, actual);
+                }
             }
         }
 

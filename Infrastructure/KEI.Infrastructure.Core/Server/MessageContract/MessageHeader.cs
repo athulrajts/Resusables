@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
+﻿using System.IO;
 
 namespace KEI.Infrastructure.Server
 {
     public interface IMessageHeader
     {
-        public uint MessageLength { get; }
+        public uint MessageLength { get; set; }
 
         public void WriteBytes(Stream stream);
 
@@ -16,22 +13,32 @@ namespace KEI.Infrastructure.Server
 
     public class MessageHeader : IMessageHeader
     {
-        public uint CommandID { get; set; }
+        public uint ID { get; set; }
         public uint MessageLength { get; set; }
+
+        public MessageHeader(uint id)
+        {
+            ID = id;
+        }
+
+        public MessageHeader()
+        {
+
+        }
 
         public void WriteBytes(Stream stream)
         {
-            using var writer = new BinaryWriter(stream);
+            var writer = new BinaryWriter(stream);
 
-            writer.Write(CommandID);
+            writer.Write(ID);
             writer.Write(MessageLength);
         }
 
         public void ReadBytes(Stream stream)
         {
-            using var reader = new BinaryReader(stream);
+            var reader = new BinaryReader(stream);
 
-            CommandID = reader.ReadUInt32();
+            ID = reader.ReadUInt32();
             MessageLength = reader.ReadUInt32();
         }
     }

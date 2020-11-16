@@ -1,7 +1,7 @@
-﻿using System;
-using System.ComponentModel;
-using System.IO;
+﻿using System.IO;
 using System.Net.Sockets;
+using System.ComponentModel;
+using KEI.Infrastructure.Service;
 
 namespace KEI.Infrastructure.Server
 {
@@ -10,11 +10,13 @@ namespace KEI.Infrastructure.Server
     public delegate void ClientDisconnectedDelegate();
     public delegate void CommandRecievedDelegate(IMessageHeader header, Stream bodyStream);
 
+    [OptionalService("Server", typeof(ICommander))]
     public interface IServer : INotifyPropertyChanged
     {
         public bool IsConnected { get; }
         public bool IsRunning { get; }
         public bool StartServer(ushort port);
+        public bool StartServer();
         public bool StopServer();
         public void SetupForReconnection();
 

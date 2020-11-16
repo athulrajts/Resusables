@@ -1,16 +1,12 @@
-﻿using KEI.Infrastructure;
-using Localizer.Core;
-using Prism.Commands;
-using Prism.Events;
-using Prism.Mvvm;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.IO;
+﻿using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Collections;
+using Prism.Mvvm;
+using Prism.Events;
+using Prism.Commands;
+using Localizer.Core;
 
 namespace Localizer.ViewModels
 {
@@ -40,8 +36,10 @@ namespace Localizer.ViewModels
 
         private async void ExecuteTranslateCommand()
         {
-            var translations = File.Resources.Where(x => string.IsNullOrEmpty(x.TranslatedText));
-            int total = translations.Count();
+            var translations = File.Resources.Where(x => string.IsNullOrEmpty(x.TranslatedText)).ToList();
+            
+            int total = translations.Count;
+
             _cancellationTokenSource = new CancellationTokenSource();
 
             _viewService.SetBusy("Translating");
@@ -59,22 +57,17 @@ namespace Localizer.ViewModels
 
         private async void ExecuteTranslateSelected(IList param)
         {
-            if (param is IEnumerable<Translation> translations)
-            {
-                int total = translations.Count();
+            int total = param.Count;
 
-                _cancellationTokenSource = new CancellationTokenSource();
+            _cancellationTokenSource = new CancellationTokenSource();
 
-                _viewService.SetBusy("Translating");
+            _viewService.SetBusy("Translating");
 
-                var progress = new Progress<int>(count => _viewService.UpdateBusyText("Translating", $"{count}/{total}"));
+            var progress = new Progress<int>(count => _viewService.UpdateBusyText("Translating", $"{count}/{total}"));
 
-                await Translate(translations, progress, _cancellationTokenSource.Token);
+            await Translate(param, progress, _cancellationTokenSource.Token);
 
-                _viewService.SetAvailable();
-
-            }
-
+            _viewService.SetAvailable();
         }
 
         private DelegateCommand translateAll;
@@ -95,10 +88,11 @@ namespace Localizer.ViewModels
             _viewService.SetAvailable();
         }
 
-        private async Task Translate(IEnumerable<Translation> items, IProgress<int> progress, CancellationToken cancellationToken)
+        private async Task Translate(IList items, IProgress<int> progress, CancellationToken cancellationToken)
         {
             int current = 0;
-            foreach (var item in items)
+            
+            foreach (var item in items.OfType<Translation>())
             {
                 if (cancellationToken.IsCancellationRequested)
                 {

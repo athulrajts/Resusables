@@ -3,7 +3,7 @@ using System.Data;
 
 namespace KEI.Infrastructure.Database
 {
-    [Service("Database Reader", typeof(CSVDatabaseReader))]
+    [Service("Database Reader")]
     public interface IDatabaseReader
     {
         DataTable ReadDatabase(string filePath);

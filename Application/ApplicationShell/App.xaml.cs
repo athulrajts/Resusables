@@ -82,8 +82,8 @@ namespace ApplicationShell
             containerRegistry.RegisterServices(GetServices());
 
             // Initialize Native
-            NativeInitializer.SetLogger(Container.Resolve<ILogManager>());
-            NativeInitializer.SetViewService(Container.Resolve<IViewService>());
+            //NativeInitializer.SetLogger(Container.Resolve<ILogManager>());
+            //NativeInitializer.SetViewService(Container.Resolve<IViewService>());
 
             // Regster Application Related Services
             containerRegistry.RegisterSingleton<IDatabaseManager, DatabaseManager>();
@@ -115,17 +115,17 @@ namespace ApplicationShell
         {
             SplashScreenLogger.Instance.Log("Application Initialized");
 
-            Container.Resolve<IServer>().StartServer(8000);
-
             Container.Resolve<ISystemStatusManager>().ApplicationMode = StartupApplicationMode;
 
             Container.Resolve<IEquipment>().LoadRecipe(PathUtils.GetPath("Configs/DefaultRecipe.rcp"));
 
             Logger.Debug("Application Initialized");
 
-            base.OnInitialized();
+            ServiceManager.InitializeServices();
 
             splash.Close();
+
+            base.OnInitialized();
         }
 
         public ApplicationMode StartupApplicationMode = ApplicationMode.Production;
@@ -160,79 +160,53 @@ namespace ApplicationShell
 
         }
 
-        private IEnumerable<Service> GetServices()
+        private IEnumerable<ServiceInfo> GetServices()
         {
             var serviceConfigPath = PathUtils.GetPath("Configs/Services.cfg");
-            List<Service> selectedService = XmlHelper.Deserialize<ObservableCollection<Service>>(serviceConfigPath)?.ToList();
-            List<Service> defaultServices = GetDefaultServices();
+
+            var selectedService = XmlHelper.Deserialize<ObservableCollection<ServiceInfo>>(serviceConfigPath);
+
             if (selectedService == null)
             {
-                selectedService = defaultServices;
-
-                XmlHelper.Serialize(new ObservableCollection<Service>(selectedService), serviceConfigPath);
-            }
-            else
-            {
-                var modifications = new List<Action>();
-
-                foreach (var service in defaultServices)
-                {
-                    if(selectedService.Find(x => x.Name == service.Name) is null)
-                    {
-                        modifications.Add(() => selectedService.Add(service));
-                    }
-                }
-
-                foreach (var service in selectedService)
-                {
-                    if(defaultServices.Find(x => x.Name == service.Name) is null)
-                    {
-                        modifications.Add(() => selectedService.Remove(service));
-                    }
-                }
-
-                if (modifications.Count > 0)
-                {
-                    modifications.ForEach(x => x.Invoke());
-                    XmlHelper.Serialize(new ObservableCollection<Service>(selectedService), serviceConfigPath);
-                }
+                selectedService = GetDefaultServices();
+                XmlHelper.Serialize(new ObservableCollection<ServiceInfo>(selectedService), serviceConfigPath);
             }
 
             return selectedService;
         }
 
-        private List<Service> GetDefaultServices()
+        private ObservableCollection<ServiceInfo> GetDefaultServices()
         {
-            return new List<Service>
+            return new ObservableCollection<ServiceInfo>
             {
-                new Service
+                new ServiceInfo
                 {
-                    ServiceType = new TypeInfo(typeof(IApplicationViewService)),
-                    ImplementationType = new TypeInfo(typeof(ApplicationViewService)),
-                    Name = "View Service"
+                    ServiceType = typeof(IApplicationViewService),
+                    ImplementationType = typeof(ApplicationViewService),
+                    Name = "View Service",
                 },
-                new Service
+                new ServiceInfo
                 {
-                    ServiceType = new TypeInfo(typeof(IVisionProcessor)),
-                    ImplementationType = new TypeInfo(typeof(VisionProcessor)),
+                    ServiceType = typeof(IVisionProcessor),
+                    ImplementationType = typeof(VisionProcessor),
                     Name = "Vision"
                 },
-                new Service
+                new ServiceInfo
                 {
-                    ServiceType = new TypeInfo(typeof(IGreedoCamera)),
-                    ImplementationType = new TypeInfo(typeof(SimulatedCamera)),
+                    ServiceType = typeof(IGreedoCamera),
+                    ImplementationType = typeof(SimulatedCamera),
                     Name = "Camera"
                 },
-                new Service
+                new ServiceInfo
                 {
-                    ServiceType = new TypeInfo(typeof(IDatabaseReader)),
-                    ImplementationType = new TypeInfo(typeof(CSVDatabaseReader)),
+                    ServiceType = typeof(IDatabaseReader),
+                    ImplementationType = typeof(CSVDatabaseReader),
                     Name = "Database Reader"
                 },
-                new Service
+                new ServiceInfo
                 {
-                    ServiceType = new TypeInfo(typeof(IDatabaseWritter)),
-                    ImplementationType = new TypeInfo(typeof(CSVDatabaseWritter)),
+                    ServiceType = typeof(IDatabaseWritter),
+                    ImplementationType = typeof(CSVDatabaseWritter),
                     Name = "Database Writter"
                 },
             };

@@ -3,7 +3,7 @@ using System.Data;
 
 namespace KEI.Infrastructure.Database
 {
-    [Service("Database Writter", typeof(CSVDatabaseWritter))]
+    [Service("Database Writter")]
     public interface IDatabaseWritter
     {
         string DestinationPath { get; set; }

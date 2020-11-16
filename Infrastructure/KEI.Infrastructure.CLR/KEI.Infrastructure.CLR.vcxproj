@@ -31,7 +31,7 @@
     <ProjectGuid>{C0568D9F-61E0-44BF-9103-C871256CF9CF}</ProjectGuid>
     <Keyword>NetCoreCProj</Keyword>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <TargetFrameworkVersion>
     </TargetFrameworkVersion>
   </PropertyGroup>

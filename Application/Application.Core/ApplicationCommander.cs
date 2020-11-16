@@ -35,6 +35,8 @@ namespace Application.Core
             var message = inputs.ReadBody<CommandMessage>();
 
             ContainerLocator.Container.Resolve<IViewService>().Inform(message.Message);
+
+            responder.SendResponse(new ErrorResponse(MessageID, "Test Error"));
         }
     }
 }

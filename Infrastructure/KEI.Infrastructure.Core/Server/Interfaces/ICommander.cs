@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using KEI.Infrastructure.Service;
 
 namespace KEI.Infrastructure.Server
 {
+    [OptionalService("Commander")]
     public interface ICommander : ITcpCommander, ITcpResponder
     {
 

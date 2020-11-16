@@ -71,6 +71,8 @@ namespace Application.Production.ViewModels
             {
                 PropertyChangedEventManager.RemoveListener(vm, this, "CurrentSubViewModel");
             });
+
+            Dispose();
         }
 
         #endregion
@@ -211,6 +213,11 @@ namespace Application.Production.ViewModels
         {
             RaisePropertyChanged(nameof(Time));
             RaisePropertyChanged(nameof(Month));
+        }
+
+        public void Dispose()
+        {
+            _timer.Dispose();
         }
 
         #endregion

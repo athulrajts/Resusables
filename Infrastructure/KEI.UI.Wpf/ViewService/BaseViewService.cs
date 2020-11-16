@@ -4,7 +4,6 @@ using System.Reflection;
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Prism.Ioc;
-using Prism.Unity;
 using Prism.Services.Dialogs;
 using KEI.Infrastructure;
 using KEI.Infrastructure.Logging;
@@ -145,14 +144,7 @@ namespace KEI.UI.Wpf.ViewService
                 { "text", string.Join(Environment.NewLine, msg) }
             };
 
-            loading = new DialogWindowHost<LoadingOverlay, LoadingOverlayViewModel>(parameters)
-            {
-                Height = Application.Current.MainWindow.ActualHeight,
-                Width = Application.Current.MainWindow.ActualWidth,
-                WindowState = Application.Current.MainWindow.WindowState,
-                Owner = Application.Current.MainWindow,
-                SizeToContent = SizeToContent.Manual
-            };
+            loading = new OverlayWindow<LoadingOverlay, LoadingOverlayViewModel>(parameters);
 
             loading.Show();
 

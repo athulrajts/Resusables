@@ -5,6 +5,7 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using Xunit;
+using TcpClient = System.Net.Sockets.TcpClient;
 
 namespace KEI.Infrastructure.Core.Tests
 {

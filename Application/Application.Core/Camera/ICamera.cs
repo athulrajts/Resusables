@@ -2,7 +2,7 @@
 
 namespace Application.Core.Camera
 {
-    [Service("Camera", typeof(SimulatedCamera))]
+    [Service("Camera")]
     public interface IGreedoCamera : ICamera, ICanSetExposure, ICanSetPixelFormat, ICanSetSize { }
 
     public interface ICamera

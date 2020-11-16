@@ -17,35 +17,12 @@ namespace ServiceEditor.Converters
                 return false;
             }
 
-            if (value is Service s)
+            if (value is ServiceInfo s)
             {
                 if (s.ImplementationType.GetUnderlyingType() is Type t)
                 {
-                    if (t.GetProperty("ConfigPath") is PropertyInfo cpi)
-                    {
-                        var obj = FormatterServices.GetUninitializedObject(t);
-                        var path = cpi.GetValue(obj)?.ToString();
-
-                        if(File.Exists(path) == false)
-                        {
-                            if (t.GetMethod("DefineConfigShape", BindingFlags.NonPublic | BindingFlags.Instance) is MethodInfo mi)
-                            {
-                                return true;
-                            }
-                            else
-                            {
-                                return false;
-                            }
-                        }
-                        else
-                        {
-                            return true;
-                        }
-                    }
-                    else
-                    {
-                        return false;
-                    }
+                    var obj = FormatterServices.GetUninitializedObject(t);
+                    return obj is IConfigurable;
                 }
                 else
                 {

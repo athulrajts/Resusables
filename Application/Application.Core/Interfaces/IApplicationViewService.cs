@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Application.Core
 {
-    [Service("View Service", null)]
+    [Service("View Service")]
     public interface IApplicationViewService : IViewService
     {
         PromptResult ShowUpdatedConfigs(Dictionary<string,Dictionary<string,ConfigHistoryItem>> history);

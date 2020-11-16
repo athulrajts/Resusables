@@ -1,4 +1,5 @@
-﻿using System;
+﻿using KEI.Infrastructure.Service;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
@@ -6,7 +7,7 @@ using System.Reflection;
 
 namespace KEI.Infrastructure.Server
 {
-    public abstract class Commander : ICommander, IDisposable
+    public abstract class Commander : ICommander, IDisposable, IInitializable
     {
         public const uint DISCONNECT_COMMAND = 10;
 
@@ -25,8 +26,6 @@ namespace KEI.Infrastructure.Server
             _server.OnClientDisconnected += () => _client.DisconnectAndCleanup();
             _server.OnServerDisconnected += () => DisconnectServerFromClient();
             _server.OnCommandReceived += OnCommandReceived;
-
-            InitializeCommandMap(_commandMap);
         }
 
         private void OnCommandReceived(IMessageHeader header, Stream bodyStream)
@@ -42,7 +41,7 @@ namespace KEI.Infrastructure.Server
                     ExecuteCommand(mh.ID, bodyStream);
                 }
             }
-            else if(header.GetType().GetProperty("CommandID") is PropertyInfo pi)
+            else if(header.GetType().GetProperty("ID") is PropertyInfo pi)
             {
                 uint commandID = (uint)pi.GetValue(header);
 
@@ -95,6 +94,13 @@ namespace KEI.Infrastructure.Server
         public void Dispose()
         {
             DisconnectServerFromClient();
+        }
+
+        public bool Initialize()
+        {
+            InitializeCommandMap(_commandMap);
+
+            return true;
         }
     }
 

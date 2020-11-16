@@ -6,7 +6,8 @@ using KEI.Infrastructure.Logging;
 
 namespace KEI.Infrastructure.Configuration
 {
-    public abstract class ConfigHolder<T> : BindableBase, IConfigHolder<T> where T: class, new()
+    public abstract class ConfigHolder<T> : BindableBase, IConfigHolder<T>
+        where T: class, new()
     {
 
         #region Constructor
@@ -65,11 +66,20 @@ namespace KEI.Infrastructure.Configuration
             return true;
         }
 
-        public bool StoreConfig()
+        public bool ResetConfig()
+        {
+            CreateDefaultConfig();
+
+            return StoreConfig();
+        }
+
+        public bool StoreConfig() => StoreConfig(ConfigPath);
+
+        public bool StoreConfig(string path)
         {
             if (typeof(IEnumerable).IsAssignableFrom(typeof(T)))
             {
-                if (XmlHelper.Serialize((Config as IEnumerable<object>).ToListDataContainer(ConfigName), ConfigPath) == false)
+                if (XmlHelper.Serialize((Config as IEnumerable<object>).ToListDataContainer(ConfigName), path) == false)
                 {
                     Logger.Error($"Unable to Store Config \"{ConfigName}\"");
                     return false;
@@ -77,7 +87,7 @@ namespace KEI.Infrastructure.Configuration
             }
             else
             {
-                if (XmlHelper.Serialize(Config.ToDataContainer(ConfigName), ConfigPath) == false)
+                if (XmlHelper.Serialize(Config.ToDataContainer(ConfigName), path) == false)
                 {
                     Logger.Error($"Unable to Store Config \"{ConfigName}\"");
                     return false;

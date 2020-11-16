@@ -1,20 +1,17 @@
-﻿using KEI.Infrastructure.Logging;
-using Prism.Mvvm;
-using System.Collections.ObjectModel;
-using System.Xml;
-using KEI.Infrastructure;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Collections.Generic;
-using System;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Runtime.CompilerServices;
+﻿using System;
 using System.IO;
-using LogViewer.Models.DirectoryTree;
-using Prism.Commands;
-using LogViewer.Parsers;
 using System.Linq;
+using System.Windows.Data;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Runtime.CompilerServices;
+using Prism.Mvvm;
+using Prism.Commands;
+using KEI.Infrastructure;
 using KEI.Infrastructure.Utils;
+using KEI.Infrastructure.Logging;
+using LogViewer.Parsers;
+using LogViewer.Models.DirectoryTree;
 
 namespace LogViewer.ViewModels
 {

@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Net.Sockets;
 using System.Text;
 
@@ -19,7 +18,7 @@ namespace KEI.Infrastructure.Server
             {
                 if (client != null)
                 {
-                    client.Send(GetResponseBuffer());
+                    client.Send(GetResponseBytes());
                     if (addCRLF)
                     {
                         byte[] abCRLF = Encoding.ASCII.GetBytes("\r\n");
@@ -39,7 +38,7 @@ namespace KEI.Infrastructure.Server
         /// </remarks>
         /// </summary>
         /// <returns>response array</returns> 
-        public byte[] GetResponseBuffer()
+        public byte[] GetResponseBytes()
         {
             using var stream = new MemoryStream();
             using var writer = new BinaryWriter(stream);

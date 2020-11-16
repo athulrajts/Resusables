@@ -28,7 +28,7 @@ namespace KEI.Infrastructure.Prism
             return registry;
         }
 
-        public static IContainerRegistry RegisterServices(this IContainerRegistry registry, IEnumerable<Service.Service> services)
+        public static IContainerRegistry RegisterServices(this IContainerRegistry registry, IEnumerable<ServiceInfo> services)
         {
             foreach (var service in services)
             {
@@ -37,6 +37,15 @@ namespace KEI.Infrastructure.Prism
 
                 registry.RegisterSingleton(service.ServiceType.GetUnderlyingType(), service.ImplementationType.GetUnderlyingType());
             }
+
+            foreach (var service in services)
+            {
+                if (service.ServiceType == null || service.ImplementationType == null)
+                    continue;
+
+                ServiceManager.RegisterService(service.ServiceType.GetUnderlyingType());
+            }
+
             return registry;
         }
 

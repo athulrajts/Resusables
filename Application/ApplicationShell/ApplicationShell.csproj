@@ -1,6 +1,6 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0-windows</TargetFramework>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <OutputType>WinExe</OutputType>
     <AssemblyName>Application</AssemblyName>
@@ -49,14 +49,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Application.UI\Application.UI.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="KEI.Icons">
-      <HintPath>..\..\Build\Debug\KEI.Icons.dll</HintPath>
-    </Reference>
-    <Reference Include="KEI.Infrastructure.CLR">
-      <HintPath>..\..\Build\Debug\KEI.Infrastructure.CLR.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <None Update="log4net.config">

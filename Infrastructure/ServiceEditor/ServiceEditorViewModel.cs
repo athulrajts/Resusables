@@ -1,18 +1,16 @@
-﻿using KEI.Infrastructure.Service;
-using Prism.Mvvm;
-using System.Collections.ObjectModel;
-using System.Reflection;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
-using Prism.Commands;
-using KEI.Infrastructure;
-using TypeInfo = KEI.Infrastructure.Types.TypeInfo;
-using System.Collections.Generic;
+using System.Reflection;
 using System.Diagnostics;
 using System.Runtime.Serialization;
-using KEI.Infrastructure.Configuration;
-using KEI.Infrastructure.Types;
+using System.Collections.ObjectModel;
+using Prism.Mvvm;
+using Prism.Commands;
+using KEI.Infrastructure;
 using KEI.Infrastructure.Utils;
+using KEI.Infrastructure.Types;
+using KEI.Infrastructure.Service;
+using TypeInfo = KEI.Infrastructure.Types.TypeInfo;
 
 namespace ServiceEditor.ViewModels
 {
@@ -25,24 +23,34 @@ namespace ServiceEditor.ViewModels
         {
             _viewService = viewService;
 
-            Services = new ObservableCollection<Service>(provider.GetServices());
+            Services = new ObservableCollection<ServiceInfo>(provider.GetServices());
 
-            SelectedServices = XmlHelper.Deserialize<ObservableCollection<Service>>(FilePath) ?? new ObservableCollection<Service>();
+            SelectedServices = XmlHelper.Deserialize<ObservableCollection<ServiceInfo>>(FilePath) ?? new ObservableCollection<ServiceInfo>();
+
+            // Add required services
+            foreach (var requiredService in Services.Where(x => x.IsRequired))
+            {
+                if(SelectedServices.FirstOrDefault(x => x.Name == requiredService.Name) is null)
+                {
+                    SelectedServices.Add(requiredService);
+                }
+            }
+
 
             SetImplementations();
         }
 
         #region Properties
 
-        private ObservableCollection<Service> services;
-        public ObservableCollection<Service> Services
+        private ObservableCollection<ServiceInfo> services;
+        public ObservableCollection<ServiceInfo> Services
         {
             get { return services; }
             set { SetProperty(ref services, value); }
         }
 
-        private ObservableCollection<Service> selectedServices;
-        public ObservableCollection<Service> SelectedServices
+        private ObservableCollection<ServiceInfo> selectedServices;
+        public ObservableCollection<ServiceInfo> SelectedServices
         {
             get { return selectedServices; }
             set { SetProperty(ref selectedServices, value); }
@@ -56,11 +64,7 @@ namespace ServiceEditor.ViewModels
         {
             foreach (var service in SelectedServices)
             {
-                service.AvailableImplementations = Services.FirstOrDefault(x => x.Name == service.Name)?.AvailableImplementations;
-                if (service.ImplementationType is TypeInfo t)
-                {
-                    service.ImplementationType = service.AvailableImplementations.FirstOrDefault(x => x.FullName == t.FullName);
-                }
+                service.ImplementationType = service.AvailableImplementations?.FirstOrDefault();
             }
         }
 
@@ -84,11 +88,11 @@ namespace ServiceEditor.ViewModels
 
         #region Configure Service
 
-        private DelegateCommand<Service> configureServiceCommand;
-        public DelegateCommand<Service> ConfigureServiceCommand =>
-            configureServiceCommand ??= configureServiceCommand = new DelegateCommand<Service>(ExecuteConfigureServiceCommand);
+        private DelegateCommand<ServiceInfo> configureServiceCommand;
+        public DelegateCommand<ServiceInfo> ConfigureServiceCommand =>
+            configureServiceCommand ??= configureServiceCommand = new DelegateCommand<ServiceInfo>(ExecuteConfigureServiceCommand);
 
-        void ExecuteConfigureServiceCommand(Service service)
+        void ExecuteConfigureServiceCommand(ServiceInfo service)
         {
             var implementationType = service.ImplementationType.GetUnderlyingType();
 
@@ -97,31 +101,19 @@ namespace ServiceEditor.ViewModels
                 return;
             }
 
-            if(implementationType.GetProperty("ConfigPath") is PropertyInfo pi)
+            var configurableService = FormatterServices.GetUninitializedObject(implementationType) as IConfigurable;
+            
+            string configPath = configurableService.ConfigPath;
+            if (File.Exists(configPath) == false)
             {
-                var obj = FormatterServices.GetUninitializedObject(implementationType);
-
-                var configPath = pi.GetValue(obj)?.ToString();
-                
-                if (File.Exists(configPath) == false)
-                {
-                    if (implementationType.GetMethod("DefineConfigShape", BindingFlags.NonPublic | BindingFlags.Instance) is MethodInfo mi)
-                    {
-                        var cfg = mi.Invoke(obj, null);
-
-                        if(mi.ReturnType.GetMethod("Build") is MethodInfo bmi)
-                        {
-                            IDataContainer config = (IDataContainer)bmi.Invoke(cfg, null);
-                            config.Store(configPath);
-                        }
-                    } 
-                }
-
-                if (File.Exists(configPath))
-                {
-                    Process.Start("ConfigEditor.exe", configPath); 
-                } 
+                configurableService.ResetConfig();
+                configurableService.StoreConfig(configPath);
             }
+
+            if (File.Exists(configPath))
+            {
+                Process.Start("ConfigEditor.exe", configPath); 
+            } 
         }
 
         #endregion
@@ -141,7 +133,7 @@ namespace ServiceEditor.ViewModels
                 return;
             }
 
-            if(XmlHelper.Deserialize<ObservableCollection<Service>>(fileName) is ObservableCollection<Service> cfg)
+            if(XmlHelper.Deserialize<ObservableCollection<ServiceInfo>>(fileName) is ObservableCollection<ServiceInfo> cfg)
             {
                 SelectedServices = cfg;
                 SetImplementations();
@@ -162,14 +154,26 @@ namespace ServiceEditor.ViewModels
 
         void ExecuteAddServiceCommand(object[] parameter)
         { 
-            if(parameter[0] is Service s && parameter[1] is TypeInfo t)
+            if(parameter[0] is ServiceInfo s && parameter[1] is TypeInfo t)
             {
-                if(SelectedServices.FirstOrDefault(x => x.Name == s.Name) is Service ss)
+
+                foreach (var dependency in s.Dependencies)
+                {
+                    if (SelectedServices.FirstOrDefault(x => x.ServiceType.Equals(dependency)) is null)
+                    {
+                        _viewService.Error($"Unable to add service \"{s.Name}\", requires additional dependency \"{dependency}\"");
+                        
+                        return;
+                    }
+                }
+
+                if(SelectedServices.FirstOrDefault(x => x.Name == s.Name) is ServiceInfo ss)
                 {
                     ss.ImplementationType = t;
                 }
                 else
                 {
+                    s.ImplementationType = t;
                     SelectedServices.Add(s);
                 }
             }

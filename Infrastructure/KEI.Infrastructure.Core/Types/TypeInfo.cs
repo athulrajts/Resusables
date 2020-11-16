@@ -6,7 +6,7 @@ using System.Collections.Generic;
 namespace KEI.Infrastructure.Types
 {
     [XmlRoot("UnderlyingType")]
-    public class TypeInfo
+    public class TypeInfo : IEquatable<TypeInfo>, IEquatable<Type>
     {
         [XmlAttribute]
         public string Name { get; set; }
@@ -65,6 +65,18 @@ namespace KEI.Infrastructure.Types
 
             return t;
         }
+
+        public bool Equals(TypeInfo other)
+        {
+            return FullName == other.FullName;
+        }
+
+        public bool Equals(Type other)
+        {
+            return FullName == other.FullName;
+        }
+
+        public static implicit operator TypeInfo(Type t) => new TypeInfo(t);
 
     }
 }

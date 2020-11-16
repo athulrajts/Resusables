@@ -32,7 +32,7 @@
                     <GradientStop Color="White" Offset="1"/>
                 </LinearGradientBrush>
             </Border.Background>
-            
+
             <StackPanel Orientation="Horizontal" Margin="10 0">
                 <StackPanel.Resources>
                     <Style TargetType="Button">
@@ -75,7 +75,7 @@
                   BorderBrush="Black"
                   BorderThickness="0 0 1 0">
             <TreeView.Resources>
-                <HierarchicalDataTemplate DataType="{x:Type service:Service}"
+                <HierarchicalDataTemplate DataType="{x:Type service:ServiceInfo}"
                                   ItemsSource="{Binding AvailableImplementations}">
                     <TextBlock Text="{Binding Name}"
                                    FontWeight="Medium"
@@ -109,11 +109,12 @@
                   BorderBrush="Transparent"
                   ItemsSource="{Binding SelectedServices}"
                   CanUserAddRows="False"
-                  CanUserDeleteRows="True"
+                  CanUserDeleteRows="{Binding RelativeSource={RelativeSource Self}, Path=SelectedItem.IsRequired, Converter={wpf:InvertBooleanConverter}}"
                   CanUserResizeRows="False"
                   HeadersVisibility="Column"
-                  Grid.Column="1"
-                  Grid.Row="1">
+                  SelectionMode="Single"
+                  SelectionUnit="FullRow"
+                  Grid.Row="1" Grid.Column="1">
             <DataGrid.Resources>
                 <Style x:Key="ElementStyle" TargetType="TextBlock">
                     <Setter Property="VerticalAlignment" Value="Center"/>

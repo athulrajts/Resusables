@@ -53,70 +53,43 @@
     <value>2.0</value>
   </resheader>
   <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Alarms" xml:space="preserve">
-    <value>警報</value>
-  </data>
-  <data name="Config" xml:space="preserve">
-    <value>構成</value>
-  </data>
   <data name="Machine" xml:space="preserve">
     <value>機械</value>
-  </data>
-  <data name="Manage_Screens" xml:space="preserve">
-    <value>画面を管理</value>
-  </data>
-  <data name="Save" xml:space="preserve">
-    <value>保存</value>
-  </data>
-  <data name="Teaching" xml:space="preserve">
-    <value>研修</value>
-  </data>
-  <data name="Test" xml:space="preserve">
-    <value>試し</value>
-  </data>
-  <data name="Testing" xml:space="preserve">
-    <value>検査</value>
-  </data>
-  <data name="Update" xml:space="preserve">
-    <value>更新</value>
-  </data>
-  <data name="User" xml:space="preserve">
-    <value>ユーザー</value>
   </data>
   <data name="Version" xml:space="preserve">
     <value>バージョン</value>
   </data>
-  <data name="" xml:space="preserve">
-    <value>en</value>
+  <data name="User" xml:space="preserve">
+    <value>ユーザー</value>
   </data>
-  <data name="View_Serivce" xml:space="preserve">
-    <value>Serivceを表示</value>
+  <data name="View Serivce" xml:space="preserve">
+    <value>サービスを表示</value>
   </data>
   <data name="Info" xml:space="preserve">
     <value>情報</value>
   </data>
   <data name="Warn" xml:space="preserve">
-    <value>警告する</value>
+    <value>警告</value>
   </data>
   <data name="Error" xml:space="preserve">
     <value>エラー</value>
   </data>
-  <data name="Yes_No" xml:space="preserve">
+  <data name="Yes No" xml:space="preserve">
     <value>はい・いいえ</value>
   </data>
-  <data name="Okay_Cancel" xml:space="preserve">
-    <value>はい、キャンセル</value>
+  <data name="Okay Cancel" xml:space="preserve">
+    <value>大丈夫キャンセル</value>
   </data>
-  <data name="Ignore_Retry" xml:space="preserve">
-    <value>再試行を無視</value>
+  <data name="Ignore Retry" xml:space="preserve">
+    <value>再試行を無視する</value>
   </data>
-  <data name="Set_Busy" xml:space="preserve">
-    <value>ビジーを設定</value>
+  <data name="Set Busy" xml:space="preserve">
+    <value>忙しい</value>
   </data>
   <data name="Appearance" xml:space="preserve">
     <value>外観</value>
@@ -127,28 +100,40 @@
   <data name="Language" xml:space="preserve">
     <value>言語</value>
   </data>
-  <data name="Binding" xml:space="preserve">
-    <value>バインド</value>
-  </data>
-  <data name="Demos" xml:space="preserve">
-    <value>デモ</value>
-  </data>
-  <data name="Native" xml:space="preserve">
-    <value>ネイティブ</value>
-  </data>
-  <data name="Change_Theme" xml:space="preserve">
-    <value>テーマを変更</value>
-  </data>
-  <data name="Config_Viewer" xml:space="preserve">
-    <value>構成ビューア</value>
-  </data>
   <data name="Validation" xml:space="preserve">
     <value>検証</value>
   </data>
   <data name="Text" xml:space="preserve">
     <value>テキスト</value>
   </data>
+  <data name="Binding" xml:space="preserve">
+    <value>製本</value>
+  </data>
+  <data name="Config Viewer" xml:space="preserve">
+    <value>構成ビューア</value>
+  </data>
+  <data name="Demos" xml:space="preserve">
+    <value>デモ</value>
+  </data>
   <data name="Configs" xml:space="preserve">
     <value>構成</value>
+  </data>
+  <data name="Manage Screens" xml:space="preserve">
+    <value>画面を管理する</value>
+  </data>
+  <data name="Update" xml:space="preserve">
+    <value>更新</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>セーブ</value>
+  </data>
+  <data name="Alarms" xml:space="preserve">
+    <value>アラーム</value>
+  </data>
+  <data name="Demos 2" xml:space="preserve">
+    <value>デモ2</value>
+  </data>
+  <data name="Demos 3" xml:space="preserve">
+    <value>デモ3</value>
   </data>
 </root>

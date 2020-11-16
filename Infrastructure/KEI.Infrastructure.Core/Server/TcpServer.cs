@@ -1,4 +1,7 @@
-﻿using KEI.Infrastructure.Logging;
+﻿using KEI.Infrastructure.Configuration;
+using KEI.Infrastructure.Logging;
+using KEI.Infrastructure.Service;
+using KEI.Infrastructure.Utils;
 using Prism.Mvvm;
 using System;
 using System.IO;
@@ -12,7 +15,7 @@ namespace KEI.Infrastructure.Server
         where THeader: IMessageHeader, new()
     {
         private TcpListener _listener;
-        private TcpClient _client;
+        private System.Net.Sockets.TcpClient _client;
 
         public event ClientConnectedDelagate OnClientConnected;
         public event ServerDisconnectedDelegate OnServerDisconnected;
@@ -26,6 +29,8 @@ namespace KEI.Infrastructure.Server
         public abstract int HeaderSize { get; }
 
         public int RecieveBufferSize { get; set; }
+
+        public ushort Port { get; set; }
 
         public bool StartServer(ushort port)
         {
@@ -46,6 +51,8 @@ namespace KEI.Infrastructure.Server
 
             return false;
         }
+
+        public bool StartServer() => StartServer(Port);
 
         private void OnTcpClientConnected(IAsyncResult ar)
         {
@@ -177,16 +184,50 @@ namespace KEI.Infrastructure.Server
     }
 
 
-    public class CommandServer : TcpServer<MessageHeader>
+    public class CommandServer : TcpServer<MessageHeader>, IConfigurable, IInitializable
     {
         public override int HeaderSize => 8;
 
-        public CommandServer()
+        public string ConfigPath => PathUtils.GetPath("Configs/Server.xcfg");
+
+        public virtual bool LoadConfig()
         {
+            IDataContainer config = DataContainerBuilder.FromFile(ConfigPath);
+
+            Port = config.Get<ushort>(nameof(Port));
+            RecieveBufferSize = config.Get<int>(nameof(RecieveBufferSize));
+
+            return true;
+        }
+
+        public virtual bool StoreConfig(string path)
+        {
+            IDataContainer config = new DataDictionary
+            {
+                { nameof(Port), Port },
+                { nameof(RecieveBufferSize), RecieveBufferSize }
+            };
+
+            return config.Store(path);
+        }
+
+        public virtual bool ResetConfig()
+        {
+            Port = 8000;
+
             // Amount of data recieve should be small, since we're only sending
             // command + params
             // Might need to increase size, if volume of data is larger
             RecieveBufferSize = 128;
+
+            return true;
+        }
+
+        public bool Initialize()
+        {
+            LoadConfig();
+
+            return StartServer();
         }
     }
 }

@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Reflection;
 using System.Collections.Generic;
-using KEI.Infrastructure.Validation;
 using System.IO;
+using KEI.Infrastructure.Service;
 
 namespace KEI.Infrastructure.Types
 {
     public class ImplementationsProvider
     {
         private readonly Dictionary<Type, List<Type>> _implementations = new Dictionary<Type, List<Type>>();
-        private readonly Dictionary<Type, List<Type>> _services = new Dictionary<Type, List<Type>>();
         private readonly List<Assembly> assemblies = new List<Assembly>();
 
         private static ImplementationsProvider instance;
@@ -27,9 +26,6 @@ namespace KEI.Infrastructure.Types
                 }
                 catch (Exception) { }
             }
-
-            GetImplementations(typeof(ValidationRule));
-            GetImplementations(typeof(PeriodicTasks.PeriodicTask));
         }
 
         public IEnumerable<Assembly> GetAssemblies() => assemblies;
@@ -51,6 +47,11 @@ namespace KEI.Infrastructure.Types
 
                             foreach (var type in types)
                             {
+                                if(type.IsAbstract)
+                                {
+                                    continue;
+                                }    
+
                                 if (t.IsAssignableFrom(type) && t != type)
                                 {
                                     implementationsTypes.Add(type);
@@ -65,9 +66,9 @@ namespace KEI.Infrastructure.Types
             return _implementations[t];
         }
 
-        public List<Service.Service> GetServices()
+        public List<ServiceInfo> GetServices()
         {
-            var services = new List<Service.Service>();
+            var services = new List<ServiceInfo>();
 
             foreach (var assembly in assemblies)
             {
@@ -79,9 +80,9 @@ namespace KEI.Infrastructure.Types
 
                         foreach (var type in types)
                         {
-                            if (type.GetCustomAttribute<Service.ServiceAttribute>() is Service.ServiceAttribute sa)
+                            if (type.GetCustomAttribute<ServiceAttribute>(true) is ServiceAttribute sa)
                             {
-                                services.Add(new Service.Service(type, GetImplementations(type), sa));
+                                services.Add(new ServiceInfo(type, sa));
                             }
 
                         }

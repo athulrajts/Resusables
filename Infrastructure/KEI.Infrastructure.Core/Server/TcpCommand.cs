@@ -1,8 +1,6 @@
-﻿using KEI.Infrastructure.Logging;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.IO;
-using System.Text;
+using KEI.Infrastructure.Logging;
 
 namespace KEI.Infrastructure.Server
 {
@@ -12,11 +10,11 @@ namespace KEI.Infrastructure.Server
 
         public abstract string CommandName { get; }
 
-        public void ExecuteCommand(ITcpResponder responder, Stream stream)
+        public void ExecuteCommand(ITcpResponder responder, Stream inputBuffer)
         {
             try
             {
-                InternalExecute(responder, stream);
+                InternalExecute(responder, inputBuffer);
             }
             catch (Exception ex)
             {
@@ -27,6 +25,6 @@ namespace KEI.Infrastructure.Server
             }
         }
 
-        public virtual void InternalExecute(ITcpResponder responder, Stream inputs) { }
+        public virtual void InternalExecute(ITcpResponder responder, Stream inputBuffer) { }
     }
 }

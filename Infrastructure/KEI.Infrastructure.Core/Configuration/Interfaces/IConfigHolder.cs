@@ -1,11 +1,11 @@
-﻿namespace KEI.Infrastructure.Configuration
+﻿using KEI.Infrastructure.Service;
+
+namespace KEI.Infrastructure.Configuration
 {
-    public interface IConfigHolder<T>
+    public interface IConfigHolder<T> : IConfigurable
     {
         T Config { get; set; }
-        string ConfigPath { get; }
         string ConfigName { get; }
-        bool LoadConfig();
         bool StoreConfig();
     }
 }

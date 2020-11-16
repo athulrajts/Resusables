@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Linq.Expressions;
-using System.Collections.Generic;
 using Prism.Mvvm;
 using Prism.Events;
 using KEI.Infrastructure.Service;
@@ -72,24 +71,32 @@ namespace KEI.Infrastructure.Configuration
             return true;
         }
 
-        public bool StoreConfig()
-        {
-            if (Config == null)
-                return false;
+        public bool StoreConfig() => StoreConfig(ConfigPath);
 
-            if (Config.Store(ConfigPath) == false)
+        public bool GetValue<T>(string key, ref T value) => Config.Get(key, ref value);
+        public void SetValue<T>(string key, T value) => Config.Set(key, value);
+        protected abstract PropertyContainerBuilder DefineConfigShape();
+
+        public bool StoreConfig(string path)
+        {
+            if (Config is null)
+            {
+                return false;
+            }
+
+            if (Config.Store(path) == false)
             {
                 _logger.Error($"Unable to store confing \"{ConfigPath}\"");
                 return false;
             }
 
             return true;
-
         }
 
-        public bool GetValue<T>(string key, ref T value) => Config.Get(key, ref value);
-        public void SetValue<T>(string key, T value) => Config.Set(key, value);
-        protected abstract PropertyContainerBuilder DefineConfigShape();
+        public bool ResetConfig()
+        {
+            return DefineConfigShape().Build().Store();
+        }
 
         #endregion
     }

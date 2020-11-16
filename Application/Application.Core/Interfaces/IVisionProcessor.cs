@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Application.Core.Interfaces
 {
-    [Service("Vision", typeof(Modules.VisionProcessor))]
+    [Service("Vision")]
     public interface IVisionProcessor
     {
         List<TestResult> Test(string imagePath);

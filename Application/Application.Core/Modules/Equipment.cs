@@ -41,10 +41,16 @@ namespace Application.Core.Modules
             _cameraConfig = _configManager.GetConfig(ConfigKeys.Camera);
 
             _defaultRecipe = PropertyContainerBuilder.Create("Recipe", PathUtils.GetPath("Configs/DefaultRecipe.rcp"))
-                .WithProperty("MaximumTransmittance", 100.0, "Maximum Value of Transmittance allowed that considered pass")
-                .WithProperty("MinimumTransmittance", 90.0, "Maximum Value of Transmittance allowed that considered pass")
-                .WithObject("Production DB", new DatabaseSetup { Schema = new List<DatabaseColumn>(DatabaseSchema.SchemaFor<TestResult>()), Name = PathUtils.GetPath("Database/Production/Production.csv"), CreationMode = DatabaseCreationMode.Daily })
-                .WithObject("Engineering DB", new DatabaseSetup { Schema = new List<DatabaseColumn>(DatabaseSchema.SchemaFor<TestResult>()), Name = PathUtils.GetPath("Database/Engineering/Engineering.csv"), CreationMode = DatabaseCreationMode.Daily });
+                .Property("MaximumTransmittance", 100.0)
+                .Property("MinimumTransmittance", 90.0)
+                .Property("Production DB", new DatabaseSetup { Schema = new List<DatabaseColumn>(DatabaseSchema.SchemaFor<TestResult>()), Name = PathUtils.GetPath("Database/Production/Production.csv"), CreationMode = DatabaseCreationMode.Daily })
+                .Property("Engineering DB", new DatabaseSetup { Schema = new List<DatabaseColumn>(DatabaseSchema.SchemaFor<TestResult>()), Name = PathUtils.GetPath("Database/Engineering/Engineering.csv"), CreationMode = DatabaseCreationMode.Daily });
+
+            //        _defaultRecipe = PropertyContainerBuilder.Create("Recipe", PathUtils.GetPath("Configs/DefaultRecipe.rcp"))
+            //.Property("MaximumTransmittance", 100.0, "Maximum Value of Transmittance allowed that considered pass")
+            //.Property("MinimumTransmittance", 90.0, "Maximum Value of Transmittance allowed that considered pass")
+            //.Property("Production DB", new DatabaseSetup { Schema = new List<DatabaseColumn>(DatabaseSchema.SchemaFor<TestResult>()), Name = PathUtils.GetPath("Database/Production/Production.csv"), CreationMode = DatabaseCreationMode.Daily })
+            //.Property("Engineering DB", new DatabaseSetup { Schema = new List<DatabaseColumn>(DatabaseSchema.SchemaFor<TestResult>()), Name = PathUtils.GetPath("Database/Engineering/Engineering.csv"), CreationMode = DatabaseCreationMode.Daily });
         }
 
         private IPropertyContainer currentRecipe;
@@ -60,18 +66,18 @@ namespace Application.Core.Modules
         {
             get
             {
-               return _statusManager.ApplicationMode == ApplicationMode.Production
-                    ? productionDBSetup
-                    : engineeringDBSetup;
+                return _statusManager.ApplicationMode == ApplicationMode.Production
+                     ? productionDBSetup
+                     : engineeringDBSetup;
             }
         }
 
         private void OnRecipeChanged()
         {
-            CurrentRecipe.Get($"{ApplicationMode.Production} DB", ref productionDBSetup);
+            CurrentRecipe.GetValue($"{ApplicationMode.Production} DB", ref productionDBSetup);
 
             var xml = XmlHelper.Serialize(productionDBSetup);
-            CurrentRecipe.Get($"{ApplicationMode.Engineering} DB", ref engineeringDBSetup);
+            CurrentRecipe.GetValue($"{ApplicationMode.Engineering} DB", ref engineeringDBSetup);
 
             RecipeLoaded?.Invoke(this, CurrentRecipe);
             _eventAggregator.GetEvent<RecipeLoadedEvent>().Publish(CurrentRecipe);
@@ -85,8 +91,8 @@ namespace Application.Core.Modules
             {
                 RestoreDefaultRecipe();
 
-                CurrentRecipe.Get($"{ApplicationMode.Production} DB", ref productionDBSetup);
-                CurrentRecipe.Get($"{ApplicationMode.Engineering} DB", ref engineeringDBSetup);
+                CurrentRecipe.GetValue($"{ApplicationMode.Production} DB", ref productionDBSetup);
+                CurrentRecipe.GetValue($"{ApplicationMode.Engineering} DB", ref engineeringDBSetup);
 
                 CurrentRecipe.Store();
             }
@@ -111,7 +117,7 @@ namespace Application.Core.Modules
 
             string imageName = $"{DateTime.Now.ToString("[dd-MMM-yyyy] hh_mm_ss")}.bmp";
             string imageDir = string.Empty;
-            _cameraConfig.Get(ConfigKeys.CameraConfigKeys.CapturedImagesFolder, ref imageDir);
+            _cameraConfig.GetValue(ConfigKeys.CameraConfigKeys.CapturedImagesFolder, ref imageDir);
 
             string image = Path.Combine(imageDir, imageName);
 

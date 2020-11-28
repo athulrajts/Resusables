@@ -3,9 +3,8 @@ using Prism.Ioc;
 using KEI.Infrastructure.Service;
 using KEI.Infrastructure.Localizer;
 using KEI.Infrastructure.Configuration;
-using KEI.Infrastructure.UserManagement;
 using System.Reflection;
-using KEI.Infrastructure.Server;
+using KEI.Infrastructure.UserManagement;
 
 namespace KEI.Infrastructure.Prism
 {
@@ -45,18 +44,6 @@ namespace KEI.Infrastructure.Prism
 
                 ServiceManager.RegisterService(service.ServiceType.GetUnderlyingType());
             }
-
-            return registry;
-        }
-
-        public static IContainerRegistry RegisterServer<TServer, TCommander>(this IContainerRegistry registry)
-            where TServer : IServer
-            where TCommander : ICommander
-        {
-            registry.RegisterSingleton<IServer, TServer>();
-            registry.RegisterSingleton<ICommander, TCommander>();
-
-            ContainerLocator.Container.Resolve<ICommander>();
 
             return registry;
         }

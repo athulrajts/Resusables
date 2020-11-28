@@ -30,7 +30,7 @@ namespace Application.Production.ViewModels
 
             var generalPerferences = configManager.GetConfig(ConfigKeys.GeneralPreferences);
 
-            SamplePropertyContainer = PropertyContainerBuilder.Create("Config").WithProperty("PropertyOne", true).Build();
+            SamplePropertyContainer = PropertyContainerBuilder.Create("Config").Property("PropertyOne", true).Build();
 
             //IPropertyContainer samplePropertyContainerThree = new PropertyDictionary
             //{

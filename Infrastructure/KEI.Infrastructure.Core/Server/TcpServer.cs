@@ -30,9 +30,9 @@ namespace KEI.Infrastructure.Server
 
         public int RecieveBufferSize { get; set; }
 
-        public ushort Port { get; set; }
+        public int Port { get; set; }
 
-        public bool StartServer(ushort port)
+        public bool StartServer(int port)
         {
             if (_listener == null)
             {
@@ -194,6 +194,12 @@ namespace KEI.Infrastructure.Server
         {
             IDataContainer config = DataContainerBuilder.FromFile(ConfigPath);
 
+            if(config is null)
+            {
+                StoreConfig(ConfigPath);
+                config = DataContainerBuilder.FromFile(ConfigPath);
+            }
+
             Port = config.Get<ushort>(nameof(Port));
             RecieveBufferSize = config.Get<int>(nameof(RecieveBufferSize));
 
@@ -202,7 +208,7 @@ namespace KEI.Infrastructure.Server
 
         public virtual bool StoreConfig(string path)
         {
-            IDataContainer config = new DataDictionary
+            IDataContainer config = new DataContainer
             {
                 { nameof(Port), Port },
                 { nameof(RecieveBufferSize), RecieveBufferSize }

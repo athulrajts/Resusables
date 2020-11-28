@@ -15,7 +15,7 @@ namespace KEI.Infrastructure.Server
     {
         public bool IsConnected { get; }
         public bool IsRunning { get; }
-        public bool StartServer(ushort port);
+        public bool StartServer(int port);
         public bool StartServer();
         public bool StopServer();
         public void SetupForReconnection();

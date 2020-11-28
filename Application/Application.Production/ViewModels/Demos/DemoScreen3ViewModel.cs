@@ -1,6 +1,6 @@
 ﻿using Application.Core;
 using Application.Production.Views;
-using KEI.Infrastructure.Configuration;
+using KEI.Infrastructure;
 using KEI.Infrastructure.Prism;
 using KEI.Infrastructure.Screen;
 using KEI.UI.Wpf.Hotkey;
@@ -17,15 +17,14 @@ namespace Application.Production.ViewModels
         public DemoScreen3ViewModel(IHotkeyService hotkeyService) : base(hotkeyService)
         {
             SamplePropertyContainer = PropertyContainerBuilder.Create("Sample Confing")
-                .WithProperty("IntegerProperty", 22, "Integer Property")
-                .WithProperty("FloalProperty", 3.14, "Float Property")
-                .WithProperty("DoubleProperty", 3.14142, "Double Property")
-                .WithProperty("BoolProperty", false, "Boolean Property")
-                .WithProperty("StringProperty", "Hello World", "String Property")
-                .WithFile("FileProperty", @".\Configs\DefaultRecipe.rcp", "File Path Property")
-                .WithFolder("FolderProperty", @".\Configs", "Folder Path Property")
-                .WithEnum("EnumProperty", ApplicationMode.Production, "Enum Property")
-                .WithObject("Object Property", this)
+                .Property("IntegerProperty", 22).SetDescription("Integer Property")
+                .Property("FloalProperty", 3.14).SetDescription("Float Property")
+                .Property("DoubleProperty", 3.14142).SetDescription("Double Property")
+                .Property("BoolProperty", false).SetDescription("Bool Property")
+                .Property("StringProperty", "Hello World").SetDescription("String Property")
+                .Property("FileProperty", @".\Configs\DefaultRecipe.rcp").SetDescription("File Property")
+                .Property("FolderProperty", @".\Configs").SetDescription("Folder Property")
+                .Property("EnumProperty", ApplicationMode.Production).SetDescription("Enum Property")
                 .Build();
         }
     }

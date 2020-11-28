@@ -1,92 +1,131 @@
 ﻿using System;
-using System.Xml.Serialization;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 
-namespace KEI.Infrastructure.Configuration
+namespace KEI.Infrastructure
 {
-    /// <summary>
-    /// Generic class for storing and retrieving data which is capable of storing complex data
-    /// structures using a set of primitive types.
-    /// </summary>
-    [XmlRoot("DataContainer")]
-    public class DataContainer : DataContainerBase
+
+    public class DataContainer : DataContainerBase, INotifyCollectionChanged
     {
-        #region Properties
+        protected readonly Dictionary<string, object> internalDictionary;
+
+        public event NotifyCollectionChangedEventHandler CollectionChanged;
+
+        public DataContainer()
+        {
+            internalDictionary = new Dictionary<string, object>();
+        }
+
+        protected virtual object GetValue(string key)
+        {
+            var data = FindRecursive(key);
+
+            if(data is null)
+            {
+                throw new KeyNotFoundException($"{key} not found");
+            }
+
+            return data.GetValue();
+        }
+
+        protected virtual void SetValueInternal(string key, object value)
+        {
+            var data = FindRecursive(key);
+
+            if(data is not null)
+            {
+                data.SetValue(value);
+            }
+        }
+
+        public object this[string key]
+        {
+            get => GetValue(key.ToString());
+            set => SetValue(key.ToString(), value);
+        }
+
+        public override int Count => internalDictionary.Count;
+
+        public void Add(string key, object value)
+        {
+            internalDictionary.Add(key, DataObjectFactory.GetDataObjectFor(key, value));
+
+            var eArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, new List<object> { internalDictionary[key] });
+
+            Data_CollectionChanged(this, eArgs);
+
+            CollectionChanged?.Invoke(this, eArgs);
+        }
+
+        public void Add(object key, object value) => Add(key.ToString(), value);
+
+        public void Clear() => internalDictionary.Clear();
+
+        public override bool ContainsProperty(string key)
+        {
+            var split = key.Split('.');
+
+            if (split.Length == 1)
+            {
+                return internalDictionary.ContainsKey(key);
+            }
+            else
+            {
+                if (internalDictionary[split.First()] is ContainerDataObject cdo)
+                {
+                    return cdo.Value.ContainsProperty(key);
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+        }
+
+        public void Remove(string key)
+        {
+            if(internalDictionary.ContainsKey(key))
+            {
+                var eArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, new List<object> { internalDictionary[key] });
+
+                Data_CollectionChanged(this, eArgs);
+
+                CollectionChanged?.Invoke(this, eArgs);
+            }
+
+            internalDictionary.Remove(key);
+        }
+
+        public override IEnumerator<DataObject> GetEnumerator() => internalDictionary.Values.Cast<DataObject>().GetEnumerator();
+
+        public override IEnumerable<string> GetKeys() => internalDictionary.Keys;
+
+        public override void Add(DataObject obj) => Add(obj.Name, obj.GetValue());
+
+        public override void Remove(DataObject obj) => Remove(obj.Name);
+
+        public override DataObject Find(string key) => 
+            internalDictionary.ContainsKey(key) 
+            ? internalDictionary[key] as DataObject 
+            : null;
 
         /// <summary>
-        /// Contains a collection of values which are under this need
-        /// Even though any type of date can be stored in this collection
-        /// only primitive types are recommented here
-        /// </summary>
-        internal DataObjectCollection Data { get; set; } = new DataObjectCollection();
-
-        public override int Count => Data.Count;
-
-        #endregion
-
-        /// <summary>
-        /// Create <see cref="DataContainer"/> from XML serialized file
+        /// Create <see cref="DataDictionary"/> from XML serialized file
         /// </summary>
         /// <param name="path">Path to XML file</param>
-        /// <returns><see cref="DataContainer"/> deserilized from path</returns>
+        /// <returns><see cref="DataDictionary"/> deserilized from path</returns>
         public static DataContainer FromFile(string path)
         {
             if (XmlHelper.Deserialize<DataContainer>(path) is DataContainer dc)
             {
                 dc.FilePath = path;
-
+                Console.WriteLine("Read");
                 return dc;
             }
 
             return null;
         }
-
-
-        /// <summary>
-        /// Serializes DataContainer object to an XML file to the given path
-        /// </summary>
-        /// <param name="path">file path to store the config</param>
-        /// <returns>Is Sucess</returns>
-        public override bool Store(string path)
-        {
-            FilePath = path;
-
-            try
-            {
-                XmlHelper.Serialize(this, path);
-            }
-            catch (Exception)
-            {
-                ViewService.Warn($"Unable to Write config \"{Name}\" ");
-                return false;
-            }
-            return true;
-        }
-
-        /// <summary>
-        /// Creates a clone of this config
-        /// </summary>
-        /// <returns>Clone</returns>
-        public DataContainer Clone()
-            => XmlHelper.DeserializeFromString<DataContainer>(XmlHelper.Serialize(this));
-
-        public override void Add(DataObject obj)
-        {
-            Data.Add(obj);
-        }
-
-        public override void Remove(DataObject obj)
-        {
-            Data.Remove(obj);
-        }
-
-
-        public override IEnumerator<DataObject> GetEnumerator() => Data.GetEnumerator();
-
-        public override IEnumerable<string> GetKeys() => Data.Select(x => x.Name);
-
-        public override DataObject Find(string key) => Data.FirstOrDefault(x => x.Name == key);
-
     }
 }

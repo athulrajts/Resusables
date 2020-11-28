@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Globalization;
-using KEI.Infrastructure.Configuration;
+using KEI.Infrastructure;
 
 namespace KEI.UI.Wpf.Converters
 {

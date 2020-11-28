@@ -37,7 +37,7 @@ namespace Application.UI.AdvancedSetup.ViewModels
             ResultTypes.CollectionChanged += ResultTypes_CollectionChanged;
 
             var appMode = systemStatusManager.ApplicationMode;
-            _currentRecipe.Get($"{appMode} DB", ref _setupConfig);
+            _currentRecipe.GetValue($"{appMode} DB", ref _setupConfig);
             _setup = (DatabaseSetup)_setupConfig.Morph();
 
             // Take currently valid results
@@ -97,7 +97,7 @@ namespace Application.UI.AdvancedSetup.ViewModels
                     saveSchemaCommand = new DelegateCommand(() =>
                     {
                         _setup.Schema = SelectedResultProperties.Select(x => x.Column).ToList();
-                        _setupConfig.Set("Schema", _setup.Schema.ToListPropertyContainer("Schema"));
+                        _setupConfig.SetValue("Schema", _setup.Schema.ToListPropertyContainer("Schema"));
                         _currentRecipe?.Store();
 
                     });

@@ -180,7 +180,7 @@ namespace Application.Production
         private void UpdateCommandBarLocation()
         {
             bool val = false;
-            generalPreferences.Get("ShowCommandPanelOnLeftSide", ref val);
+            generalPreferences.GetValue("ShowCommandPanelOnLeftSide", ref val);
             if (val)
             {
                 CommandsGridColumn = 0;

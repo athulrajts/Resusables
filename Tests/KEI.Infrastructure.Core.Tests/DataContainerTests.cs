@@ -46,17 +46,17 @@ namespace KEI.Infrastructure.Core.Tests
             foreach (var item in data)
             {
                 var expected = t.GetProperty(item.Name).GetValue(obj);
-                var actual = item.Value;
+                var actual = item.GetValue();
 
-                if (expected is Enum && item.Value is Selector s)
-                {
-                    var enumValue = Enum.Parse(expected.GetType(), s.SelectedItem);
-                    Assert.Equal(expected, enumValue);
-                }
-                else
-                {
+                //if (expected is Enum && item.Value is Selector s)
+                //{
+                //    var enumValue = Enum.Parse(expected.GetType(), s.SelectedItem);
+                //    Assert.Equal(expected, enumValue);
+                //}
+                //else
+                //{
                     Assert.Equal(expected, actual);
-                }
+                //}
             }
         }
 
@@ -71,7 +71,7 @@ namespace KEI.Infrastructure.Core.Tests
             foreach (var item in property)
             {
                 var expected = t.GetProperty(item.Name).GetValue(obj);
-                var actual = item.Value;
+                var actual = item.GetValue();
                 Assert.Equal(expected, actual);
             }
         }
@@ -144,11 +144,11 @@ namespace KEI.Infrastructure.Core.Tests
             const string PROP_NAME = "IntProperty";
 
             IPropertyContainer property = PropertyContainerBuilder.Create()
-                .WithProperty(PROP_NAME, 42)
+                .Property(PROP_NAME, 42)
                 .Build();
 
             int prop = 0;
-            bool containsProperty = property.Get(PROP_NAME, ref prop);
+            bool containsProperty = property.GetValue(PROP_NAME, ref prop);
 
             Assert.True(containsProperty);
             Assert.NotEqual((decimal)0, prop, 0);
@@ -166,11 +166,11 @@ namespace KEI.Infrastructure.Core.Tests
             const string PROP_NAME = "IntProperty";
 
             IPropertyContainer property = PropertyContainerBuilder.Create()
-                .WithProperty(PROP_NAME, 42)
+                .Property(PROP_NAME, 42)
                 .Build();
 
             int prop = 0;
-            bool containsProperty = property.Get("blah", ref prop);
+            bool containsProperty = property.GetValue("blah", ref prop);
 
             Assert.False(containsProperty);
             Assert.Equal(default, prop);
@@ -188,13 +188,13 @@ namespace KEI.Infrastructure.Core.Tests
             const int SET_VALUE = 14;
 
             IPropertyContainer property = PropertyContainerBuilder.Create()
-                .WithProperty(PROP_NAME, VALUE)
+                .Property(PROP_NAME, VALUE)
                 .Build();
 
-            property.Set(PROP_NAME, SET_VALUE);
+            property.SetValue(PROP_NAME, SET_VALUE);
 
             int value = 0;
-            property.Get(PROP_NAME, ref value);
+            property.GetValue(PROP_NAME, ref value);
             int value2 = property.Get<int>(PROP_NAME);
 
             Assert.NotEqual(VALUE, value);
@@ -219,7 +219,7 @@ namespace KEI.Infrastructure.Core.Tests
             Assert.True(property.ContainsProperty(PROP_NAME));
 
             int value = 0;
-            property.Get(PROP_NAME, ref value);
+            property.GetValue(PROP_NAME, ref value);
 
             Assert.Equal(SET_VALUE, value);
         }
@@ -232,11 +232,11 @@ namespace KEI.Infrastructure.Core.Tests
             const int SET_VALUE = 14;
 
             IPropertyContainer property = PropertyContainerBuilder.Create()
-                .WithProperty(PROP_NAME, VALUE)
+                .Property(PROP_NAME, VALUE)
                 .Build();
 
             int originalValue = 0;
-            property.Get(PROP_NAME, ref originalValue);
+            property.GetValue(PROP_NAME, ref originalValue);
 
             Assert.True(property.ContainsProperty(PROP_NAME));
 
@@ -245,7 +245,7 @@ namespace KEI.Infrastructure.Core.Tests
             Assert.True(property.ContainsProperty(PROP_NAME));
 
             int value = 0;
-            property.Get(PROP_NAME, ref value);
+            property.GetValue(PROP_NAME, ref value);
 
             Assert.NotEqual(originalValue, value);
             Assert.Equal(SET_VALUE, value);
@@ -263,7 +263,7 @@ namespace KEI.Infrastructure.Core.Tests
             const int NEW_VALUE = 14;
 
             IPropertyContainer pc = PropertyContainerBuilder.Create()
-                .WithProperty(PROP_NAME, VALUE)
+                .Property(PROP_NAME, VALUE)
                 .Build();
 
             var bindingTarget = new BindingTestObject();
@@ -274,14 +274,14 @@ namespace KEI.Infrastructure.Core.Tests
 
             Assert.Equal(VALUE, bindingTarget.IntProperty);
 
-            pc.Set(PROP_NAME, NEW_VALUE);
+            pc.SetValue(PROP_NAME, NEW_VALUE);
 
             Assert.Equal(NEW_VALUE, bindingTarget.IntProperty);
 
             bindingTarget.IntProperty = 32;
 
             int propertyValue = 0;
-            pc.Get(PROP_NAME, ref propertyValue);
+            pc.GetValue(PROP_NAME, ref propertyValue);
 
             pc.RemoveBinding(PROP_NAME, () => bindingTarget.IntProperty);
             
@@ -298,7 +298,7 @@ namespace KEI.Infrastructure.Core.Tests
             const int NEW_VALUE = 14;
 
             IPropertyContainer property = PropertyContainerBuilder.Create()
-                .WithProperty(PROP_NAME, VALUE)
+                .Property(PROP_NAME, VALUE)
                 .Build();
 
             var bindingTarget = new BindingTestObject();
@@ -309,14 +309,14 @@ namespace KEI.Infrastructure.Core.Tests
 
             Assert.Equal(VALUE, bindingTarget.IntProperty);
 
-            property.Set(PROP_NAME, NEW_VALUE);
+            property.SetValue(PROP_NAME, NEW_VALUE);
 
             Assert.Equal(NEW_VALUE, bindingTarget.IntProperty);
 
             bindingTarget.IntProperty = 32;
 
             int propertyValue = 0;
-            property.Get(PROP_NAME, ref propertyValue);
+            property.GetValue(PROP_NAME, ref propertyValue);
 
             property.RemoveBinding(PROP_NAME, () => bindingTarget.IntProperty);
 
@@ -331,7 +331,7 @@ namespace KEI.Infrastructure.Core.Tests
             const int NEW_VALUE = 14;
 
             IPropertyContainer property = PropertyContainerBuilder.Create()
-                .WithProperty(PROP_NAME, VALUE)
+                .Property(PROP_NAME, VALUE)
                 .Build();
 
             var bindingTarget = new BindingTestObject();
@@ -342,7 +342,7 @@ namespace KEI.Infrastructure.Core.Tests
 
             Assert.Equal(VALUE, bindingTarget.IntProperty);
 
-            property.Set(PROP_NAME, NEW_VALUE);
+            property.SetValue(PROP_NAME, NEW_VALUE);
 
             Assert.NotEqual(NEW_VALUE, bindingTarget.IntProperty);
             Assert.Equal(VALUE, bindingTarget.IntProperty);
@@ -350,7 +350,7 @@ namespace KEI.Infrastructure.Core.Tests
             bindingTarget.IntProperty = 32;
 
             int propertyValue = 0;
-            property.Get(PROP_NAME, ref propertyValue);
+            property.GetValue(PROP_NAME, ref propertyValue);
 
             property.RemoveBinding(PROP_NAME, () => bindingTarget.IntProperty);
 
@@ -365,7 +365,7 @@ namespace KEI.Infrastructure.Core.Tests
             const int NEW_VALUE = 14;
 
             IPropertyContainer property = PropertyContainerBuilder.Create()
-                .WithProperty(PROP_NAME, VALUE)
+                .Property(PROP_NAME, VALUE)
                 .Build();
 
             var bindingTarget = new BindingTestObject();
@@ -376,7 +376,7 @@ namespace KEI.Infrastructure.Core.Tests
 
             Assert.Equal(VALUE, bindingTarget.IntProperty);
 
-            property.Set(PROP_NAME, NEW_VALUE);
+            property.SetValue(PROP_NAME, NEW_VALUE);
 
             Assert.NotEqual(NEW_VALUE, bindingTarget.IntProperty);
             Assert.Equal(VALUE, bindingTarget.IntProperty);
@@ -384,7 +384,7 @@ namespace KEI.Infrastructure.Core.Tests
             bindingTarget.IntProperty = 32;
 
             int propertyValue = 0;
-            property.Get(PROP_NAME, ref propertyValue);
+            property.GetValue(PROP_NAME, ref propertyValue);
 
             property.RemoveBinding(PROP_NAME, () => bindingTarget.IntProperty);
 

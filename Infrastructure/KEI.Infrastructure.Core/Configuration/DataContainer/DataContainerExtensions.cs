@@ -1,10 +1,10 @@
-﻿using KEI.Infrastructure.Server;
+﻿//using KEI.Infrastructure.Server;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 
-namespace KEI.Infrastructure.Configuration
+namespace KEI.Infrastructure
 {
     public static class DataContainerExtensions
     {
@@ -45,10 +45,10 @@ namespace KEI.Infrastructure.Configuration
         {
             foreach (DataObject item in dc)
             {
-                if (item.Value is IPropertyContainer dcValue)
+                if (item is ContainerDataObject cdo)
                 {
-                    var nameAppender = string.IsNullOrEmpty(name) ? dcValue.Name : $"{name}.{dcValue.Name}";
-                    ToDictionaryInternal(dcValue, ref dictionary, nameAppender);
+                    var nameAppender = string.IsNullOrEmpty(name) ? cdo.Name : $"{name}.{cdo.Name}";
+                    ToDictionaryInternal(cdo.Value, ref dictionary, nameAppender);
                 }
                 else
                 {
@@ -66,7 +66,7 @@ namespace KEI.Infrastructure.Configuration
         {
             var retValue = default(T);
 
-            dc.Get(key, ref retValue);
+            dc.GetValue(key, ref retValue);
 
             return retValue;
         }
@@ -81,52 +81,35 @@ namespace KEI.Infrastructure.Configuration
 
         internal static void Put(this IDataContainer dc, string key, object value)
         {
-            if (dc.ContainsProperty(key))
+            if(dc.ContainsProperty(key))
             {
-                dc.Set(key, value);
+                dc.SetValue(key, value);
             }
             else
             {
-                if (dc is IPropertyContainer p)
-                {
-                    p.Add(new PropertyObject
-                    {
-                        Name = key,
-                        Value = value,
-                        Editor = value.GetType().GetEditorType(),
-                    });
-                }
-                else if (dc is IDataContainer d)
-                {
-                    d.Add(new DataObject
-                    {
-                        Name = key,
-                        Value = value,
-                    });
-                }
-
+                dc.Add(DataObjectFactory.GetDataObjectFor(key, value));
             }
         }
 
         public static DataContainer GetDataContainer(IPropertyContainer pc)
         {
-            if (pc == null)
-                return null;
+            //if (pc == null)
+            //    return null;
 
             DataContainer dc = new DataContainer();
-            dc.Name = pc.Name;
+            //dc.Name = pc.Name;
 
-            foreach (var item in pc)
-            {
-                if (item.Value is IPropertyContainer cpc)
-                {
-                    dc.Put(item.Name, GetDataContainer(cpc));
-                }
-                else
-                {
-                    dc.Data.Add(item);
-                }
-            }
+            //foreach (var item in pc)
+            //{
+            //    if (item.Value is IPropertyContainer cpc)
+            //    {
+            //        dc.Put(item.Name, GetDataContainer(cpc));
+            //    }
+            //    else
+            //    {
+            //        dc.Data.Add(item);
+            //    }
+            //}
 
             return dc;
         }
@@ -134,8 +117,7 @@ namespace KEI.Infrastructure.Configuration
         #endregion
 
 
-        public static IDataContainer ToListDataContainer<T>(this IEnumerable<T> list, string name = "UntitledList")
-            where T : class
+        public static IDataContainer ToListDataContainer(this IList list, string name = "UntitledList")
         {
             return DataContainerBuilder.CreateList(name, list);
         }
@@ -152,80 +134,55 @@ namespace KEI.Infrastructure.Configuration
             return PropertyContainerBuilder.CreateObject(name, obj);
         }
 
-        public static IPropertyContainer ToListPropertyContainer<T>(this IEnumerable<T> list, string name = "UntitledList")
-            where T : class
+        public static IPropertyContainer ToListPropertyContainer(this IList list, string name = "UntitledList")
         {
             return PropertyContainerBuilder.CreateList(name, list);
         }
 
 
-        public static IPropertyContainer ToPropertyContainer(this DataContainer dc) => GetPropertyContainer(dc);
-        public static IDataContainer ToDataContainer(this PropertyContainer pc) => GetPropertyContainer(pc);
-        private static PropertyContainer GetPropertyContainer(DataContainer dc)
-        {
-            if (dc == null)
-                return null;
+        //public static IPropertyContainer ToPropertyContainer(this DataContainer dc) => GetPropertyContainer(dc);
+        //public static IDataContainer ToDataContainer(this PropertyContainer pc) => GetPropertyContainer(pc);
+        //private static PropertyContainer GetPropertyContainer(DataContainer dc)
+        //{
+        //    if (dc == null)
+        //        return null;
 
-            PropertyContainer pc = PropertyContainer.Create();
-            pc.Name = dc.Name;
+        //    PropertyContainer pc = PropertyContainer.Create();
+        //    pc.Name = dc.Name;
 
-            foreach (var item in dc)
-            {
-                if (item.Value is DataContainer cdc)
-                {
-                    pc.Put(item.Name, GetPropertyContainer(cdc));
-                }
-                else
-                {
-                    pc.AddProperty(new PropertyObject
-                    {
-                        Name = item.Name,
-                        Value = item.Value,
-                        BrowseOption = BrowseOptions.Browsable,
-                        Editor = item.Value.GetType().GetEditorType()
-                    });
-                }
-            }
+        //    foreach (var item in dc)
+        //    {
+        //        if (item.Value is DataContainer cdc)
+        //        {
+        //            pc.Put(item.Name, GetPropertyContainer(cdc));
+        //        }
+        //        else
+        //        {
+        //            pc.AddProperty(new PropertyObject
+        //            {
+        //                Name = item.Name,
+        //                Value = item.Value,
+        //                BrowseOption = BrowseOptions.Browsable,
+        //                Editor = item.Value.GetType().GetEditorType()
+        //            });
+        //        }
+        //    }
 
-            return pc;
-        }
+        //    return pc;
+        //}
 
         public static void WriteBytes(this IDataContainer container, Stream stream)
         {
             var writer = new BinaryWriter(stream);
 
-            foreach (var prop in container)
+            foreach (var data in container)
             {
-                if (prop.Type == typeof(string))
+                if(data is IWriteToBinaryStream wbs)
                 {
-                    writer.WriteUInt32PrefixedString(prop.Value as string);
-                }
-                else if (prop.Type == typeof(uint))
-                {
-                    writer.Write((uint)prop.Value);
-                }
-                else if (prop.Type == typeof(int))
-                {
-                    writer.Write((int)prop.Value);
-                }
-                else if (prop.Type == typeof(double))
-                {
-                    writer.Write((double)prop.Value);
-                }
-                else if (prop.Type == typeof(float))
-                {
-                    writer.Write((float)prop.Value);
-                }
-                else if (prop.Type == typeof(bool))
-                {
-                    writer.Write((bool)prop.Value);
-                }
-                else if (prop.Type == typeof(byte))
-                {
-                    writer.Write((byte)prop.Value);
+                    wbs.WriteBytes(writer);
                 }
             }
-        
+
         }
     }
 }

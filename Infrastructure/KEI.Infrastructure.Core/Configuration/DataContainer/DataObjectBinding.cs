@@ -1,19 +1,17 @@
 ﻿using System;
-using System.Windows;
 using System.Reflection;
 using System.ComponentModel;
-using KEI.Infrastructure.Helpers;
 
-namespace KEI.Infrastructure.Configuration
+namespace KEI.Infrastructure
 {
     /// <summary>
     /// Object Representing a binding between a CLR Property
     /// and a <see cref="PropertyObject"/>. CLR Property should invoke
     /// <see cref="PropertyChangedEventHandler"/> in property setter for the binding to work
     /// </summary>
-    internal class PropertyBinding : IDisposable
+    internal class DataObjectBinding : IDisposable
     {
-        public PropertyBinding(object target, DataObject property, PropertyInfo targetProperty, BindingMode mode)
+        public DataObjectBinding(object target, DataObject property, PropertyInfo targetProperty, BindingMode mode)
         {
             BindingTarget = new WeakReference(target);
             Property = property;
@@ -45,13 +43,13 @@ namespace KEI.Infrastructure.Configuration
                 {
                     if (BindingTarget.IsAlive)
                     {
-                        Property.Value = TargetProperty.GetValue(BindingTarget.Target);
+                        Property.SetValue(TargetProperty.GetValue(BindingTarget.Target));
                     }
                 }
             }
             else if (sender == Property)
             {
-                if (e.PropertyName == Property.Name)
+                if (e.PropertyName == "Value")
                 {
                     UpdateTarget();
                 }
@@ -88,28 +86,10 @@ namespace KEI.Infrastructure.Configuration
         {
             if (TargetProperty?.CanWrite == true)
             {
-                object value = null;
-                if (Property.Value is Selector s)
-                {
-                    var type = s.Type.GetUnderlyingType();
-                    if (type.IsEnum)
-                    {
-                        value = Enum.Parse(type, s.SelectedItem);
-                    }
-                    else
-                    {
-                        value = type.ConvertFrom(s.SelectedItem);
-                    }
-                }
-                else if (Property.Value is IConvertible)
-                {
-                    value = TargetProperty.PropertyType.ConvertFrom(Property.ValueString);
-                }
-
                 // Update the target property if the owner hasn't already been GC'ed
                 if (BindingTarget.IsAlive)
                 {
-                    TargetProperty.SetValue(BindingTarget.Target, value); 
+                    TargetProperty.SetValue(BindingTarget.Target, Property.GetValue()); 
                 }
             }
         }

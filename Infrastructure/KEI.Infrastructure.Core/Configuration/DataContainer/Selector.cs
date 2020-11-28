@@ -4,8 +4,9 @@ using System.Xml.Serialization;
 using System.Collections.Generic;
 using Prism.Mvvm;
 using KEI.Infrastructure.Types;
+using System.Collections;
 
-namespace KEI.Infrastructure.Configuration
+namespace KEI.Infrastructure
 {
     /// <summary>
     /// Container for Holding <see cref="Enum"/> Properties or, Properties whos
@@ -51,6 +52,18 @@ namespace KEI.Infrastructure.Configuration
             Option = new List<string>(Enum.GetNames(t.GetType()));
             SelectedItem = t.ToString();
             Type = new TypeInfo(t.GetType());
+        }
+
+        public Selector(string selectedValue, IList options)
+        {
+            foreach (var opt in options)
+            {
+                Option.Add(opt.ToString());
+            }
+
+            SelectedItem = selectedValue;
+
+            Type = options[0]?.GetType();
         }
 
         /// <summary>

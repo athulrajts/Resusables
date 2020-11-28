@@ -1,5 +1,5 @@
 ﻿using Prism.Mvvm;
-using KEI.Infrastructure.Configuration;
+using KEI.Infrastructure;
 using Application.Core;
 
 namespace Application.Production.Themes

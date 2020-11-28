@@ -1,6 +1,6 @@
 ﻿using System.Windows.Input;
 using Prism.Commands;
-using KEI.Infrastructure.Configuration;
+using KEI.Infrastructure;
 using KEI.UI.Wpf;
 using Application.Core;
 using Application.Core.Interfaces;
@@ -31,8 +31,8 @@ namespace Application.UI.AdvancedSetup.ViewModels
 
         private void GetInitialValues()
         {
-            _generalPreferences.Get("Theme", ref currentTheme);
-            _generalPreferences.Get("ShowCommandPanelOnLeftSide", ref currentShowCommandsOnLeft);
+            _generalPreferences.GetValue("Theme", ref currentTheme);
+            _generalPreferences.GetValue("ShowCommandPanelOnLeftSide", ref currentShowCommandsOnLeft);
         }
         
         private Theme selectedTheme;
@@ -82,13 +82,13 @@ namespace Application.UI.AdvancedSetup.ViewModels
                         if (currentTheme != selectedTheme)
                         {
                             needSave = true;
-                            _generalPreferences.Set("Theme", selectedTheme);
+                            _generalPreferences.SetValue("Theme", selectedTheme);
                             currentTheme = selectedTheme;
                         }
                         if (currentShowCommandsOnLeft != showCommandsOnLeft)
                         {
                             needSave = true;
-                            _generalPreferences.Set("ShowCommandPanelOnLeftSide", showCommandsOnLeft);
+                            _generalPreferences.SetValue("ShowCommandPanelOnLeftSide", showCommandsOnLeft);
                             currentShowCommandsOnLeft = showCommandsOnLeft;
                         }
 

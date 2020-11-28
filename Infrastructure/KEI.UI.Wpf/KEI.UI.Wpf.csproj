@@ -55,5 +55,6 @@ del /f "Prism.Unity.Wpf.xml" 2&gt;nul
 del /f "System.Threading.Tasks.Extensions.xml" 2&gt;nul
 del /f "Prism.xml" 2&gt;nul
 del /f "System.Runtime.CompilerServices.Unsafe.xml" 2&gt;nul</PostBuildEvent>
+    <LangVersion>9.0</LangVersion>
   </PropertyGroup>
 </Project>

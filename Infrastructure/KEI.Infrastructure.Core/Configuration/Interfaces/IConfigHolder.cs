@@ -1,6 +1,6 @@
 ﻿using KEI.Infrastructure.Service;
 
-namespace KEI.Infrastructure.Configuration
+namespace KEI.Infrastructure
 {
     public interface IConfigHolder<T> : IConfigurable
     {

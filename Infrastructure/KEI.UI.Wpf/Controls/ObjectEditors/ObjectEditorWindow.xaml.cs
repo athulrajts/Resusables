@@ -1,4 +1,4 @@
-﻿using KEI.Infrastructure.Configuration;
+﻿using KEI.Infrastructure;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -31,7 +31,7 @@ namespace KEI.UI.Wpf.Controls.ObjectEditors
 
                     foreach (var item in c)
                     {
-                        EditingCollection.Add(item.Value);
+                        EditingCollection.Add(item.GetValue());
                     }
                 }
                 else

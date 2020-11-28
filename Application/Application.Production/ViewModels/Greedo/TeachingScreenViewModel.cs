@@ -148,7 +148,7 @@ namespace Application.Production.ViewModels
         {
             string imageName = $"{DateTime.Now.ToString("[dd-MMM-yyyy] hh_mm_ss")}.bmp";
             string imageDir = string.Empty;
-            _camerConfig.Get(ConfigKeys.CameraConfigKeys.CapturedImagesFolder, ref imageDir);
+            _camerConfig.GetValue(ConfigKeys.CameraConfigKeys.CapturedImagesFolder, ref imageDir);
 
             return Path.Combine(imageDir, imageName);
         }

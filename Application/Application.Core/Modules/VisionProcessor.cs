@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using KEI.Infrastructure.Configuration;
+using KEI.Infrastructure;
+using KEI.Infrastructure.Utils;
+using KEI.Infrastructure.Events;
 using KEI.Infrastructure.Service;
 using KEI.Infrastructure.Validation;
+using KEI.Infrastructure.Configuration;
 using Application.Core.Constants;
 using Application.Core.Interfaces;
 using static Application.Core.Constants.ConfigKeys;
-using KEI.Infrastructure.Events;
-using KEI.Infrastructure.Utils;
 
 namespace Application.Core.Modules
 {
@@ -20,10 +21,10 @@ namespace Application.Core.Modules
         protected override PropertyContainerBuilder DefineConfigShape()
         {
             return PropertyContainerBuilder.Create(ConfigName, ConfigPath)
-                .WithProperty("MorphologyOperatorSize", 25, validation: ValidationBuilder.Create().Positive())
-                .WithProperty("MedinBlurSize", 3, validation: ValidationBuilder.Create().Positive())
-                .WithProperty("WindowSizeTolerance", 110, validation: ValidationBuilder.Create().Positive())
-                .WithProperty("PermissibleDistanceOfRotation", 100, validation: ValidationBuilder.Create().Positive());
+                .Property("MorphologyOperatorSize", 25)
+                .Property("MedinBlurSize", 3)
+                .Property("WindowSizeTolerance", 110)
+                .Property("PermissibleDistanceOfRotation", 100);
         }
 
         #endregion
@@ -85,8 +86,8 @@ namespace Application.Core.Modules
 
             double maxTransmittance = 100;
             double minTransmittance = 90;
-            _recipe?.Get(RecipeKeys.MaxTransmittance, ref maxTransmittance);
-            _recipe?.Get(RecipeKeys.MinTransmittance, ref minTransmittance);
+            _recipe?.GetValue(RecipeKeys.MaxTransmittance, ref maxTransmittance);
+            _recipe?.GetValue(RecipeKeys.MinTransmittance, ref minTransmittance);
 
             int morphSize = 25;
             GetValue(VisionConfigKeys.MorphologyOperatorSize, ref morphSize);

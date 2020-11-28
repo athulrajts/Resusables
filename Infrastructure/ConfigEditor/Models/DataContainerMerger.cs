@@ -1,4 +1,4 @@
-﻿using KEI.Infrastructure.Configuration;
+﻿using KEI.Infrastructure;
 using Prism.Mvvm;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -72,8 +72,8 @@ namespace ConfigEditor.Models
                 foreach (var key in diff.Intersect(leftData.Keys))
                 {
                     var mergeItem = AllItems.FirstOrDefault(x => x.Key == key);
-                    object value = mergeItem.Option == MergeOption.Left ? mergeItem.Left?.Value : mergeItem.Right?.Value;
-                    dc.Set(key, rightData[key].Value);
+                    object value = mergeItem.Option == MergeOption.Left ? mergeItem.Left?.GetValue() : mergeItem.Right?.GetValue();
+                    dc.SetValue(key, rightData[key].GetValue());
                 }
             }
             else if(shape == MergeOption.Right)
@@ -83,9 +83,9 @@ namespace ConfigEditor.Models
                 foreach (var key in diff.Intersect(rightData.Keys))
                 {
                     var mergeItem = AllItems.FirstOrDefault(x => x.Key == key);
-                    object value = mergeItem.Option == MergeOption.Left ? mergeItem.Left?.Value : mergeItem.Right?.Value;
+                    object value = mergeItem.Option == MergeOption.Left ? mergeItem.Left?.GetValue() : mergeItem.Right?.GetValue();
 
-                    dc.Set(key, value);
+                    dc.SetValue(key, value);
                 }
             }
 
@@ -114,10 +114,12 @@ namespace ConfigEditor.Models
             Right = right;
             Key = key;
 
-            IsDifferent = left?.ValueString != right?.ValueString;
+            IsDifferent = left?.StringValue != right?.StringValue;
 
-            if (IsDifferent && Right != null)
+            if (IsDifferent && Right is not null)
+            {
                 Option = MergeOption.Right;
+            }
         }
 
         public void Swap()

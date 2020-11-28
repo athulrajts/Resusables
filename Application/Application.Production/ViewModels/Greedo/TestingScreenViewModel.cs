@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using Prism.Events;
 using Prism.Commands;
+using KEI.Infrastructure;
 using KEI.Infrastructure.Prism;
 using KEI.Infrastructure.Screen;
 using KEI.Infrastructure.Events;
 using KEI.Infrastructure.Database;
-using KEI.Infrastructure.Configuration;
 using KEI.UI.Wpf.Hotkey;
 using Application.Core;
 using Application.Core.Interfaces;

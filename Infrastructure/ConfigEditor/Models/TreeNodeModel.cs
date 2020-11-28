@@ -1,4 +1,4 @@
-﻿using KEI.Infrastructure.Configuration;
+﻿using KEI.Infrastructure;
 using Prism.Mvvm;
 using System.Collections.ObjectModel;
 
@@ -40,7 +40,7 @@ namespace ConfigEditor.Models
 
             foreach (var item in dc)
             {
-                if(item.Value is IPropertyContainer dcValue)
+                if(item.GetValue() is IPropertyContainer dcValue)
                 {
                     Children.Add(new TreeNodeModel(dcValue));
                 }

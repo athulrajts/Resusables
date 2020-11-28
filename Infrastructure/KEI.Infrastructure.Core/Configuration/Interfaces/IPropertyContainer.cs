@@ -1,12 +1,11 @@
-﻿using System;
-using System.Linq.Expressions;
+﻿using KEI.Infrastructure.Validation;
+using System;
 
-namespace KEI.Infrastructure.Configuration
+namespace KEI.Infrastructure
 {
     public interface IPropertyContainer : IDataContainer, ICloneable
     {
-        public bool RemoveBinding<T>(string propertyKey, Expression<Func<T>> expression);
-        public bool SetBinding<T>(string propertyKey, Expression<Func<T>> expression, BindingMode mode = BindingMode.TwoWay);
         public bool SetBrowseOptions(string property, BrowseOptions option);
+        public bool SetValidation(string property, ValidatorGroup validation);
     }
 }

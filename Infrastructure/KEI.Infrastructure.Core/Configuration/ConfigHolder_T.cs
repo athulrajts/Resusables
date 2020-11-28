@@ -77,12 +77,16 @@ namespace KEI.Infrastructure.Configuration
 
         public bool StoreConfig(string path)
         {
-            if (typeof(IEnumerable).IsAssignableFrom(typeof(T)))
+            if (typeof(IList).IsAssignableFrom(typeof(T)))
             {
-                if (XmlHelper.Serialize((Config as IEnumerable<object>).ToListDataContainer(ConfigName), path) == false)
+                if(Config is IList listConfig)
                 {
-                    Logger.Error($"Unable to Store Config \"{ConfigName}\"");
-                    return false;
+                    if(XmlHelper.Serialize(listConfig.ToListDataContainer(ConfigName), path) == false)
+                    {
+                        Logger.Error($"Unable to Store Config \"{ConfigName}\"");
+                        return false;
+                    }
+                    
                 }
             }
             else

@@ -1,4 +1,0 @@
-﻿namespace KEI.Infrastructure.Configuration
-{
-
-}

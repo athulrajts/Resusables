@@ -66,8 +66,7 @@ namespace KEI.Infrastructure.UserManagement
 
         private IDataContainer GetDefaultUserPreferences(string username)
         {
-            return DataContainerBuilder.Create(username)
-                .Build();
+            return DataContainerBuilder.Create(username).Build();
         }
     }
 }

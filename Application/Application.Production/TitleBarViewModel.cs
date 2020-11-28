@@ -8,7 +8,6 @@ using Prism.Commands;
 using KEI.Infrastructure;
 using KEI.Infrastructure.Prism;
 using KEI.Infrastructure.UserManagement;
-using KEI.UI.Wpf;
 using Application.Core;
 using KEI.Infrastructure.Localizer;
 using System.Globalization;

@@ -1,6 +1,5 @@
 ﻿using Application.Core;
-using Application.UI;
-using KEI.Infrastructure.Configuration;
+using KEI.Infrastructure;
 using Prism.Ioc;
 using System;
 using System.ComponentModel;
@@ -39,7 +38,7 @@ namespace ApplicationShell.Themes
         private void UpdateTheme()
         {
             Theme newTheme = Theme.Light;
-            generalPreferences.Get("Theme", ref newTheme);
+            generalPreferences.GetValue("Theme", ref newTheme);
 
             UpdateResources(newTheme);
         }

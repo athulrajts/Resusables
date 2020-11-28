@@ -1,8 +1,9 @@
 ﻿using System.IO;
+using KEI.Infrastructure;
+using KEI.Infrastructure.Utils;
 using KEI.Infrastructure.Helpers;
 using KEI.Infrastructure.Service;
 using KEI.Infrastructure.Configuration;
-using KEI.Infrastructure.Utils;
 
 namespace Application.Core.Camera
 {
@@ -71,7 +72,7 @@ namespace Application.Core.Camera
         protected override PropertyContainerBuilder DefineConfigShape()
         {
             return PropertyContainerBuilder.Create(ConfigName, ConfigPath)
-                .WithFolder("CapturedImagesFolder", @".\Images\CapturedImages\");
+                .Property("CapturedImagesFolder", @".\Images\CapturedImages\");
         }
     }
 }

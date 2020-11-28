@@ -5,12 +5,15 @@ using System.Xml.Serialization;
 using System.Collections.Generic;
 using Prism.Mvvm;
 using KEI.Infrastructure.Types;
-using KEI.Infrastructure.Helpers;
 using System.ComponentModel;
 using System.Xml.Schema;
 using System.Xml;
+using KEI.Infrastructure.Logging;
+using System.IO;
+using System.Linq.Expressions;
+using System.Reflection;
 
-namespace KEI.Infrastructure.Configuration
+namespace KEI.Infrastructure
 {
     /// <summary>
     /// Base class for <see cref="DataContainer"/> and <see cref="PropertyContainer"/>
@@ -22,14 +25,12 @@ namespace KEI.Infrastructure.Configuration
         /// <summary>
         /// Name of the DataContainer
         /// </summary>
-        [XmlAttribute]
         public string Name { get; set; }
 
 
         /// <summary>
         /// The path from which this object was deserialised from
         /// </summary>
-        [XmlIgnore]
         public string FilePath { get; set; }
 
 
@@ -37,9 +38,11 @@ namespace KEI.Infrastructure.Configuration
         /// Represents Type that this instance can be cast into
         /// can be converted into
         /// </summary>
-        [XmlElement(IsNullable = false)]
-        public TypeInfo UnderlyingType { get; set; }
+        public Types.TypeInfo UnderlyingType { get; set; }
 
+        /// <summary>
+        /// Number of data objects in this container
+        /// </summary>
         public abstract int Count { get; }
 
         #endregion
@@ -52,108 +55,41 @@ namespace KEI.Infrastructure.Configuration
         /// <param name="key">Key, which uniquely identifies the data</param>
         /// <param name="value">Value object passed as reference</param>
         /// <returns>Is Success</returns>
-        public virtual bool Get<T>(string key, ref T value)
+        public virtual bool GetValue<T>(string key, ref T value)
         {
-            var split = key.Split('.');
+            var data = FindRecursive(key);
 
-            if (split.Length == 1)
+            bool result = false;
+
+            if (data is null)
             {
-                var dataItem = Find(key);
-
-                if (dataItem == null)
-                {
-                    ViewService.Warn($"Unable to find \"{key}\" from {Name}");
-                    return false;
-                }
-
-                if (dataItem.Value is Selector s)
-                {
-                    var type = s.Type.GetUnderlyingType();
-                    if (type.IsEnum)
-                    {
-                        value = (T)Enum.Parse(type, s.SelectedItem);
-                    }
-                    else
-                    {
-                        value = (T)type.ConvertFrom(s.SelectedItem);
-                    }
-                }
-                else
-                {
-                    value = (T)dataItem.Value;
-                }
-
-                return true;
+                Logger.Warn($"Unable to find \"{key}\" from {Name}");
             }
-            else
+            else if (data.GetValue() is T val)
             {
-                object temp = null;
-                Get(split.First(), ref temp);
-                if (temp is IDataContainer dc)
-                {
-                    dc.Get(string.Join(".", split.Skip(1)), ref value);
-                }
-                else
-                {
-                    throw new Exception("Nested configs should be of type PropertyContainer");
-                }
+                value = val;
+                result = true;
             }
 
-            return false;
+            return result;
         }
-     
+
         /// <summary>
         /// Sets the Data value
         /// </summary>
         /// <param name="key">Key, which uniquely identifies the data</param>
         /// <param name="value">Value to set</param>
-        public virtual void Set(string key, object value)
+        public virtual void SetValue(string key, object value)
         {
-            var split = key.Split('.');
+            var data = FindRecursive(key);
 
-            if (split.Length == 1)
+            if (data is null)
             {
-                var dataItem = Find(key);
-
-                if (dataItem == null)
-                {
-                    ViewService.Warn($"Unable to find \"{key}\" from {Name}");
-                    return;
-                }
-
-                if (dataItem.Value is Selector s)
-                {
-                    dataItem.Value = s.Clone(value?.ToString());
-                }
-                else if (dataItem.Value is IDataContainer dc)
-                {
-                    if (dc.UnderlyingType == null)
-                        return;
-
-                    if (value is IDataContainer dcValue)
-                    {
-                        dataItem.Value = dcValue;
-                    }
-
-                }
-                else
-                {
-                    dataItem.Value = value;
-                }
+                Logger.Warn($"Unable to find \"{key}\" from {Name}");
             }
             else
             {
-                object temp = null;
-                Get(split.First(), ref temp);
-
-                if (temp is IDataContainer dc)
-                {
-                    dc.Set(string.Join(".", split.Skip(1)), value);
-                }
-                else
-                {
-                    throw new Exception("Nested configs should be of type IDataContainer");
-                }
+                data.SetValue(value);
             }
         }
 
@@ -196,10 +132,12 @@ namespace KEI.Infrastructure.Configuration
         /// <returns>returns as object</returns>
         public virtual object Morph()
         {
-            if (UnderlyingType == null)
-                return null;
+            if (UnderlyingType is null)
+            {
+                throw new InvalidOperationException("Morph not supported for this instance");
+            }
 
-            var morphType = UnderlyingType.GetUnderlyingType();
+            Type morphType = UnderlyingType;
 
             var result = Activator.CreateInstance(morphType);
 
@@ -207,59 +145,62 @@ namespace KEI.Infrastructure.Configuration
             {
                 if (prop.CanWrite)
                 {
-                    if (Find(prop.Name) is DataObject di)
+                    var data = Find(prop.Name);
+
+                    if(data is null)
                     {
-                        if (di.Value is IConvertible)
-                        {
-                            prop.SetValue(result, di.Value);
-                        }
-                        else if (di.Value is IDataContainer cfg)
-                        {
-                            if (cfg.UnderlyingType == null)
-                                continue;
-
-                            var cfgMorphType = cfg.UnderlyingType.GetUnderlyingType();
-
-                            if (typeof(IList).IsAssignableFrom(cfgMorphType))
-                            {
-                                var list = Activator.CreateInstance(cfgMorphType) as IList;
-
-                                foreach (var item in cfg)
-                                {
-                                    if (item.Value is IDataContainer objectCfg)
-                                    {
-                                        list.Add(objectCfg.Morph());
-                                    }
-                                }
-
-                                prop.SetValue(result, list);
-                            }
-                            else
-                            {
-                                prop.SetValue(result, cfg.Morph());
-                            }
-                        }
-                        else if (di.Value is Selector s)
-                        {
-                            prop.SetValue(result, Enum.Parse(s.Type.GetUnderlyingType(), s.SelectedItem));
-                        }
+                        continue;
                     }
 
+                    if (data.GetValue() is IDataContainer dc)
+                    {
+                        if (dc.UnderlyingType is null)
+                        {
+                            continue;
+                        }
+
+                        if (typeof(IList).IsAssignableFrom(prop.PropertyType))
+                        {
+                            var list = (IList)Activator.CreateInstance(dc.UnderlyingType);
+
+                            foreach (var listItem in dc)
+                            {
+                                if (listItem.GetValue() is IDataContainer li)
+                                {
+                                    list.Add(li.Morph());
+                                }
+                            }
+
+                            prop.SetValue(result, list);
+                        }
+                        else
+                        {
+                            prop.SetValue(result, dc.Morph());
+                        }
+                    }
+                    else if (data is not null)
+                    {
+                        prop.SetValue(result, data.GetValue());
+                    }
                 }
             }
 
             return result;
         }
 
-        public virtual object MorphList()
+        /// <summary>
+        /// Maps this contents of this container to a class objected
+        /// represented by <see cref="UnderlyingType"/>
+        /// </summary>
+        /// <returns></returns>
+        public virtual IList MorphList()
         {
-            if (UnderlyingType == null)
-                return null;
+            if (UnderlyingType is null)
+            {
+                throw new InvalidOperationException("Morph not supported for this instance");
+            }
 
-            var morphType = UnderlyingType.GetUnderlyingType();
-
-            if (morphType == null)
-                return null;
+            Type morphType = UnderlyingType;
 
             var list = Activator.CreateInstance(morphType) as IList;
 
@@ -267,9 +208,9 @@ namespace KEI.Infrastructure.Configuration
             {
                 foreach (var item in this)
                 {
-                    if (item.Value is IDataContainer objectCfg)
+                    if (item is ContainerDataObject cdo)
                     {
-                        list.Add(objectCfg.Morph());
+                        list.Add(cdo.Value.Morph());
                     }
                 }
             }
@@ -277,7 +218,12 @@ namespace KEI.Infrastructure.Configuration
             return list;
         }
 
-        public List<T> MorphList<T>() => (List<T>)MorphList();
+        /// <summary>
+        /// Generic wrapper the casts call to <see cref="MorphList"/> to give type
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public IList<T> MorphList<T>() => (IList<T>)MorphList();
 
 
         /// <summary>
@@ -318,7 +264,7 @@ namespace KEI.Infrastructure.Configuration
                 {
                     item.PropertyChanged += OnPropertyChangedRaised;
 
-                    if (item.Value is IDataContainer dc)
+                    if (item.GetValue() is IDataContainer dc)
                     {
                         dc.PropertyChanged += OnPropertyChangedRaised;
                     }
@@ -330,7 +276,7 @@ namespace KEI.Infrastructure.Configuration
                 {
                     item.PropertyChanged -= OnPropertyChangedRaised;
 
-                    if (item.Value is IDataContainer dc)
+                    if (item.GetValue() is IDataContainer dc)
                     {
                         dc.PropertyChanged -= OnPropertyChangedRaised;
                     }
@@ -342,17 +288,10 @@ namespace KEI.Infrastructure.Configuration
         {
             string propName = e.PropertyName;
 
-            /// We only care when <see cref="DataObject.Name"/> is raised as event
-            if (propName == nameof(DataObject.Value) ||
-                propName == nameof(DataObject.ValueString))
-            {
-                return;
-            }
-
             /// If sender is one of our children, pass the event on up the tree.
-            if (sender is DataObject)
+            if (sender is DataObject o && e.PropertyName == "Value")
             {
-                RaisePropertyChanged(propName);
+                RaisePropertyChanged(o.Name);
             }
 
             /// If one of our childrens value is <see cref="IDataContainer"/>
@@ -376,13 +315,18 @@ namespace KEI.Infrastructure.Configuration
 
         #endregion
 
+        /// <summary>
+        /// Merge two DataContainers
+        /// </summary>
+        /// <param name="right"></param>
+        /// <returns></returns>
         public bool Merge(IDataContainer right)
         {
             List<Action> actions = new List<Action>();
 
             AddNewItems(this, right, ref actions);
 
-            RemoveOldItems(this , right, ref actions);
+            RemoveOldItems(this, right, ref actions);
 
             // Store updated config if changes were made.
             if (actions.Count > 0)
@@ -395,6 +339,12 @@ namespace KEI.Infrastructure.Configuration
             return false;
         }
 
+        /// <summary>
+        /// helper methods to merge datacontainers
+        /// </summary>
+        /// <param name="workingCopy">left</param>
+        /// <param name="workingBase">right</param>
+        /// <param name="addActions"></param>
         private void AddNewItems(IDataContainer workingCopy, IDataContainer workingBase, ref List<Action> addActions)
         {
             foreach (var item in workingBase)
@@ -403,37 +353,59 @@ namespace KEI.Infrastructure.Configuration
                 {
                     addActions.Add(() => workingCopy.Add(item));
 
-                    Logging.Logger.Info($"Added new property {item.Name} = {item.ValueString}");
+                    Logger.Info($"Added new property {item.Name} = {item.StringValue}");
                 }
-                else if (item.Value is IDataContainer baseChild)
+                else if (item is ContainerDataObject baseChild)
                 {
-                    AddNewItems(workingCopy.Get<IDataContainer>(item.Name), baseChild, ref addActions);
+                    AddNewItems(workingCopy.Get<IDataContainer>(item.Name), baseChild.Value, ref addActions);
                 }
 
             }
         }
 
+
+        /// <summary>
+        /// helper methods to merge datacontainers
+        /// </summary>
+        /// <param name="workingCopy">left</param>
+        /// <param name="workingBase">right</param>
+        /// <param name="addActions"></param>
         private void RemoveOldItems(IDataContainer workingCopy, IDataContainer workingBase, ref List<Action> removeActions)
         {
-            foreach (var prop in workingCopy)
+            foreach (var item in workingCopy)
             {
-                if (workingBase.ContainsProperty(prop.Name) == false)
+                if (workingBase.ContainsProperty(item.Name) == false)
                 {
-                    removeActions.Add(() => workingCopy.Remove(prop));
+                    removeActions.Add(() => workingCopy.Remove(item));
 
-                    Logging.Logger.Info($"Removed property {prop.Name} = {prop.ValueString}");
+                    Logger.Info($"Removed property {item.Name} = {item.StringValue}");
                 }
-                else if (prop.Value is IDataContainer baseChild)
+                else if (item is ContainerDataObject baseChild)
                 {
-                    RemoveOldItems(workingCopy.Get<PropertyContainer>(prop.Name), baseChild, ref removeActions);
+                    RemoveOldItems(workingCopy.Get<IDataContainer>(item.Name), baseChild.Value, ref removeActions);
                 }
             }
         }
 
+        /// <summary>
+        /// Adds DataObject to datacontainer
+        /// </summary>
+        /// <param name="obj"></param>
         public abstract void Add(DataObject obj);
-        public abstract void Remove(DataObject name);
-        public abstract DataObject Find(string key);
         
+        /// <summary>
+        /// Removes DataObject from datacontainer
+        /// </summary>
+        /// <param name="name"></param>
+        public abstract void Remove(DataObject name);
+        
+        /// <summary>
+        /// Gets a DataObject from this datacontainer
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public abstract DataObject Find(string key);
+
         /// <summary>
         /// Gets <see cref="PropertyObject"/> with given name
         /// </summary>
@@ -450,287 +422,252 @@ namespace KEI.Infrastructure.Configuration
             else
             {
                 object temp = null;
-                Get(split.First(), ref temp);
-                if (temp is DataContainerBase dc)
+                GetValue(split.First(), ref temp);
+
+                if (temp is IDataContainer dc)
                 {
                     return dc.Find(string.Join(".", split.Skip(1)));
                 }
                 else
                 {
-                    throw new Exception("Nested configs should be of type PropertyContainer");
+                    throw new Exception("Nested configs should be of type IDataContainer");
                 }
             }
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-        
+
+        #region IXmlSerializable Members
+
         public XmlSchema GetSchema() => null;
 
         public virtual void ReadXml(XmlReader reader)
         {
-            // We need to for storing the type of a property
-            Type typeAttribute = null;
-
-            // Temp object for reading from xml
-            var dataObj = new DataObject();
-
-            /// Read <see cref="IDataContainer.Name"/> from XML if it exists
-            /// Stored as attribute
-            if (reader.HasAttributes)
+            // Read attribute name
+            if (reader.GetAttribute(DataObject.KEY_ATTRIBUTE) is string s)
             {
-                reader.MoveToAttribute(0);
-                Name = reader.Value;
+                Name = s;
             }
 
+            // read to content
+            reader.Read();
 
-            while (reader.Read())
+            while (reader.EOF == false)
             {
-                // Skip if NodeType is not Element
-                // No relevant information available here.
+                // nothing of value skip.
                 if (reader.NodeType != XmlNodeType.Element)
                 {
-                    continue;
-                }
-
-                if (reader.NodeType == XmlNodeType.Element && reader.Name == "Data")
-                {
-
-                    // Add previously parsing property to the collection
-                    // Since we're done with that and starting parsing a new item.
-                    if (dataObj.Value != null)
-                    {
-                        Add(dataObj);
-                        typeAttribute = null;
-                    }
-
-                    dataObj = new DataObject();
-
-
-                    while (reader.MoveToNextAttribute())
-                    {
-
-                        if (reader.Name == nameof(DataObject.Name))
-                        {
-                            dataObj.Name = reader.Value;
-                        }
-                        else if (reader.Name == nameof(DataObject.Value))
-                        {
-                            if (typeAttribute != null)
-                            {
-                                dataObj.Value = typeAttribute.ConvertFrom(reader.Value);
-                            }
-                            else
-                            {
-                                dataObj.ValueString = reader.Value;
-                            }
-                        }
-                        else if (reader.Name == "Type")
-                        {
-                            typeAttribute = Type.GetType($"System.{reader.Value}");
-
-                            if (typeAttribute != null)
-                            {
-                                if (string.IsNullOrEmpty(dataObj.ValueString) == false)
-                                {
-                                    dataObj.Value = typeAttribute.ConvertFrom(dataObj.ValueString);
-                                }
-                            }
-                        }
-                    }
-                }
-                else if (reader.NodeType == XmlNodeType.Element && reader.Name == "DataContainer")
-                {
-                    // Add previously parsing property to the collection
-                    // Since we're done with that and starting parsing a new item.
-                    if (dataObj.Value != null)
-                    {
-                        Add(dataObj);
-                        typeAttribute = null;
-                    }
-
-                    var dcObj = new DataObject();
-
-                    IDataContainer dc = (IDataContainer)reader.ReadObjectXML(GetType());
-                    dcObj.Name = dc.Name;
-                    dcObj.Value = dc;
-                    Add(dcObj);
-                }
-                /// Read <see cref="DataObject.Value"/> when Value is <see cref="Selector"/>
-                else if (reader.NodeType == XmlNodeType.Element && reader.Name == "EnumData")
-                {
-                    if (dataObj.Value != null)
-                    {
-                        Add(dataObj);
-                        dataObj = new DataObject();
-                    }
-
-                    var enumProp = new DataObject();
-                    var selector = new Selector();
-                    int count = 0;
-
-                    /// Read all Attributes
-                    /// 1. Name
-                    /// 2. Value
-                    /// 3. (Optional) Count
-                    /// ** Count needed when <see cref="Selector"/> object is not
-                    /// based on a <see cref="Enum"/> Type
-                    while (reader.MoveToNextAttribute())
-                    {
-                        /// Read <see cref="Selector.SelectedItem"/>
-                        if (reader.Name == "Value")
-                        {
-                            selector.SelectedItem = reader.Value;
-                        }
-                        /// Read <see cref="DataObject.Name"/>
-                        else if (reader.Name == nameof(DataObject.Name))
-                        {
-                            enumProp.Name = reader.Value;
-                        }
-                        /// Only needed to parse xml
-                        /// This could probably be removed later.
-                        else if (reader.Name == "Count")
-                        {
-                            count = XmlConvert.ToInt32(reader.Value);
-                        }
-                    }
-
-                    /// If count == 0 we are dealing with <see cref="Enum"/> based Selector
-                    if (count == 0)
-                    {
-                        enumProp.Value = selector;
-                    }
-                    /// Else we need also read the allowed values
-                    else
-                    {
-                        for (int i = 0; i < count; i++)
-                        {
-                            reader.ReadToFollowing("Option");
-                            reader.Read();
-                            selector.Option.Add(reader.Value);
-                        }
-                        enumProp.Value = selector;
-                    }
-
-                    // need to skip to move to the correct node.
                     reader.Read();
-
-                    /// Read <see cref="Selector.Type"/>
-                    selector.Type = reader.ReadObjectXML<TypeInfo>();
-
-                    /// Fill the Allowed types for <see cref="Enum"/> based Selector
-                    /// That is need to populate <see cref="System.Windows.Controls.ComboBox"/>
-                    if (count == 0)
-                    {
-                        selector.Option = new List<string>(Enum.GetNames(selector.Type.GetUnderlyingType()));
-                    }
-
-                    // Add it to collection and we're done paring
-                    Add(enumProp);
                 }
 
-                /// Read <see cref="IDataContainer.UnderlyingType"/>
-                else if (reader.NodeType == XmlNodeType.Element && reader.Name == nameof(UnderlyingType))
+                // start of a DataObject
+                else if (reader.Name == DataObject.START_ELEMENT)
                 {
-                    UnderlyingType = reader.ReadObjectXML<TypeInfo>();
-                }
-            }
+                    // Get DataObject to read.
+                    var obj = DataObjectFactory.GetDataObject(reader.GetAttribute(DataObject.TYPE_ID_ATTRIBUTE));
 
-            // We're done reading through all of the XML
-            // Add last object we were parsing to the list
-            if (dataObj.Value != null)
-            {
-                Add(dataObj);
+                    if (obj is not null)
+                    {
+                        using var newReader = XmlReader.Create(new StringReader(reader.ReadOuterXml()));
+
+                        newReader.Read();
+
+                        obj.ReadXml(newReader);
+
+                        Add(obj);
+                    }
+                }
+
+                // start of ContainerDataObject
+                else if (reader.Name == "DataContainer")
+                {
+                    // get a ContainerDataObject to start reading.
+                    var obj = (ContainerDataObject)DataObjectFactory.GetDataObject("dc");
+
+                    if (obj is not null)
+                    {
+                        obj.Value = new DataContainer();
+
+                        using var newReader = XmlReader.Create(new StringReader(reader.ReadOuterXml()));
+
+                        newReader.Read();
+
+                        obj.ReadXml(newReader);
+
+                        Add(obj);
+                    }
+                }
+
+                // Start of Underlying type
+                // for Datacontainers created from .NET objects
+                else if (reader.Name == nameof(Types.TypeInfo))
+                {
+                    UnderlyingType = reader.ReadObjectXML<Types.TypeInfo>();
+                }
             }
         }
 
         public virtual void WriteXml(XmlWriter writer)
         {
-            /// if we have a <see cref="IDataContainer.Name"/>
-            /// Write it as an <see cref="XmlAttribute"/>
+            // write name as attribute if we have a name
             if (string.IsNullOrEmpty(Name) == false)
             {
-                writer.WriteAttributeString(nameof(Name), Name);
+                writer.WriteAttributeString(DataObject.KEY_ATTRIBUTE, Name);
             }
 
-            /// if we have an <see cref="IDataContainer.UnderlyingType"/>
-            /// Write it as an <see cref="XmlAttribute"/>
-            if (UnderlyingType != null)
+            // write underlying type if this was created from a .NET object
+            if (UnderlyingType is not null)
             {
                 writer.WriteObjectXML(UnderlyingType);
             }
 
-            foreach (var item in this)
+            // write all the dataobjects
+            foreach (var obj in this)
             {
+                obj.WriteXml(writer);
+            }
+        }
 
-                /// If <see cref="DataObject.Value"/> is <see cref="DataContainerBase"/>
-                /// We're recursively call this function again
-                if (item.Value is DataContainerBase inner)
-                {
-                    writer.WriteObjectXML(inner);
-                }
-                /// If <see cref="DataObject.Value"/> is <see cref="Selector"/>
-                else if (item.Value is Selector selector)
-                {
-                    var type = selector.Type.GetUnderlyingType();
+        #endregion
 
-                    /// Write <see cref="XmlElement"/> with <see cref="XmlElement.Name"/> as "EnumProperty"
-                    /// Need to refactor to avoid hard coded strings
-                    writer.WriteStartElement("EnumData");
 
-                    /// Write <see cref="DataObject.Name"/> as <see cref="XmlAttribute"/>
-                    writer.WriteAttributeString(nameof(item.Name), item.Name);
+        /// <summary>
+        /// Adds binding
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="propertyKey">name of the <see cref="DataObject"/> to bind to</param>
+        /// <param name="expression"><see cref="MemberExpression"/> that gets CLR property </param>
+        /// <param name="updateSourceOnPropertyChange">Whether or not to update value inside <see cref="DataContainer"/> when Target value changes</param>
+        public bool SetBinding<T>(string propertyKey, Expression<Func<T>> expression, BindingMode mode = BindingMode.TwoWay)
+        {
+            var property = FindRecursive(propertyKey);
 
-                    /// If we are not dealing with <see cref="Enum"/> based <see cref="Selector"/>
-                    /// write the number of allowed items also to make parsing easier
-                    if (type.IsEnum == false)
-                    {
-                        writer.WriteAttributeString("Count", selector.Option.Count.ToString());
-                    }
-
-                    /// Write <see cref="Selector.SelectedItem"/> as Value <see cref="XmlAttribute"/>
-                    writer.WriteAttributeString("Value", selector.SelectedItem);
-
-                    /// Write all the allowed values in <see cref="Selector.Option"/>
-                    if (type.IsEnum == false)
-                    {
-                        foreach (var op in selector.Option)
-                        {
-                            writer.WriteElementString("Option", op);
-                        }
-                    }
-
-                    /// Write type of elements in <see cref="Selector.Option"/>
-                    writer.WriteObjectXML(selector.Type);
-
-                    /// Write the End Element for "EnumProperty"
-                    writer.WriteEndElement();
-                }
-                /// We are dealing with a <see cref="PropertyObject"/> who <see cref="DataObject.Value"/> can be
-                /// Directly converted to and from <see cref="string"/> type
-                else
-                {
-                    /// Write Start Element
-                    /// Need to refactor Hard coded strings
-                    writer.WriteStartElement("Data");
-
-                    /// Write <see cref="DataObject.Name"/> as <see cref="XmlAttribute"/>
-                    writer.WriteAttributeString(nameof(item.Name), item.Name);
-
-                    string typeName = "String";
-                    if (item.Value != null)
-                    {
-                        typeName = item.Value?.GetType().Name;
-                    }
-
-                    writer.WriteAttributeString(nameof(item.Value), item.ValueString);
-                    writer.WriteAttributeString("Type", typeName);
-
-                    // Write End Element for Property
-                    writer.WriteEndElement();
-                }
-
+            if (property is null)
+            {
+                return false;
             }
 
+            MemberExpression memberExpression = expression.Body as MemberExpression;
+            var propinfo = memberExpression.Member as PropertyInfo;
+
+            if (memberExpression is null)
+            {
+                throw new InvalidCastException("Body of Lambda expression must be a Member expression");
+            }
+
+            var target = Expression.Lambda(memberExpression.Expression).Compile().DynamicInvoke();
+
+            if (BindingManager.Instance.GetBinding(target, propinfo.Name) is null)
+            {
+                var binding = new DataObjectBinding(target, property, propinfo, mode);
+                if (mode != BindingMode.OneTime)
+                {
+                    BindingManager.Instance.AddBinding(binding);
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Adds binding
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="expression"><see cref="MemberExpression"/> that gets CLR property </param>
+        /// <param name="updateSourceOnPropertyChange">Whether or not to update value inside <see cref="DataContainer"/> when Target value changes</param>
+        public bool SetBinding<T>(Expression<Func<T>> expression, BindingMode mode = BindingMode.TwoWay)
+        {
+            MemberExpression memberExpression = expression.Body as MemberExpression;
+            var propinfo = memberExpression.Member as PropertyInfo;
+
+            if (memberExpression is null)
+            {
+                throw new InvalidCastException("Body of Lambda expression must be a Member expression");
+            }
+
+            var property = FindRecursive(propinfo.Name);
+
+            if (property is null)
+            {
+                return false;
+            }
+
+            var target = Expression.Lambda(memberExpression.Expression).Compile().DynamicInvoke();
+
+            if (BindingManager.Instance.GetBinding(target, propinfo.Name) is null)
+            {
+                var binding = new DataObjectBinding(target, property, propinfo, mode);
+                if (mode != BindingMode.OneTime)
+                {
+                    BindingManager.Instance.AddBinding(binding);
+                }
+            }
+
+            return true;
+
+        }
+
+        /// <summary>
+        /// Removes property binding
+        /// Could cause memory leaks if not removed
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="propertyKey">name of the <see cref="PropertyObject"/> to bind to</param>
+        /// <param name="expression"><see cref="MemberExpression"/> that gets CLR property </param>
+        public bool RemoveBinding<T>(string propertyKey, Expression<Func<T>> expression)
+        {
+            var property = FindRecursive(propertyKey);
+
+            if (property is null)
+            {
+                return false;
+            }
+
+            var memberExpression = expression.Body as MemberExpression;
+            var propinfo = memberExpression.Member as PropertyInfo;
+
+            if (memberExpression is null)
+            {
+                throw new InvalidCastException("Body of Lambda expression must be a Member expression");
+            }
+
+            var target = Expression.Lambda(memberExpression.Expression).Compile().DynamicInvoke();
+
+            if (BindingManager.Instance.GetBinding(target, propinfo.Name) is DataObjectBinding pb)
+            {
+                BindingManager.Instance.RemoveBinding(pb);
+            }
+
+            return true;
+        }
+
+        public bool RemoveBinding<T>(Expression<Func<T>> expression)
+        {
+            var memberExpression = expression.Body as MemberExpression;
+            var propinfo = memberExpression.Member as PropertyInfo;
+
+            if (memberExpression is null)
+            {
+                throw new InvalidCastException("Body of Lambda expression must be a Member expression");
+            }
+
+            var property = FindRecursive(propinfo.Name);
+
+            if (property is null)
+            {
+                return false;
+            }
+
+            var target = Expression.Lambda(memberExpression.Expression).Compile().DynamicInvoke();
+
+            if (BindingManager.Instance.GetBinding(target, propinfo.Name) is DataObjectBinding pb)
+            {
+                BindingManager.Instance.RemoveBinding(pb);
+            }
+
+            return true;
         }
     }
+
+
 }

@@ -1,5 +1,8 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:c="clr-namespace:KEI.UI.Wpf.Controls"
+                    xmlns:prism="http://prismlibrary.com/"
+                    xmlns:converter="clr-namespace:KEI.UI.Wpf.Converters">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/KEI.UI.Wpf;component/Themes/TextBoxes.xaml"/>
         <ResourceDictionary Source="pack://application:,,,/KEI.UI.Wpf;component/Themes/Buttons.xaml"/>

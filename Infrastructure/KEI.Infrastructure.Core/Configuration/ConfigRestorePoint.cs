@@ -29,10 +29,10 @@
             _fullName = fullName;
 
             object orig = null;
-            _original.Get(fullName, ref orig);
+            _original.GetValue(fullName, ref orig);
 
             object copy = null;
-            _clone.Get(fullName, ref copy);
+            _clone.GetValue(fullName, ref copy);
 
             OldValue = orig;
             NewValue = copy;
@@ -40,11 +40,11 @@
 
         public void Commit()
         {
-            _original.Set(_fullName, NewValue);
+            _original.SetValue(_fullName, NewValue);
             _original.Store();
         }
 
-        public void Revert() => _clone.Set(_fullName, OldValue);
+        public void Revert() => _clone.SetValue(_fullName, OldValue);
 
     }
 }

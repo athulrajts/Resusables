@@ -6,6 +6,7 @@ namespace KEI.Infrastructure.Core.Tests
 {
     public class POCO
     {
+
         public char CharProperty { get; set; } = 'c';
         public int IntProperty { get; set; } = 42;
         public float FloatProeprty { get; set; } = 3.14f;

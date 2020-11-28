@@ -1,4 +1,4 @@
-﻿using KEI.Infrastructure.Configuration;
+﻿using KEI.Infrastructure;
 using Prism.Events;
 using System;
 

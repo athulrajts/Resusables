@@ -155,32 +155,38 @@ namespace Application.Production.ViewModels
 
         protected override void ProcessPropertyChanged(object sender, string property)
         {
-            if (property == nameof(PropertyObject.ValueString) || property == nameof(PropertyObject.Validation))
+            if (property == nameof(PropertyObject.StringValue) || property == nameof(PropertyObject.Validation))
+            {
                 return;
+            }
 
             if (sender is IPropertyContainer dc)
             {
 
-                if (!changedValues.ContainsKey(dc.Name))
+                if (changedValues.ContainsKey(dc.Name) == false)
+                {
                     changedValues.Add(dc.Name, new Dictionary<string, ConfigHistoryItem>());
+                }
 
-                if (!changedValues[dc.Name].ContainsKey(property))
+                if (changedValues[dc.Name].ContainsKey(property) == false)
                 {
                     object currentValue = null;
 
                     var origConfig = Configs.FirstOrDefault(x => x.Name == dc.Name);
 
-                    origConfig.Get(property, ref currentValue);
+                    origConfig.GetValue(property, ref currentValue);
 
                     changedValues[dc.Name].Add(property, new ConfigHistoryItem(origConfig, dc, property));
                 }
                 else
                 {
                     object newValue = null;
-                    dc.Get(property, ref newValue);
+                    dc.GetValue(property, ref newValue);
 
-                    if (newValue is Selector s)
-                        newValue = s.SelectedItem;
+                    //if (newValue is Selector s)
+                    //{
+                    //    newValue = s.SelectedItem;
+                    //}
 
                     changedValues[dc.Name][property].NewValue = newValue;
                 }

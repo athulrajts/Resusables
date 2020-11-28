@@ -5,7 +5,6 @@ using System.Collections.Generic;
 
 namespace KEI.Infrastructure.Types
 {
-    [XmlRoot("UnderlyingType")]
     public class TypeInfo : IEquatable<TypeInfo>, IEquatable<Type>
     {
         [XmlAttribute]
@@ -76,7 +75,18 @@ namespace KEI.Infrastructure.Types
             return FullName == other.FullName;
         }
 
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as TypeInfo);
+        }
+
         public static implicit operator TypeInfo(Type t) => new TypeInfo(t);
 
+        public static implicit operator Type(TypeInfo t) => t.GetUnderlyingType();
+
+        public override int GetHashCode()
+        {
+            return GetUnderlyingType().GetHashCode();
+        }
     }
 }

@@ -144,16 +144,16 @@ namespace KEI.Infrastructure
         }
 
 
-        public static T ReadObjectXML<T>(this XmlReader reader)
+        public static T ReadObjectXML<T>(this XmlReader reader, bool inplace = true)
         {
             var s = new XmlSerializer(typeof(T));
-            return (T)s.Deserialize(reader.ReadSubtree());
+            return (T)s.Deserialize(inplace ? reader : reader.ReadSubtree());
         }
 
-        public static object ReadObjectXML(this XmlReader reader, Type type)
+        public static object ReadObjectXML(this XmlReader reader, Type type, bool inplace = true)
         {
             var s = new XmlSerializer(type);
-            return s.Deserialize(reader.ReadSubtree());
+            return s.Deserialize(inplace ? reader : reader.ReadSubtree());
         }
 
         public static void WriteObjectXML<T>(this XmlWriter writer, T obj)

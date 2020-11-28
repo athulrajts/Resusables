@@ -91,8 +91,6 @@ namespace ApplicationShell
             containerRegistry.RegisterSingleton<IEquipment, Equipment>();
             containerRegistry.RegisterSingleton<ApplicationCommands>();
 
-            containerRegistry.RegisterServer<CommandServer, ApplicationCommander>();
-
             // Register Dialogs
             containerRegistry.RegisterDialog<AdvancedSetupDialog>();
             containerRegistry.RegisterDialog<StartTestDialog>();

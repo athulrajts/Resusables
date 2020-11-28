@@ -32,6 +32,8 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="Configuration\DataContainer\DataObject2.cs" />
+    <Compile Remove="Configuration\PropertyContainer\PropertyContainer2.cs" />
     <Compile Remove="Server\CommandServerBkp.cs" />
   </ItemGroup>
 

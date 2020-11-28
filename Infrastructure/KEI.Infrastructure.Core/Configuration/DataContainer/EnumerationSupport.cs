@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace KEI.Infrastructure.Configuration
+namespace KEI.Infrastructure
 {
     public class BasicEnumerator<T> : IEnumerator<T>
     {

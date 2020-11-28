@@ -6,11 +6,9 @@ using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Controls;
-using KEI.Infrastructure.Validation;
-using KEI.Infrastructure.Configuration;
+using KEI.Infrastructure;
 using KEI.UI.Wpf.Controls.ObjectEditors;
 using ValidationResult = KEI.Infrastructure.Validation.ValidationResult;
-using ValidationRule = KEI.Infrastructure.Validation.ValidationRule;
 
 namespace KEI.UI.Wpf.Configuration
 {
@@ -29,39 +27,41 @@ namespace KEI.UI.Wpf.Configuration
         public static readonly DependencyProperty DataProperty =
             DependencyProperty.Register("Data", typeof(PropertyObject), typeof(DatumViewer), new PropertyMetadata(null, DataChanged));
 
-        private ValidationRule typeValidator;
-
         private static void DataChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (d is DatumViewer template && e.NewValue is PropertyObject data)
             {
 
-                template.typeValidator = Validators.Type(data.Type);
+                //template.typeValidator = Validators.Type(data.Type);
 
-                template.StringValue = data.ValueString;
+                template.StringValue = data.StringValue;
 
                 template.RaisePropertyChanged(nameof(Editor));
 
-                if (data.Value is Selector s)
+                if (data is EnumPropertyObject epo)
                 {
-                    template.EnumSource = s.Option;
+                    template.EnumSource = new List<string>(Enum.GetNames(epo.Value.GetType()));
                     template.RaisePropertyChanged("EnumSource");
-                    template.StringValue = s.SelectedItem;
+                    template.StringValue = Enum.GetName(epo.Value.GetType(), epo.Value);
                 }
 
                 if (e.OldValue is PropertyObject oldValue)
+                {
                     template.SubscribePropertyChanged(oldValue, false);
+                }
                 else if (e.NewValue is PropertyObject newValue)
+                {
                     template.SubscribePropertyChanged(newValue, true);
+                }
 
             }
         }
 
         private void Data_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(PropertyObject.ValueString))
+            if (e.PropertyName == nameof(PropertyObject.StringValue))
             {
-                stringValue = Data.ValueString;
+                stringValue = Data.StringValue;
                 RaisePropertyChanged(nameof(StringValue));
             }
         }
@@ -84,30 +84,26 @@ namespace KEI.UI.Wpf.Configuration
             set
             {
                 if (stringValue == value)
+                {
                     return;
+                }
 
                 stringValue = value;
 
-                if (Editor == EditorType.String ||
-                    Editor == EditorType.Folder ||
-                    Editor == EditorType.File)
-                {
-                    ValidationResult = typeValidator.Validate(value);
-                }
-                
-                if (ValidationResult == null)
-                    ValidationResult = new ValidationResult(true);
+                ValidationResult = Data.ValidateForType(stringValue)
+                    ? new ValidationResult(true)
+                    : new ValidationResult(false, "Invalid Type");
 
-                if(ValidationResult.IsValid)
+                if (ValidationResult.IsValid)
                 {
-                    if (Data.Validation is ValidatorGroup vg)
+                    if (Data.Validation is not null)
                     {
-                        ValidationResult = vg.Validate(value);
+                        ValidationResult = Data.Validation.Validate(stringValue);
 
                         if (ValidationResult.IsValid)
                         {
                             SetValue(value);
-                        } 
+                        }
                     }
                     else
                     {
@@ -121,23 +117,20 @@ namespace KEI.UI.Wpf.Configuration
 
         private void SetValue(string value)
         {
-            if (Data.Value is Selector s)
-            {
-                Data.Value = s.Clone(value);
-            }
-            else
-            {
-                Data.ValueString = value;
-            }
+            Data.StringValue = value;
         }
         public EditorType Editor => Data.Editor;
 
         private void SubscribePropertyChanged(PropertyObject source, bool subscribe)
         {
             if (subscribe)
+            {
                 source.PropertyChanged += Data_PropertyChanged;
+            }
             else
+            {
                 source.PropertyChanged -= Data_PropertyChanged;
+            }
         }
 
 
@@ -151,11 +144,8 @@ namespace KEI.UI.Wpf.Configuration
 
         private void TextBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (!typeof(IConvertible).IsAssignableFrom(Data.Type))
-            {
-                var editor = new ObjectEditorWindow(Data.Value);
-                editor.ShowDialog();
-            }
+            var editor = new ObjectEditorWindow(Data.GetValue());
+            editor.ShowDialog();
         }
 
         public List<string> EnumSource { get; set; }

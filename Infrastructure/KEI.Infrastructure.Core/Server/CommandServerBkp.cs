@@ -16,31 +16,6 @@ namespace KEI.Infrastructure.Server
         Complete = 3 //the full command and data is complete, execute!
     };
 
-    static class SocketExtensions
-    {
-        public static void DisconnectAndCleanup(this Socket s)
-        {
-            if (s != null)
-            {
-                //now we need to disconnect the client
-                try
-                {
-                    if (s.Connected)
-                    {
-                        s.Disconnect(false);
-                        s.Shutdown(SocketShutdown.Both);
-                    }
-                    s.Close();
-                    s = null;
-                }
-                catch
-                {
-                    s = null;
-                }
-            }
-        }
-    }
-
     [Obsolete("Use TcpServer")]
     public class CommandServerBkp : BindableBase
     {

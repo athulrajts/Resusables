@@ -19,6 +19,6 @@ namespace KEI.Infrastructure.UserManagement
         public IDataContainer UserPrefrences { get; set; }
         
         public bool GetProperty<T>(string key, ref T value)
-            => UserPrefrences.Get(key, ref value);
+            => UserPrefrences.GetValue(key, ref value);
     }
 }

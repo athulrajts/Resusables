@@ -1,10 +1,10 @@
 ﻿using System.Data;
 using System.Collections.Generic;
 using Prism.Events;
-using KEI.Infrastructure.Database;
-using KEI.Infrastructure.Configuration;
-using Application.Core.Interfaces;
+using KEI.Infrastructure;
 using KEI.Infrastructure.Events;
+using KEI.Infrastructure.Database;
+using Application.Core.Interfaces;
 
 namespace Application.Core.Modules
 {
@@ -34,7 +34,7 @@ namespace Application.Core.Modules
         public void InitializeDatabase(string databaseName)
         {
             IPropertyContainer setup = null;
-            _currentRecipe.Get(databaseName, ref setup);
+            _currentRecipe.GetValue(databaseName, ref setup);
 
             if(setup.Morph() is DatabaseSetup dbs)
             {

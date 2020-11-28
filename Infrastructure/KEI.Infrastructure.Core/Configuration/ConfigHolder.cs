@@ -73,8 +73,8 @@ namespace KEI.Infrastructure.Configuration
 
         public bool StoreConfig() => StoreConfig(ConfigPath);
 
-        public bool GetValue<T>(string key, ref T value) => Config.Get(key, ref value);
-        public void SetValue<T>(string key, T value) => Config.Set(key, value);
+        public bool GetValue<T>(string key, ref T value) => Config.GetValue(key, ref value);
+        public void SetValue<T>(string key, T value) => Config.SetValue(key, value);
         protected abstract PropertyContainerBuilder DefineConfigShape();
 
         public bool StoreConfig(string path)

@@ -1,12 +1,9 @@
-﻿using KEI.Infrastructure.Helpers;
-using KEI.Infrastructure.Types;
-using KEI.Infrastructure.Validation;
-using System;
+﻿using System;
+using System.Reflection;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+using KEI.Infrastructure.Helpers;
 
-namespace KEI.Infrastructure.Configuration
+namespace KEI.Infrastructure
 {
     /// <summary>
     /// Class use to build <see cref="PropertyContainer"/> Objects
@@ -25,316 +22,132 @@ namespace KEI.Infrastructure.Configuration
         /// </summary>
         private string filename = string.Empty;
 
+        PropertyObject lastCreatedObject;
+
         #endregion
 
         #region Constructor
 
-        private PropertyContainerBuilder(StorageMode storageMode = StorageMode.DictionaryBased)
+        private PropertyContainerBuilder()
         {
-            config = storageMode switch
-            {
-                StorageMode.DictionaryBased => new PropertyDictionary(),
-                StorageMode.ListBased => new PropertyContainer(),
-                _ => new PropertyDictionary()
-            };
-            filename = string.Empty;
+            config = new PropertyContainer();
         }
 
-        private PropertyContainerBuilder(string configName, string fileName = "", StorageMode storageMode = StorageMode.DictionaryBased)
+        private PropertyContainerBuilder(string configName, string fileName = "")
         {
-            config = storageMode switch
-            {
-                StorageMode.DictionaryBased => new PropertyDictionary { Name = configName, FilePath = fileName },
-                StorageMode.ListBased => new PropertyContainer { Name = configName, FilePath = fileName },
-                _ => new PropertyDictionary { Name = configName, FilePath = fileName }
-            };
+            config = new PropertyContainer { Name = configName, FilePath = fileName };
             filename = fileName;
         }
 
-        public static PropertyContainerBuilder Create(string name, string filename = "", StorageMode storageMode = StorageMode.DictionaryBased)
-            => new PropertyContainerBuilder(name, filename, storageMode);
+        public static PropertyContainerBuilder Create(string name, string filename = "")
+            => new PropertyContainerBuilder(name, filename);
 
-        public static PropertyContainerBuilder Create(StorageMode storageMode = StorageMode.DictionaryBased) 
-            => new PropertyContainerBuilder(storageMode);
+        public static PropertyContainerBuilder Create() 
+            => new PropertyContainerBuilder();
 
         #endregion
 
-        public static IPropertyContainer FromFile(string path, StorageMode storageMode = StorageMode.DictionaryBased)
-            => storageMode switch
-            {
-                StorageMode.DictionaryBased => PropertyDictionary.FromFile(path),
-                StorageMode.ListBased => PropertyContainer.FromFile(path),
-                _ => PropertyDictionary.FromFile(path)
-            };
+        public static IPropertyContainer FromFile(string path) => PropertyContainer.FromFile(path);
 
-        #region Builder Methods
-
-        /// <summary>
-        /// Appends an Enumeration Property, Sets <see cref="PropertyObject.Editor"/> as <see cref="EditorType.Enum"/>
-        /// and Sets allowed Values as <see cref="Enum.GetNames(Type)"/>
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="enumType"></param>
-        /// <param name="description"></param>
-        /// <param name="browseOption"></param>
-        /// <returns></returns>
-        public PropertyContainerBuilder WithEnum(string name, Enum enumType, string description = null, BrowseOptions browseOption = BrowseOptions.Browsable)
-        {
-            if (config.ContainsProperty(name))
-                return this;
-
-            config.Add(new PropertyObject
-            {
-                Name = name,
-                Description = description,
-                Value = new Selector(enumType),
-                Editor = EditorType.Enum,
-                BrowseOption = browseOption
-            });
-
-            return this;
-        }
-
-        /// <summary>
-        /// Appends integer property
-        /// </summary>
-        /// <param name="name">name of <see cref="PropertyObject"/></param>
-        /// <param name="value">value of <see cref="PropertyObject"/></param>
-        /// <param name="description">description for property</param>
-        /// <param name="validation">validations for property</param>
-        /// <param name="browseOptions">browse option for property</param>
-        /// <returns><see cref="PropertyContainerBuilder"/> instance</returns>
-        public PropertyContainerBuilder WithProperty(string name, int value, string description = null, ValidatorGroup validation = null, BrowseOptions browseOptions = BrowseOptions.Browsable)
-            => WithProperty(name, (object)value, description, validation, browseOptions);
-
-        /// <summary>
-        /// Appends boolean property
-        /// </summary>
-        /// <param name="name">name of <see cref="PropertyObject"/></param>
-        /// <param name="value">value of <see cref="PropertyObject"/></param>
-        /// <param name="description">description for property</param>
-        /// <param name="validation">validations for property</param>
-        /// <param name="browseOptions">browse option for property</param>
-        /// <returns><see cref="PropertyContainerBuilder"/> instance</returns>
-        public PropertyContainerBuilder WithProperty(string name, bool value, string description = null, ValidatorGroup validation = null, BrowseOptions browseOptions = BrowseOptions.Browsable)
-            => WithProperty(name, (object)value, description, validation, browseOptions);
-
-        /// <summary>
-        /// Appends character property
-        /// </summary>
-        /// <param name="name">name of <see cref="PropertyObject"/></param>
-        /// <param name="value">value of <see cref="PropertyObject"/></param>
-        /// <param name="description">description for property</param>
-        /// <param name="validation">validations for property</param>
-        /// <param name="browseOptions">browse option for property</param>
-        /// <returns><see cref="PropertyContainerBuilder"/> instance</returns>
-        public PropertyContainerBuilder WithProperty(string name, char value, string description = null, ValidatorGroup validation = null, BrowseOptions browseOptions = BrowseOptions.Browsable)
-            => WithProperty(name, (object)value, description, validation, browseOptions);
-
-        /// <summary>
-        /// Appends float property
-        /// </summary>
-        /// <param name="name">name of <see cref="PropertyObject"/></param>
-        /// <param name="value">value of <see cref="PropertyObject"/></param>
-        /// <param name="description">description for property</param>
-        /// <param name="validation">validations for property</param>
-        /// <param name="browseOptions">browse option for property</param>
-        /// <returns><see cref="PropertyContainerBuilder"/> instance</returns>
-        public PropertyContainerBuilder WithProperty(string name, float value, string description = null, ValidatorGroup validation = null, BrowseOptions browseOptions = BrowseOptions.Browsable)
-            => WithProperty(name, (object)value, description, validation, browseOptions);
-
-        /// <summary>
-        /// Appends double property
-        /// </summary>
-        /// <param name="name">name of <see cref="PropertyObject"/></param>
-        /// <param name="value">value of <see cref="PropertyObject"/></param>
-        /// <param name="description">description for property</param>
-        /// <param name="validation">validations for property</param>
-        /// <param name="browseOptions">browse option for property</param>
-        /// <returns><see cref="PropertyContainerBuilder"/> instance</returns>
-        public PropertyContainerBuilder WithProperty(string name, double value, string description = null, ValidatorGroup validation = null, BrowseOptions browseOptions = BrowseOptions.Browsable)
-            => WithProperty(name, (object)value, description, validation, browseOptions);
-
-        /// <summary>
-        /// Appends string property
-        /// </summary>
-        /// <param name="name">name of <see cref="PropertyObject"/></param>
-        /// <param name="value">value of <see cref="PropertyObject"/></param>
-        /// <param name="description">description for property</param>
-        /// <param name="validation">validations for property</param>
-        /// <param name="browseOptions">browse option for property</param>
-        /// <returns><see cref="PropertyContainerBuilder"/> instance</returns>
-        public PropertyContainerBuilder WithProperty(string name, string value, string description = null, ValidatorGroup validation = null, BrowseOptions browseOptions = BrowseOptions.Browsable)
-            => WithProperty(name, (object)value, description, validation, browseOptions);
-
-
-        /// <summary>
-        /// Appends a property who's value is restricted to a set of values given
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="name">name of <see cref="PropertyObject"/></param>
-        /// <param name="selectedValue">value of <see cref="PropertyObject"/></param>
-        /// <param name="allowedValues">allowed values for property</param>
-        /// <param name="description">description for property</param>
-        /// <param name="browseOption">browse option for property</param>
-        /// <returns></returns>
-        public PropertyContainerBuilder WithSelector<T>(string name, T selectedValue, List<T> allowedValues, string description = null, BrowseOptions browseOption = BrowseOptions.Browsable)
-        {
-            if (config.ContainsProperty(name))
-                return this;
-
-            config.Add(new PropertyObject
-            {
-                Name = name,
-                Description = description,
-                Value = Selector.Create<T>(selectedValue, allowedValues.ToArray()),
-                Editor = EditorType.Enum,
-                BrowseOption = browseOption
-            });
-
-
-            return this;
-        }
-        public PropertyContainerBuilder WithPropertyContainer(string name, IPropertyContainer value, string description = null, ValidatorGroup validation = null, BrowseOptions browseOptions = BrowseOptions.Browsable)
-        {
-            if (config.ContainsProperty(name))
-                return this;
-
-            config.Add(new PropertyObject
-            {
-                Name = name,
-                Description = description,
-                Value = value,
-                Editor = EditorType.Object,
-                BrowseOption = browseOptions
-            });
-
-            return this;
-        }
-
-
-
-        /// <summary>
-        /// Appends a string property to the <see cref="PropertyContainer"/> and
-        /// Sets the <see cref="PropertyObject.Editor"/> as <see cref="EditorType.File"/>
-        /// and add a default validation checking whether the file exists
-        /// </summary>
-        /// <param name="property">name of <see cref="PropertyObject"/></param>
-        /// <param name="value">file path</param>
-        /// <param name="description">description for property</param>
-        /// <returns><see cref="PropertyContainerBuilder"/> instance</returns>
-        public PropertyContainerBuilder WithFile(string property, string value, string description = null)
-        {
-            if (config.ContainsProperty(property))
-                return this;
-
-            config.Add(new PropertyObject
-            {
-                Name = property,
-                ValueString = value?.ToString(),
-                Description = description,
-                Validation = ValidationBuilder.Create().File().Validator,
-                Value = value,
-                Editor = EditorType.File
-            });
-
-            return this;
-        }
-
-
-        /// <summary>
-        /// Appends a string property to the <see cref="PropertyContainer"/> and
-        /// Sets the <see cref="PropertyObject.Editor"/> as <see cref="EditorType.Folder"/>
-        /// and add a default validation checking whether the folder exists
-        /// </summary>
-        /// <param name="property">name of <see cref="PropertyObject"/></param>
-        /// <param name="value">folder path</param>
-        /// <param name="description">description for property</param>
-        /// <returns><see cref="PropertyContainerBuilder"/> instance</returns>
-        public PropertyContainerBuilder WithFolder(string property, string value, string description = null)
-        {
-            if (config.ContainsProperty(property))
-                return this;
-
-            config.Add(new PropertyObject
-            {
-                Name = property,
-                ValueString = value?.ToString(),
-                Description = description,
-                Validation = ValidationBuilder.Create().Directory().Validator,
-                Value = value,
-                Editor = EditorType.Folder
-            });
-
-            return this;
-        }
-
-        /// <summary>
-        /// Appends <see cref="PropertyContainer"/> with Given Object as references and stores it
-        /// under in a <see cref="PropertyObject"/> with the given key
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="name">name of <see cref="PropertyObject"/></param>
-        /// <param name="value">value to be used as reference</param>
-        /// <returns><see cref="PropertyContainerBuilder"/> instance</returns>
-        public PropertyContainerBuilder WithObject<T>(string name, T value)
-           where T : class
+        public PropertyContainerBuilder Property(string name, object value)
         {
             if (config.ContainsProperty(name) || value is null)
+            {
                 return this;
+            }
 
-            var objectConfig = new PropertyContainerBuilder(name);
+            if(DataObjectFactory.GetPropertyObjectFor(name, value) is PropertyObject obj)
+            {
+                config.Add(obj);
 
-            objectConfig.SetUnderlyingType(new TypeInfo(value.GetType()));
+                lastCreatedObject = obj;
+            }
 
-            var props = value == null ? typeof(T).GetProperties() : value.GetType().GetProperties();
+            return this;
+        }
+
+        public PropertyContainerBuilder SetDescription(string description)
+        {
+            if(lastCreatedObject is not null)
+            {
+                lastCreatedObject.SetDescription(description);
+            }
+
+            return this;
+        }
+
+        public PropertyContainerBuilder SetBrowsePermission(BrowseOptions option)
+        {
+            if (lastCreatedObject is not null)
+            {
+                lastCreatedObject.SetBrowsePermission(option);
+            }
+
+            return this;
+        }
+
+        public PropertyContainerBuilder Property(PropertyInfo pi, object obj)
+        {
+
+            if (pi.GetValue(obj) is not null)
+            {
+                var option = pi.GetBrowseOption();
+                var description = pi.GetDescription();
+                config.Add(DataObjectFactory.GetPropertyObjectFor(pi.Name, pi.GetValue(obj))
+                    .SetBrowsePermission(option)
+                    .SetDescription(description));
+            }
+
+            return this;
+        }
+
+        public static IPropertyContainer CreateObject(string name, object value)
+        {
+            if (value is null)
+            {
+                return null;
+            }
+
+            var objContainer = new PropertyContainerBuilder(name);
+
+            objContainer.SetUnderlyingType(value.GetType());
+
+            var props = value.GetType().GetProperties();
 
             foreach (var prop in props)
             {
-                if (!prop.CanWrite)
+                if (prop.CanWrite == false)
+                {
                     continue;
-
-                if (prop.PropertyType.IsPrimitiveType())
-                {
-                    if (prop.PropertyType.IsEnum)
-                    {
-                        objectConfig.WithEnum(prop.Name,
-                            (Enum)prop.GetValue(value),
-                            prop.GetDescription(),
-                            prop.GetBrowseOption());
-                    }
-                    else
-                    {
-                        objectConfig.WithProperty(prop.Name,
-                            prop.PropertyType,
-                            prop.GetValue(value),
-                            prop.GetDescription(),
-                            prop.GetValidators(),
-                            prop.GetBrowseOption());
-                    }
                 }
-
-                else if (prop.PropertyType.IsList())
-                {
-                    var obj = prop.GetValue(value) as IList;
-
-                    if (prop.PropertyType.IsGenericType)
-                    {
-                        var listConfig = new PropertyContainerBuilder(prop.Name);
-                        listConfig.config.UnderlyingType = new TypeInfo(prop.PropertyType);
-                        for (int i = 0; i < obj.Count; i++)
-                        {
-                            listConfig.WithObject($"{obj[i].GetType().Name}[{i}]", obj[i]);
-                        }
-                        objectConfig.WithProperty(prop.Name, listConfig.Build());
-                    }
-                }
+                
+                objContainer.Property(prop, value); 
             }
 
-            WithProperty(name, objectConfig.Build());
-
-            return this;
+            return objContainer.Build();
         }
+
+        public static IPropertyContainer CreateList(string name, IList list)
+        {
+            if (list is null)
+            {
+                return null;
+            }
+
+            var listConfig = new PropertyContainerBuilder(name);
+
+            listConfig.SetUnderlyingType(list.GetType());
+
+            int count = 0;
+            foreach (var obj in list)
+            {
+                listConfig.Property($"{obj.GetType().Name}[{count}]", obj);
+                count++;
+            }
+
+            return listConfig.Build();
+        }
+
 
         /// <summary>
         /// Returns the config with data and configs specified by the builder
@@ -342,164 +155,13 @@ namespace KEI.Infrastructure.Configuration
         /// <returns>DataContainer Object</returns>
         public IPropertyContainer Build() => config;
 
-        #endregion
-
         #region Private/Internal Methods
 
         /// <summary>
         /// Sets the underlying type of the PropertyContainer being built
         /// </summary>
-        /// <param name="t">TypeInfo object</param>
-        internal void SetUnderlyingType(TypeInfo t) => config.UnderlyingType = t;
-
-        /// <summary>
-        /// Sets the underlying type of the PropertyContainer being built
-        /// </summary>
         /// <param name="t">Type object</param>
-        internal void SetUnderlyingType(Type t) => SetUnderlyingType(new TypeInfo(t));
-
-        /// <summary>
-        /// Adds <see cref="PropertyObject"/> to the config
-        /// </summary>
-        /// <param name="name">Data Name</param>
-        /// <param name="value">Data Value</param>
-        /// <param name="description">Data Description</param>
-        /// <returns>DataContainer Builder Object</returns>
-        internal PropertyContainerBuilder WithProperty(string name, object value, string description = null, ValidatorGroup rule = null, BrowseOptions browseOption = BrowseOptions.Browsable)
-        {
-            if (config.ContainsProperty(name) || value is null)
-                return this;
-
-            config.Add(new PropertyObject
-            {
-                Name = name,
-                ValueString = value.ToString(),
-                Description = description,
-                Validation = rule,
-                Value = value,
-                Editor = value.GetType().GetEditorType(),
-                BrowseOption = browseOption
-            });
-
-            return this;
-        }
-
-        /// <summary>
-        /// Method Used by ConfigBuilder internal to Create PropertyContainer from CLR types
-        /// </summary>
-        /// <param name="property">Name of the Property</param>
-        /// <param name="type"><see cref="Type"/> of the Property</param>
-        /// <param name="value">Value of the Property</param>
-        /// <param name="description">Description for Property</param>
-        /// <param name="rules">Validation Rules for Property</param>
-        /// <param name="browseOption">BrowseOption for Property</param>
-        /// <returns></returns>
-        internal PropertyContainerBuilder WithProperty(string property, Type type, object value, string description, ValidatorGroup rules, BrowseOptions browseOption)
-        {
-            if (config.ContainsProperty(property))
-                return this;
-
-            config.Add(new PropertyObject
-            {
-                Name = property,
-                ValueString = value?.ToString(),
-                Description = description,
-                Validation = rules,
-                Value = value,
-                Editor = type.GetEditorType(),
-                BrowseOption = browseOption
-            });
-
-            return this;
-        }
-
-        /// <summary>
-        /// Create a <see cref="PropertyContainer"/> by using an <see cref="IEnumerable{T}"/> as reference
-        /// </summary>
-        /// <typeparam name="T">Specialization for <see cref="IEnumerable{T}"/></typeparam>
-        /// <param name="name">Name of the result <see cref="PropertyContainer"/></param>
-        /// <param name="list"><see cref="IEnumerable{T}"/> that is used as reference to build <see cref="PropertyContainer"/></param>
-        /// <returns><see cref="PropertyContainer"/> built using <see cref="IEnumerable{T}"/> as reference</returns>
-        public static IPropertyContainer CreateList<T>(string name, IEnumerable<T> list, StorageMode storageMode = StorageMode.DictionaryBased)
-            where T : class
-        {
-            if (list is null)
-            {
-                return null;
-            }
-
-            var listConfig = new PropertyContainerBuilder(name, "", storageMode);
-            listConfig.SetUnderlyingType(new TypeInfo(list.GetType()));
-            for (int i = 0; i < list.Count(); i++)
-            {
-                listConfig.WithObject($"{list.ElementAt(i).GetType().Name}[{i}]", list.ElementAt(i));
-            }
-            return listConfig.Build();
-        }
-
-        /// <summary>
-        /// Create a <see cref="PropertyContainer"/> intance based on an <see cref="object"/>
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="name">Name of the result <see cref="PropertyContainer"/></param>
-        /// <param name="value"><see cref="object"/> that is used a reference to build <see cref="PropertyContainer"/></param>
-        /// <returns><see cref="PropertyContainer"/> built using <see cref="object"/> as reference</returns>
-        public static IPropertyContainer CreateObject<T>(string name, T value, StorageMode storageMode = StorageMode.DictionaryBased)
-            where T : class
-        {
-            if (value is null)
-            {
-                return null;
-            }
-
-            var objectCfg = new PropertyContainerBuilder(name, "", storageMode);
-
-            objectCfg.SetUnderlyingType(new TypeInfo(value.GetType()));
-
-            var props = value.GetType().GetProperties();
-
-            foreach (var prop in props)
-            {
-                if (!prop.CanWrite)
-                {
-                    continue;
-                }
-
-                if (prop.PropertyType.IsPrimitiveType())
-                {
-                    if (prop.PropertyType.IsEnum)
-                    {
-                        objectCfg.WithEnum(prop.Name,
-                            (Enum)prop.GetValue(value),
-                            prop.GetDescription(),
-                            prop.GetBrowseOption());
-                    }
-                    else
-                    {
-                        objectCfg.WithProperty(prop.Name,
-                            prop.GetValue(value),
-                            prop.GetDescription(),
-                            prop.GetValidators(),
-                            prop.GetBrowseOption());
-                    }
-                }
-                else if (prop.PropertyType.IsList())
-                {
-                    objectCfg.WithProperty(prop.Name,
-                        CreateList(prop.Name, prop.GetValue(value) as IEnumerable<object>),
-                        prop.GetDescription(),
-                        prop.GetValidators(),
-                        prop.GetBrowseOption());
-                }
-                else
-                {
-                    objectCfg.WithObject(prop.Name, prop.GetValue(value));
-                }
-
-            }
-
-            return objectCfg.Build();
-        }
+        internal void SetUnderlyingType(Type t) => config.UnderlyingType = t;
 
         #endregion
     }

@@ -1,6 +1,7 @@
-﻿using KEI.Infrastructure.Service;
-using KEI.Infrastructure.Configuration;
+﻿using KEI.Infrastructure;
 using KEI.Infrastructure.Utils;
+using KEI.Infrastructure.Service;
+using KEI.Infrastructure.Configuration;
 
 namespace Application.Core
 {
@@ -13,8 +14,11 @@ namespace Application.Core
         protected override PropertyContainerBuilder DefineConfigShape()
         {
             return PropertyContainerBuilder.Create(ConfigName, ConfigPath)
-                .WithProperty("ShowCommandPanelOnLeftSide", false, "Indices whether commands of each screen is shown on the left side")
-                .WithEnum("Theme", Theme.Dark, "Current Application Theme", BrowseOptions.NonEditable);
+                .Property("ShowCommandPanelOnLeftSide", false)
+                    .SetDescription("Indices whether commands of each screen is shown on the left side")
+                .Property("Theme", Theme.Dark)
+                    .SetDescription("Current Application Theme")
+                    .SetBrowsePermission(BrowseOptions.NonBrowsable);
         }
 
         public GeneralPreferences(IEssentialServices essentialServices) : base(essentialServices)

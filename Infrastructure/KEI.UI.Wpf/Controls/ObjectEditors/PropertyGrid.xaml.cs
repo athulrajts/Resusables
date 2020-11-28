@@ -1,22 +1,20 @@
-﻿using KEI.Infrastructure.Types;
-using KEI.Infrastructure.Validation;
-using KEI.UI.Wpf.Configuration;
+﻿using KEI.Infrastructure.Validation;
 using Prism.Mvvm;
 using System;
+using System.Reflection;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
-using System.Windows.Controls;
-using System.Reflection;
-using ValidationResult = KEI.Infrastructure.Validation.ValidationResult;
-using System.Collections;
-using KEI.UI.Wpf.Controls.ObjectEditors;
-using Prism.Commands;
 using System.Windows.Input;
-using KEI.Infrastructure.Validation.Attributes;
-using KEI.Infrastructure.Configuration;
+using System.Windows.Controls;
+using Prism.Commands;
+using KEI.Infrastructure;
 using KEI.Infrastructure.Helpers;
+using KEI.Infrastructure.Validation.Attributes;
+using KEI.UI.Wpf.Controls.ObjectEditors;
+using ValidationResult = KEI.Infrastructure.Validation.ValidationResult;
 
 namespace KEI.UI.Wpf.Controls.Configuration
 {
@@ -229,9 +227,9 @@ namespace KEI.UI.Wpf.Controls.Configuration
         public DataItemPropertyInfo(PropertyObject item)
         {
             source = item;
-            PropertyValue = item.Value?.ToString();
+            PropertyValue = item.GetValue().ToString();
             PropertyName = item.Name;
-            PropertyType = item.Type;
+            PropertyType = item.GetDataType();
             PropertyDescription = item.Description;
 
             if (PropertyType != null)
@@ -239,34 +237,37 @@ namespace KEI.UI.Wpf.Controls.Configuration
                 converter = TypeDescriptor.GetConverter(PropertyType); 
             }
 
-            if (source.Editor == EditorType.Enum && source.Value is Selector s)
+            if (source is SelectablePropertyObject spo)
             {
-                EnumSource = s.Option;
-                PropertyValue = s.SelectedItem;
+                EnumSource = spo.Value.Option;
+                PropertyValue = spo.Value.SelectedItem;
+            }
+            else if(source is EnumPropertyObject epo)
+            {
+                EnumSource = new List<string>(Enum.GetNames(epo.EnumType));
+                PropertyValue = Enum.GetName(epo.EnumType, epo.Value);
             }
 
             PropertyEditor = source.Editor;
             BrowseOption = item.BrowseOption;
 
-            PropertyChangedEventManager.AddListener(source, this, PropertyName);
+            PropertyChangedEventManager.AddListener(source, this, "Value");
         }
 
         ~DataItemPropertyInfo()
         {
-            PropertyChangedEventManager.RemoveListener(source, this, PropertyName);
+            PropertyChangedEventManager.RemoveListener(source, this, "Value");
         }
 
-        public override object GetPropertyValue() => source.Value;
+        public override object GetPropertyValue() => source.GetValue();
 
         public bool ReceiveWeakEvent(Type managerType, object sender, EventArgs e)
         {
             if (managerType == typeof(PropertyChangedEventManager))
             {
-                var eArgs = e as PropertyChangedEventArgs;
-
-                if(sender is PropertyObject p)
+                if (sender is PropertyObject p)
                 {
-                    PropertyValue = p.ValueString;
+                    PropertyValue = p.StringValue;
                     RaisePropertyChanged(nameof(PropertyValue));
                 }
 
@@ -275,7 +276,7 @@ namespace KEI.UI.Wpf.Controls.Configuration
             return false;
         }
 
-        public override void SetPropertyValue(string value) => source.ValueString = value;
+        public override void SetPropertyValue(string value) => source.StringValue = value;
 
         public override ValidationResult Validate(string value) => source.Validation == null 
             ?  new ValidationResult(true) 

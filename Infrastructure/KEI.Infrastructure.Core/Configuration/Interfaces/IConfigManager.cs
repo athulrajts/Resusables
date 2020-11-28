@@ -1,6 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 
-namespace KEI.Infrastructure.Configuration
+namespace KEI.Infrastructure
 {
     public interface IConfigManager
     {

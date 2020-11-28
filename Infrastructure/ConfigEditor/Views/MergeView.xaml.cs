@@ -1,4 +1,4 @@
-﻿using KEI.Infrastructure.Configuration;
+﻿using KEI.Infrastructure;
 using System;
 using System.Globalization;
 using System.Windows.Controls;

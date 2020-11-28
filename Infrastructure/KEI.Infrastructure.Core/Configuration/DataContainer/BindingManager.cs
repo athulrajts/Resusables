@@ -3,16 +3,16 @@ using System.Linq;
 using System.Timers;
 using System.Collections.Generic;
 
-namespace KEI.Infrastructure.Configuration
+namespace KEI.Infrastructure
 {
     internal class BindingManager
     {
         private static BindingManager instance;
         public static BindingManager Instance
-            => instance ?? (instance = new BindingManager());
+            => instance ??= new BindingManager();
 
-        private List<PropertyBinding> _bindings = new List<PropertyBinding>();
-        private Timer timer = new Timer(TimeSpan.FromHours(1).TotalMilliseconds);
+        private List<DataObjectBinding> _bindings = new List<DataObjectBinding>();
+        private readonly Timer timer = new Timer(TimeSpan.FromHours(1).TotalMilliseconds);
         internal BindingManager()
         {
             timer.Elapsed += Timer_Elapsed;
@@ -36,9 +36,9 @@ namespace KEI.Infrastructure.Configuration
             }
         }
 
-        internal void AddBinding(PropertyBinding pb) => _bindings.Add(pb);
-        internal PropertyBinding GetBinding(object target, string name) => _bindings.Find(x => x.BindingTarget == target && x.TargetProperty.Name == name);
-        internal void RemoveBinding(PropertyBinding pb)
+        internal void AddBinding(DataObjectBinding pb) => _bindings.Add(pb);
+        internal DataObjectBinding GetBinding(object target, string name) => _bindings.Find(x => x.BindingTarget == target && x.TargetProperty.Name == name);
+        internal void RemoveBinding(DataObjectBinding pb)
         {
             pb.Dispose();
             _bindings.Remove(pb);

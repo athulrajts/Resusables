@@ -28,7 +28,7 @@ namespace KEI.Infrastructure
         public IEnumerable<string> GetKeys();
         
         public DataObject Find(string key);
-        public bool ContainsProperty(string key);
+        public bool ContainsData(string key);
         public bool Merge(IDataContainer data);
         public void Add(DataObject obj);
         public void Remove(DataObject obj);

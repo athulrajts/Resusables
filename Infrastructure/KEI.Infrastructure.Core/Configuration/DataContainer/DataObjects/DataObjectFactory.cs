@@ -1,14 +1,18 @@
-﻿using KEI.Infrastructure.Configuration;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace KEI.Infrastructure
 {
+    /// <summary>
+    /// Class used internally to create DataObjects
+    /// </summary>
     public static class DataObjectFactory
     {
-
+        /// <summary>
+        /// Create map for <see cref="DataObject.Type"/> to it's implementation
+        /// </summary>
         private static readonly Dictionary<string, Type> factory = new Dictionary<string, Type>
         {
             { "bool" , typeof(BoolDataObject) },
@@ -22,6 +26,10 @@ namespace KEI.Infrastructure
             { "char", typeof(CharDataObject)}
         };
 
+        /// <summary>
+        /// Create map for <see cref="DataObject.Type"/> to it's implementation
+        /// Used for creating <see cref="PropertyObject"/>
+        /// </summary>
         private static readonly Dictionary<string, Type> propfactory = new Dictionary<string, Type>
         {
             { "bool" , typeof(BoolPropertyObject) },
@@ -36,7 +44,11 @@ namespace KEI.Infrastructure
             { "char", typeof(CharPropertyObject)}
         };
 
-        public static void RegisterObject<T>()
+        /// <summary>
+        /// Support for 3rd party implementation for <see cref="DataObject"/>
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        public static void RegisterDataObject<T>()
             where T : DataObject
         {
             var instance = (DataObject)FormatterServices.GetUninitializedObject(typeof(T));
@@ -44,6 +56,23 @@ namespace KEI.Infrastructure
             factory.Add(instance.Type, typeof(T));
         }
 
+        /// <summary>
+        /// Support for 3rd party implementations for <see cref="PropertyObject"/>
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        public static void RegisterPropertyObject<T>()
+            where T : PropertyObject
+        {
+            var instance = (PropertyObject)FormatterServices.GetUninitializedObject(typeof(T));
+
+            propfactory.Add(instance.Type, typeof(T));
+        }
+
+        /// <summary>
+        /// Gets an uninitialized <see cref="DataObject"/> implementation for given type.
+        /// </summary>
+        /// <param name="typeid"></param>
+        /// <returns></returns>
         public static DataObject GetDataObject(string typeid)
         {
             return factory.ContainsKey(typeid)
@@ -51,7 +80,11 @@ namespace KEI.Infrastructure
                 : null;
         }
 
-
+        /// <summary>
+        /// Gets an uninitialized <see cref="PropertyObject"/> implementation for given type.
+        /// </summary>
+        /// <param name="typeid"></param>
+        /// <returns></returns>
         public static DataObject GetPropertyObject(string typeid)
         {
             return propfactory.ContainsKey(typeid)
@@ -59,6 +92,12 @@ namespace KEI.Infrastructure
                 : null;
         }
 
+        /// <summary>
+        /// Gets an initialized <see cref="DataObject"/> implementation for given value and name.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static DataObject GetDataObjectFor(string name, object value)
         {
             return value switch
@@ -74,10 +113,17 @@ namespace KEI.Infrastructure
                 IDataContainer => new ContainerDataObject(name, (IDataContainer)value),
                 IList => new ContainerDataObject(name, (IList)value),
                 null => throw new NullReferenceException(),
+                DataObject => value as DataObject,
                 _ => new ContainerDataObject(name, value),
             };
         }
 
+        /// <summary>
+        /// Gets an initialized <see cref="PropertyObject"/> implementation for given value and name.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static PropertyObject GetPropertyObjectFor(string name, object value)
         {
             return value switch
@@ -93,6 +139,7 @@ namespace KEI.Infrastructure
                 IDataContainer => new ContainerPropertyObject(name, (IDataContainer)value),
                 IList => new ContainerPropertyObject(name, (IList)value),
                 null => throw new NullReferenceException(),
+                PropertyObject => value as PropertyObject,
                 _ => new ContainerPropertyObject(name, value)
             };
         }

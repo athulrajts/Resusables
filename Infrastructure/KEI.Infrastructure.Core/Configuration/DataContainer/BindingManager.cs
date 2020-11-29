@@ -13,6 +13,7 @@ namespace KEI.Infrastructure
 
         private List<DataObjectBinding> _bindings = new List<DataObjectBinding>();
         private readonly Timer timer = new Timer(TimeSpan.FromHours(1).TotalMilliseconds);
+        
         internal BindingManager()
         {
             timer.Elapsed += Timer_Elapsed;
@@ -37,7 +38,9 @@ namespace KEI.Infrastructure
         }
 
         internal void AddBinding(DataObjectBinding pb) => _bindings.Add(pb);
+        
         internal DataObjectBinding GetBinding(object target, string name) => _bindings.Find(x => x.BindingTarget == target && x.TargetProperty.Name == name);
+        
         internal void RemoveBinding(DataObjectBinding pb)
         {
             pb.Dispose();

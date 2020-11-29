@@ -2,19 +2,40 @@
 using System.Xml;
 using KEI.Infrastructure.Types;
 using System.Collections;
+using System.ComponentModel;
 
 namespace KEI.Infrastructure
 {
-    public class SelectablePropertyObject : PropertyObject
+    /// <summary>
+    /// Specialized PropertyObject implementation whos value
+    /// can on be from a set of valid values.
+    /// There is no DataObject implementation this is only used when need to be changed from UI
+    /// so a combobox can be used instead of a textbox
+    /// </summary>
+    internal class SelectablePropertyObject : PropertyObject
     {
         const string OPTION_ELEMENT = "Option";
 
+        /// <summary>
+        /// Implementation for <see cref="DataObject.Type"/>
+        /// </summary>
         public override string Type => "opt";
 
         public Selector Value { get; set; } = new Selector();
 
+        /// <summary>
+        /// Type of list of valid values
+        /// </summary>
         public Type ListType { get; set; }
 
+        /// <summary>
+        /// Type of each element in list of valid values
+        /// </summary>
+        public Type ElementType { get; set; }
+
+        /// <summary>
+        /// Implementation for <see cref="DataObject.StringValue"/>
+        /// </summary>
         public override string StringValue
         {
             get { return Value.SelectedItem; }
@@ -31,22 +52,49 @@ namespace KEI.Infrastructure
             }
         }
 
+        /// <summary>
+        /// Implementation for <see cref="PropertyObject.Editor"/>
+        /// </summary>
         public override EditorType Editor => EditorType.Enum;
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        /// <param name="options"></param>
         public SelectablePropertyObject(string name, IConvertible value, IList options)
         {
             Name = name;
             Value = new Selector(value.ToString(), options);
+            ListType = options.GetType();
+            ElementType = ListType.GenericTypeArguments[0];
+
+            Value.PropertyChanged += Value_PropertyChanged;
         }
 
+        ~SelectablePropertyObject()
+        {
+            Value.PropertyChanged -= Value_PropertyChanged;
+        }
+
+        /// <summary>
+        /// Implementation for <see cref="DataObject.GetValue"/>
+        /// </summary>
+        /// <returns></returns>
         public override object GetValue()
         {
-            return Value.SelectedItem;
+            return TypeDescriptor.GetConverter(ElementType).ConvertTo(Value.SelectedItem, ElementType);
         }
 
+        /// <summary>
+        /// Implementation for <see cref="DataObject.SetValue(object)"/>
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public override bool SetValue(object value)
         {
-            if (ValidateForType(value.ToString()) == false)
+            if (CanConvertFromString(value.ToString()) == false)
             {
                 return false;
             }
@@ -56,16 +104,39 @@ namespace KEI.Infrastructure
             return true;
         }
 
+        /// <summary>
+        /// Implementation for <see cref="DataObject.GetDataType"/>
+        /// </summary>
+        /// <returns></returns>
         public override Type GetDataType()
         {
-            return ListType.GetGenericArguments()[0];
+            return ElementType;
         }
 
-        public override bool ValidateForType(string value)
+        /// <summary>
+        /// Implementation for <see cref="DataObject.CanConvertFromString(string)"/>
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public override bool CanConvertFromString(string value)
         {
             return Value.Option.Contains(value);
         }
 
+        /// <summary>
+        /// Implementation for <see cref="DataObject.ConvertFromString(string)"/>
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public override object ConvertFromString(string value)
+        {
+            return value;
+        }
+
+        /// <summary>
+        /// Implementation for <see cref="DataObject.WriteXmlInternal(XmlWriter)"/>
+        /// </summary>
+        /// <param name="writer"></param>
         protected override void WriteXmlInternal(XmlWriter writer)
         {
             base.WriteXmlInternal(writer);
@@ -78,13 +149,19 @@ namespace KEI.Infrastructure
             }
         }
 
-        protected override bool ReadElement(string elementName, XmlReader reader)
+        /// <summary>
+        /// Implementation for <see cref="DataObject.ReadXmlElement(string, XmlReader)"/>
+        /// </summary>
+        /// <param name="elementName"></param>
+        /// <param name="reader"></param>
+        /// <returns></returns>
+        protected override bool ReadXmlElement(string elementName, XmlReader reader)
         {
             if(elementName == nameof(TypeInfo))
             {
                 ListType = reader.ReadObjectXML<TypeInfo>();
 
-                Value.Type = ListType.GetGenericArguments()[0];
+                ElementType = Value.Type = ListType.GetGenericArguments()[0];
 
                 return true;
             }
@@ -96,6 +173,22 @@ namespace KEI.Infrastructure
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Implementation for <see cref="DataObject.OnXmlReadingCompleted"/>
+        /// </summary>
+        protected override void OnXmlReadingCompleted()
+        {
+            Value.PropertyChanged += Value_PropertyChanged;
+        }
+
+        private void Value_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(Selector.SelectedItem))
+            {
+                RaisePropertyChanged(nameof(Value));
+            }
         }
 
     }

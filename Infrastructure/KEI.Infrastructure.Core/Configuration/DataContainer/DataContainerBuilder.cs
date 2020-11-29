@@ -18,7 +18,7 @@ namespace KEI.Infrastructure
 
         public DataContainerBuilder Data(string name, object value)
         {
-            if (config.ContainsProperty(name) || value is null)
+            if (config.ContainsData(name) || value is null)
             {
                 return this;
             }

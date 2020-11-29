@@ -5,64 +5,51 @@ using System.Linq;
 
 namespace KEI.Infrastructure
 {
-
+    /// <summary>
+    /// Concrete implementation for <see cref="IDataContainer"/>
+    /// </summary>
     public class DataContainer : DataContainerBase, INotifyCollectionChanged
     {
-        protected readonly Dictionary<string, object> internalDictionary;
-
-        public event NotifyCollectionChangedEventHandler CollectionChanged;
+        /// <summary>
+        /// Storage structure for all data stored inside this object
+        /// </summary>
+        protected readonly Dictionary<string, DataObject> internalDictionary;
 
         public DataContainer()
         {
-            internalDictionary = new Dictionary<string, object>();
+            internalDictionary = new Dictionary<string, DataObject>();
+
+            CollectionChanged += Data_CollectionChanged;
         }
 
-        protected virtual object GetValue(string key)
-        {
-            var data = FindRecursive(key);
-
-            if(data is null)
-            {
-                throw new KeyNotFoundException($"{key} not found");
-            }
-
-            return data.GetValue();
-        }
-
-        protected virtual void SetValueInternal(string key, object value)
-        {
-            var data = FindRecursive(key);
-
-            if(data is not null)
-            {
-                data.SetValue(value);
-            }
-        }
-
-        public object this[string key]
-        {
-            get => GetValue(key.ToString());
-            set => SetValue(key.ToString(), value);
-        }
-
+        /// <summary>
+        /// Implementation for <see cref="IDataContainer.Count"/>
+        /// </summary>
         public override int Count => internalDictionary.Count;
 
+        /// <summary>
+        /// Function to make use of list initializers
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
         public void Add(string key, object value)
         {
             internalDictionary.Add(key, DataObjectFactory.GetDataObjectFor(key, value));
 
-            var eArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, new List<object> { internalDictionary[key] });
-
-            Data_CollectionChanged(this, eArgs);
-
-            CollectionChanged?.Invoke(this, eArgs);
+            RaiseCollectionChanged(NotifyCollectionChangedAction.Add, internalDictionary[key]);
         }
 
-        public void Add(object key, object value) => Add(key.ToString(), value);
-
+        /// <summary>
+        /// Clear all data
+        /// </summary>
         public void Clear() => internalDictionary.Clear();
 
-        public override bool ContainsProperty(string key)
+        /// <summary>
+        /// Implementation for <see cref="IDataContainer.ContainsData(string)"/>
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public override bool ContainsData(string key)
         {
             var split = key.Split('.');
 
@@ -74,7 +61,7 @@ namespace KEI.Infrastructure
             {
                 if (internalDictionary[split.First()] is ContainerDataObject cdo)
                 {
-                    return cdo.Value.ContainsProperty(key);
+                    return cdo.Value.ContainsData(key);
                 }
                 else
                 {
@@ -84,31 +71,56 @@ namespace KEI.Infrastructure
 
         }
 
+        /// <summary>
+        /// Remove property with name <paramref name="key"/>
+        /// </summary>
+        /// <param name="key"></param>
         public void Remove(string key)
         {
-            if(internalDictionary.ContainsKey(key))
+            if(internalDictionary.ContainsKey(key) == false)
             {
-                var eArgs = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, new List<object> { internalDictionary[key] });
-
-                Data_CollectionChanged(this, eArgs);
-
-                CollectionChanged?.Invoke(this, eArgs);
+                return;
             }
 
+            var removedItem = internalDictionary[key];
+
             internalDictionary.Remove(key);
+
+            RaiseCollectionChanged(NotifyCollectionChangedAction.Remove, removedItem);
         }
 
+        /// <summary>
+        /// Implementation for <see cref="IDataContainer.GetEnumerator"/>
+        /// </summary>
+        /// <returns></returns>
         public override IEnumerator<DataObject> GetEnumerator() => internalDictionary.Values.Cast<DataObject>().GetEnumerator();
 
+        /// <summary>
+        /// Implementation for <see cref="IDataContainer.GetKeys"/>
+        /// </summary>
+        /// <returns></returns>
         public override IEnumerable<string> GetKeys() => internalDictionary.Keys;
 
+        /// <summary>
+        /// Implementation for <see cref="IDataContainer.Add(DataObject)"/>
+        /// </summary>
+        /// <param name="obj"></param>
         public override void Add(DataObject obj) => Add(obj.Name, obj.GetValue());
 
+        /// <summary>
+        /// Implementation for <see cref="IDataContainer.Remove(DataObject)"/>
+        /// </summary>
+        /// <param name="obj"></param>
         public override void Remove(DataObject obj) => Remove(obj.Name);
 
+        /// <summary>
+        /// Implemenation for <see cref="IDataContainer.Find(string)"/>
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
         public override DataObject Find(string key) => 
             internalDictionary.ContainsKey(key) 
-            ? internalDictionary[key] as DataObject 
+            ? internalDictionary[key] 
             : null;
 
         /// <summary>
@@ -121,11 +133,19 @@ namespace KEI.Infrastructure
             if (XmlHelper.Deserialize<DataContainer>(path) is DataContainer dc)
             {
                 dc.FilePath = path;
-                Console.WriteLine("Read");
                 return dc;
             }
 
             return null;
         }
+
+        #region INotifyCollectionChanged Members
+
+        public event NotifyCollectionChangedEventHandler CollectionChanged;
+
+        private void RaiseCollectionChanged(NotifyCollectionChangedAction action, object changedItem)
+            => CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(action, changedItem));
+
+        #endregion
     }
 }

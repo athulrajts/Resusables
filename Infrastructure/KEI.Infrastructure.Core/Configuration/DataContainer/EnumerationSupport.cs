@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 namespace KEI.Infrastructure
 {
+    // TODO : Is this needed ??? remove if not
     public class BasicEnumerator<T> : IEnumerator<T>
     {
         private IList<T> _dataObjects;

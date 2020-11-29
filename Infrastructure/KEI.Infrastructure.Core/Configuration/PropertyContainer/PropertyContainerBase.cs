@@ -1,6 +1,6 @@
-﻿using KEI.Infrastructure.Validation;
-using System.IO;
+﻿using System.IO;
 using System.Xml;
+using KEI.Infrastructure.Validation;
 
 namespace KEI.Infrastructure
 {
@@ -40,6 +40,10 @@ namespace KEI.Infrastructure
             return false;
         }
 
+        /// <summary>
+        /// Implementation for <see cref="DataContainerBase.ReadXml(XmlReader)"/>
+        /// </summary>
+        /// <param name="reader"></param>
         public override void ReadXml(XmlReader reader)
         {
             // Read attribute name

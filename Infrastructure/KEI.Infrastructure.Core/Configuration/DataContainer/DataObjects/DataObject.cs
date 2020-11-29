@@ -1,10 +1,10 @@
-﻿using Prism.Mvvm;
-using System;
-using System.ComponentModel;
+﻿using System;
 using System.IO;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
+using System.Collections.Generic;
+using Prism.Mvvm;
 
 namespace KEI.Infrastructure
 {
@@ -13,8 +13,14 @@ namespace KEI.Infrastructure
         public void WriteBytes(BinaryWriter writer);
     }
 
+    /// <summary>
+    /// Abstraction for holding different type of data in <see cref="IDataContainer"/>
+    /// Handles Xml Serialization and Deserialization
+    /// Handles validation when updating values.
+    /// </summary>
     public abstract class DataObject : BindableBase, IXmlSerializable
     {
+        // constants for xml serialization
         public const string KEY_ATTRIBUTE = "key";
         public const string VALUE_ATTRIBUTE = "value";
         public const string TYPE_ID_ATTRIBUTE = "type";
@@ -25,6 +31,9 @@ namespace KEI.Infrastructure
 
         }
 
+        /// <summary>
+        /// Unique name/key
+        /// </summary>
         private string name;
         public string Name
         {
@@ -32,6 +41,9 @@ namespace KEI.Infrastructure
             set { SetProperty(ref name, value); }
         }
 
+        /// <summary>
+        /// Value as string if possible
+        /// </summary>
         protected string stringValue;
         public virtual string StringValue
         {
@@ -39,45 +51,109 @@ namespace KEI.Infrastructure
             set { SetProperty(ref stringValue, value, () => OnStringValueChanged(value)); }
         }
 
+        /// <summary>
+        /// Type of DataObject
+        /// </summary>
         public abstract string Type { get; }
 
-        public virtual bool ValidateForType(string value) { return true; }
+        /// <summary>
+        /// Checks whether we can convert the given string this objects value
+        /// </summary>
+        /// <param name="value">value to check</param>
+        /// <returns></returns>
+        public virtual bool CanConvertFromString(string value) { return true; }
 
-        protected virtual void OnStringValueChanged(string value) { }
+        /// <summary>
+        /// Gets object that can be used to update our value from given string
+        /// </summary>
+        /// <param name="value">value to update</param>
+        /// <returns></returns>
+        public virtual object ConvertFromString(string value) { return null; }
 
+        /// <summary>
+        /// Gets value held by this object
+        /// </summary>
+        /// <returns></returns>
         public abstract object GetValue();
+
+        /// <summary>
+        /// Sets value held by this object
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public abstract bool SetValue(object value);
 
+        /// <summary>
+        /// Sets value held by this object from given string
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public bool SetValueFromString(string value)
+        {
+            return CanConvertFromString(value) && SetValue(ConvertFromString(value));
+        }
+
+        /// <summary>
+        /// Override ToString() to return string representation
+        /// </summary>
+        /// <returns></returns>
         public override string ToString() => StringValue;
+
+        /// <summary>
+        /// Gets the type of value this objects holds.
+        /// </summary>
+        /// <returns></returns>
+        public abstract Type GetDataType();
+
+        #region XmlSerialization Members
 
         public XmlSchema GetSchema() => null;
 
+        /// <summary>
+        /// Update values from XML
+        /// </summary>
+        /// <param name="reader">XmlReader to read</param>
         public virtual void ReadXml(XmlReader reader)
         {
-            ReadAttrubutes(reader);
+            // Read all the attributes.
+            ReadXmlAttrubutes(reader);
 
             reader.Read();
 
+            // Loop till we finisehd reading
             while (reader.EOF == false)
             {
+                /// Encountered element of type <see cref="XmlNodeType.Element"/>
+                /// Implementations should override <see cref="ReadXmlElement(string, XmlReader)"/>
+                /// to read the element.
                 if (reader.NodeType == XmlNodeType.Element)
                 {
-                    if (ReadElement(reader.Name, reader) == false)
+                    /// If implementation doesn't provide way to read the element, skip.
+                    if (ReadXmlElement(reader.Name, reader) == false)
                     {
                         reader.Read();
                     }
                 }
+
+                // nothing of intereset, skip.
                 else
                 {
                     reader.Read();
                 }
             }
 
-            OnReadingCompleted();
+            // Finish up reading after all required values have been read.
+            OnXmlReadingCompleted();
 
         }
 
-        protected virtual void ReadAttrubutes(XmlReader reader)
+        /// <summary>
+        /// Read all the attributes from XML
+        /// reads <see cref="KEY_ATTRIBUTE"/> and <see cref="VALUE_ATTRIBUTE"/> if exists
+        /// as default implementation
+        /// </summary>
+        /// <param name="reader"></param>
+        protected virtual void ReadXmlAttrubutes(XmlReader reader)
         {
             Name = reader.GetAttribute(KEY_ATTRIBUTE);
 
@@ -87,24 +163,50 @@ namespace KEI.Infrastructure
             }
         }
 
-        protected virtual bool ReadElement(string elementName, XmlReader reader)
+        /// <summary>
+        /// This function wil lbe called whenever an <see cref="XmlNodeType.Element"/> is
+        /// encountered while read
+        /// </summary>
+        /// <param name="elementName">Value of <see cref="XmlReader.Name"/></param>
+        /// <param name="reader">XmlReader to complete reading element</param>
+        /// <returns>returns true when reading was finished succesfully</returns>
+        protected virtual bool ReadXmlElement(string elementName, XmlReader reader)
         {
             return false;
         }
 
-        protected virtual void OnReadingCompleted() { }
+        /// <summary>
+        /// Called when reading from Xml is done completely
+        /// can be used by implementations to use initialize objects after all
+        /// required values are read.
+        /// </summary>
+        protected virtual void OnXmlReadingCompleted() { }
 
+        /// <summary>
+        /// Writes value to an XmlWriter
+        /// </summary>
+        /// <param name="writer"></param>
         public virtual void WriteXml(XmlWriter writer)
         {
-            string elementName = (this is ContainerDataObject || this is ContainerPropertyObject) ? "DataContainer" : START_ELEMENT;
+            /// value held by this object is an <see cref="IDataContainer"/>
+            /// starting tag is "DataContainer", otherwise starting tag is <see cref="START_ELEMENT"/> ("Data")
+            string elementName = (GetValue() is IDataContainer) ? "DataContainer" : START_ELEMENT;
 
+            // write start tag
             writer.WriteStartElement(elementName);
 
+            // write state of object
             WriteXmlInternal(writer);
 
+            // write end tag
             writer.WriteEndElement();
         }
 
+        /// <summary>
+        /// Writes the state of the object to an XmlWriter
+        /// Writes <see cref="Type"/>, <see cref="Name"/>  and <see cref="StringValue"/> as attributes by default
+        /// </summary>
+        /// <param name="writer"></param>
         protected virtual void WriteXmlInternal(XmlWriter writer)
         {
             writer.WriteAttributeString(TYPE_ID_ATTRIBUTE, Type);
@@ -112,28 +214,58 @@ namespace KEI.Infrastructure
             writer.WriteAttributeString(VALUE_ATTRIBUTE, StringValue);
         }
 
-        public abstract Type GetDataType();
+        #endregion
+
+        /// <summary>
+        /// Called when <see cref="StringValue"/> is set
+        /// Used to update the value held by this object when <see cref="StringValue"/>
+        /// is updated from editor.
+        /// </summary>
+        /// <param name="value"></param>
+        protected virtual void OnStringValueChanged(string value) { }
     }
 
+    /// <summary>
+    /// Generic implementation for DataObject for primitive types.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public abstract class DataObject<T> : DataObject
     {
-
+        /// <summary>
+        /// Value held by this object
+        /// </summary>
         protected T _value;
         public T Value
         {
             get { return _value; }
             set
             {
-                SetProperty(ref _value, value);
+                if(EqualityComparer<T>.Default.Equals(_value, value) == true)
+                {
+                    return;
+                }
 
-                stringValue = _value.ToString();
+                _value = value;
 
+                // update string value whenever our value changes
+                stringValue = _value?.ToString();
+
+                RaisePropertyChanged(nameof(Value));
                 RaisePropertyChanged(nameof(StringValue));
             }
         }
 
+        /// <summary>
+        /// Gets value held by object
+        /// </summary>
+        /// <returns></returns>
         public override object GetValue() => Value;
 
+        /// <summary>
+        /// Sets value held by object
+        /// </summary>
+        /// <param name="value">returns true if value was updated</param>
+        /// <returns></returns>
         public override bool SetValue(object value)
         {
             if (value.GetType() != typeof(T))
@@ -146,18 +278,15 @@ namespace KEI.Infrastructure
             return true;
         }
 
-        protected override void OnStringValueChanged(string value)
-        {
-            _value = (T)TypeDescriptor.GetConverter(typeof(T)).ConvertTo(value, typeof(T));
+        /// <summary>
+        /// Return type of value held by object
+        /// </summary>
+        /// <returns></returns>
+        public override Type GetDataType() => typeof(T);
 
-            RaisePropertyChanged(nameof(Value));
-        }
-
-        public override Type GetDataType()
-        {
-            return typeof(T);
-        }
-
+        /// <summary>
+        /// Default contructor
+        /// </summary>
         public DataObject()
         {
 

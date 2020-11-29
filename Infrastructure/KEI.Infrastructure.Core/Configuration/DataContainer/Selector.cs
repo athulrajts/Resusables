@@ -12,7 +12,6 @@ namespace KEI.Infrastructure
     /// Container for Holding <see cref="Enum"/> Properties or, Properties whos
     /// values are restricted to a set of values.
     /// </summary>
-    [XmlRoot("Property")]
     public class Selector : BindableBase
     {
         private string selectedItem;
@@ -21,7 +20,6 @@ namespace KEI.Infrastructure
         /// <summary>
         /// Value of the Propery
         /// </summary>
-        [XmlAttribute(AttributeName = "Value")]
         public string SelectedItem
         {
             get { return selectedItem; }
@@ -31,7 +29,6 @@ namespace KEI.Infrastructure
         /// <summary>
         /// Allowed values the property Can have
         /// </summary>
-        [XmlElement]
         public List<string> Option
         {
             get { return options; }
@@ -64,45 +61,6 @@ namespace KEI.Infrastructure
             SelectedItem = selectedValue;
 
             Type = options[0]?.GetType();
-        }
-
-        /// <summary>
-        /// Create an instance by specifiying the value and allowed values.
-        /// If Value is not present inside allowed values, it'll be added internally
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="selectedValue">Value</param>
-        /// <param name="options"><see cref="Array"/> of allowed values</param>
-        /// <returns></returns>
-        public static Selector Create<T>(T selectedValue, params T[] options)
-        {
-            var ret = new Selector();
-            ret.Option = options.Select(x => x.ToString()).ToList();
-            ret.SelectedItem = selectedValue.ToString();
-            if(!ret.Option.Contains(ret.SelectedItem))
-            {
-                ret.Option.Add(ret.SelectedItem);
-            }
-            ret.Type = new TypeInfo(typeof(T));
-
-            return ret;
-        }
-
-        /// <summary>
-        /// Create instance by specifiying allowed values
-        /// Value will be first item in the allowed values by default
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="options">Allowed values</param>
-        /// <returns></returns>
-        public static Selector Create<T>(params T[] options)
-        {
-            var ret = new Selector();
-            ret.Option = options.Select(x => x.ToString()).ToList();
-            ret.SelectedItem = options[0].ToString();
-            ret.Type = new TypeInfo(typeof(T));
-
-            return ret;
         }
 
         public Selector Clone(string newValue)

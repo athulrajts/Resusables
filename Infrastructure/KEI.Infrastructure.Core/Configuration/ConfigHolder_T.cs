@@ -11,10 +11,11 @@ namespace KEI.Infrastructure.Configuration
     {
 
         #region Constructor
+        
         public ConfigHolder()
         {
 
-            if (!LoadConfig())
+            if (LoadConfig() == false)
             {
                 // Backup if file already exist inorder to check why it got corrupt
                 if (File.Exists(ConfigPath))

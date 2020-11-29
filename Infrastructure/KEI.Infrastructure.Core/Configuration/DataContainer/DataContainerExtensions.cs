@@ -1,4 +1,4 @@
-﻿//using KEI.Infrastructure.Server;
+﻿using KEI.Infrastructure.Server;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -22,7 +22,7 @@ namespace KEI.Infrastructure
             {
                 return EditorType.Bool;
             }
-            else if (t.IsEnum || t == typeof(Selector) )
+            else if (t.IsEnum || t == typeof(Selector))
             {
                 return EditorType.Enum;
             }
@@ -71,23 +71,22 @@ namespace KEI.Infrastructure
             return retValue;
         }
 
-        public static void Put(this IDataContainer dc, string key, bool value) => dc.Put(key, (object)value);
-        public static void Put(this IDataContainer dc, string key, int value) => dc.Put(key, (object)value);
-        public static void Put(this IDataContainer dc, string key, float value) => dc.Put(key, (object)value);
-        public static void Put(this IDataContainer dc, string key, double value) => dc.Put(key, (object)value);
-        public static void Put(this IDataContainer dc, string key, char value) => dc.Put(key, (object)value);
-        public static void Put(this IDataContainer dc, string key, string value) => dc.Put(key, (object)value);
-        public static void Put(this IDataContainer dc, string key, IDataContainer value) => dc.Put(key, (object)value);
-
-        internal static void Put(this IDataContainer dc, string key, object value)
+        public static void Put(this IDataContainer dc, string key, object value)
         {
-            if(dc.ContainsProperty(key))
+            if (dc.ContainsData(key))
             {
                 dc.SetValue(key, value);
             }
             else
             {
-                dc.Add(DataObjectFactory.GetDataObjectFor(key, value));
+                if (dc is IPropertyContainer)
+                {
+                    dc.Add(DataObjectFactory.GetPropertyObjectFor(key, value));
+                }
+                else
+                {
+                    dc.Add(DataObjectFactory.GetDataObjectFor(key, value));
+                }
             }
         }
 
@@ -177,7 +176,7 @@ namespace KEI.Infrastructure
 
             foreach (var data in container)
             {
-                if(data is IWriteToBinaryStream wbs)
+                if (data is IWriteToBinaryStream wbs)
                 {
                     wbs.WriteBytes(writer);
                 }

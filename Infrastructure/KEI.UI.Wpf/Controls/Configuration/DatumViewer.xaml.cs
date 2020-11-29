@@ -31,18 +31,21 @@ namespace KEI.UI.Wpf.Configuration
         {
             if (d is DatumViewer template && e.NewValue is PropertyObject data)
             {
-
-                //template.typeValidator = Validators.Type(data.Type);
-
                 template.StringValue = data.StringValue;
 
                 template.RaisePropertyChanged(nameof(Editor));
 
-                if (data is EnumPropertyObject epo)
+                if (data.Type == "enum")
                 {
-                    template.EnumSource = new List<string>(Enum.GetNames(epo.Value.GetType()));
-                    template.RaisePropertyChanged("EnumSource");
-                    template.StringValue = Enum.GetName(epo.Value.GetType(), epo.Value);
+                    template.EnumSource = new List<string>(Enum.GetNames(data.GetValue().GetType()));
+                    template.RaisePropertyChanged(nameof(EnumSource));
+                    template.StringValue = Enum.GetName(data.GetValue().GetType(), data.GetValue());
+                }
+                else if(data.Type == "opt")
+                {
+                    Selector s = data.GetType().GetProperty("Value").GetValue(data) as Selector;
+                    template.EnumSource = s.Option;
+                    template.StringValue = s.SelectedItem;
                 }
 
                 if (e.OldValue is PropertyObject oldValue)
@@ -90,7 +93,7 @@ namespace KEI.UI.Wpf.Configuration
 
                 stringValue = value;
 
-                ValidationResult = Data.ValidateForType(stringValue)
+                ValidationResult = Data.CanConvertFromString(stringValue)
                     ? new ValidationResult(true)
                     : new ValidationResult(false, "Invalid Type");
 

@@ -1,17 +1,16 @@
 ﻿using System;
-using System.Linq;
-using System.Collections;
-using System.Xml.Serialization;
-using System.Collections.Generic;
-using Prism.Mvvm;
-using KEI.Infrastructure.Types;
-using System.ComponentModel;
-using System.Xml.Schema;
-using System.Xml;
-using KEI.Infrastructure.Logging;
 using System.IO;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Xml;
+using System.Xml.Schema;
+using System.Xml.Serialization;
+using Prism.Mvvm;
+using KEI.Infrastructure.Logging;
 
 namespace KEI.Infrastructure
 {
@@ -122,7 +121,7 @@ namespace KEI.Infrastructure
         /// </summary>
         /// <param name="key">data Key to search for</param>
         /// <returns>Is Found</returns>
-        public virtual bool ContainsProperty(string key) => Find(key) is DataObject;
+        public virtual bool ContainsData(string key) => Find(key) is DataObject;
 
 
         /// <summary>
@@ -349,7 +348,7 @@ namespace KEI.Infrastructure
         {
             foreach (var item in workingBase)
             {
-                if (workingCopy.ContainsProperty(item.Name) == false)
+                if (workingCopy.ContainsData(item.Name) == false)
                 {
                     addActions.Add(() => workingCopy.Add(item));
 
@@ -374,7 +373,7 @@ namespace KEI.Infrastructure
         {
             foreach (var item in workingCopy)
             {
-                if (workingBase.ContainsProperty(item.Name) == false)
+                if (workingBase.ContainsData(item.Name) == false)
                 {
                     removeActions.Add(() => workingCopy.Remove(item));
 

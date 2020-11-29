@@ -237,15 +237,18 @@ namespace KEI.UI.Wpf.Controls.Configuration
                 converter = TypeDescriptor.GetConverter(PropertyType); 
             }
 
-            if (source is SelectablePropertyObject spo)
+            if (source.Type == "opt")
             {
-                EnumSource = spo.Value.Option;
-                PropertyValue = spo.Value.SelectedItem;
+                Selector s = source.GetType().GetProperty("Value").GetValue(source) as Selector;
+                EnumSource = s.Option;
+                PropertyValue = s.SelectedItem;
             }
-            else if(source is EnumPropertyObject epo)
+            else if(source.Type == "enum")
             {
-                EnumSource = new List<string>(Enum.GetNames(epo.EnumType));
-                PropertyValue = Enum.GetName(epo.EnumType, epo.Value);
+                Enum value = source.GetValue() as Enum;
+
+                EnumSource = new List<string>(Enum.GetNames(value.GetType()));
+                PropertyValue = Enum.GetName(value.GetType(), value);
             }
 
             PropertyEditor = source.Editor;

@@ -28,8 +28,10 @@ namespace KEI.Infrastructure.Configuration
         {
             var configObj = Configs.FirstOrDefault(x => x.Name == configFullName);
 
-            if (configObj == null)
+            if (configObj is null)
+            {
                 _viewService.Error($"DataContainer \"{configFullName}\" not loaded");
+            }
 
             return configObj;
         }
@@ -48,7 +50,9 @@ namespace KEI.Infrastructure.Configuration
             bool success = cfg.Store();
 
             if (!success)
+            {
                 _viewService.Error($"Unable store DataContainer \"{configName}\" on \"{cfg.FilePath}\"");
+            }
 
 
             return success;

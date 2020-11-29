@@ -151,12 +151,12 @@ namespace KEI.Infrastructure.Core.Tests
             bool containsProperty = property.GetValue(PROP_NAME, ref prop);
 
             Assert.True(containsProperty);
-            Assert.NotEqual((decimal)0, prop, 0);
+            Assert.NotEqual(0, prop);
             Assert.Equal(42, prop);
 
             int prop2 = property.Get<int>(PROP_NAME);
 
-            Assert.NotEqual((decimal)0, prop2);
+            Assert.NotEqual(0, prop2);
             Assert.Equal(42, prop2);
         }
 
@@ -212,11 +212,11 @@ namespace KEI.Infrastructure.Core.Tests
 
             IPropertyContainer property = PropertyContainerBuilder.Create().Build();
 
-            Assert.False(property.ContainsProperty(PROP_NAME));
+            Assert.False(property.ContainsData(PROP_NAME));
 
             property.Put(PROP_NAME, SET_VALUE);
 
-            Assert.True(property.ContainsProperty(PROP_NAME));
+            Assert.True(property.ContainsData(PROP_NAME));
 
             int value = 0;
             property.GetValue(PROP_NAME, ref value);
@@ -238,11 +238,11 @@ namespace KEI.Infrastructure.Core.Tests
             int originalValue = 0;
             property.GetValue(PROP_NAME, ref originalValue);
 
-            Assert.True(property.ContainsProperty(PROP_NAME));
+            Assert.True(property.ContainsData(PROP_NAME));
 
             property.Put(PROP_NAME, SET_VALUE);
 
-            Assert.True(property.ContainsProperty(PROP_NAME));
+            Assert.True(property.ContainsData(PROP_NAME));
 
             int value = 0;
             property.GetValue(PROP_NAME, ref value);

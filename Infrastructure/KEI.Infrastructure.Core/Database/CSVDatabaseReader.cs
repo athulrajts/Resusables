@@ -10,17 +10,23 @@ namespace KEI.Infrastructure.Database
 {
     public class CSVDatabaseReader : IDatabaseReader
     {
-        private static Regex criteriaRegex = new Regex(@"(<|>|>=|<=)(-?\d+(\.)?(\d+)?)");
+        private static readonly Regex criteriaRegex = new Regex(@"(<|>|>=|<=)(-?\d+(\.)?(\d+)?)");
         private DataTable _table;
+        
         public DataTable ReadDatabase(string filePath)
         {
             if (string.IsNullOrEmpty(filePath))
+            {
                 return null;
+            }
 
             var lines = File.ReadAllLines(filePath);
 
+            // There will be atleast 5 lines of header, if not we have wrong file
             if (lines.Length < 5)
+            {
                 return null;
+            }
 
             ReadHeader(lines.Take(5));
 
@@ -104,15 +110,15 @@ namespace KEI.Infrastructure.Database
 
         private static Ineqaulity GetInequalityFromString(string symbol)
         {
-            switch (symbol)
+            return symbol switch
             {
-                case "<": return Ineqaulity.LessThan;
-                case ">": return Ineqaulity.GreaterThan;
-                case "<=": return Ineqaulity.LessThanOrEqualTo;
-                case ">=": return Ineqaulity.GreaterThanOrEqualTo;
-                case "!=": return Ineqaulity.NotEqualTo;
-                default: return Ineqaulity.LessThan;
-            }
+                "<" => Ineqaulity.LessThan,
+                ">" => Ineqaulity.GreaterThan,
+                "<=" => Ineqaulity.LessThanOrEqualTo,
+                ">=" => Ineqaulity.GreaterThanOrEqualTo,
+                "!=" => Ineqaulity.NotEqualTo,
+                _ => Ineqaulity.LessThan,
+            };
         }
 
     }

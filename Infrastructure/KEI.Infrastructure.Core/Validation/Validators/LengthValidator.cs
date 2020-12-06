@@ -23,40 +23,33 @@ namespace KEI.Infrastructure.Validation
             get { return max; }
             set { SetValidationProperty(ref max, value); }
         }
+
         public override ValidationResult Validate(object value)
         {
-            CurrentResult = new ValidationResult(true);
-
-            string str = value as string;
-
-            if(str == null)
+            if (value is not string str)
             {
-                CurrentResult = new ValidationResult(false, $"Value must be string");
-                return CurrentResult;
+                return ValidationFailed("Value must be string");
             }
 
-            if(Max == Min && str.Length != Max)
+            if (Max == Min && str.Length != Max)
             {
-                CurrentResult = new ValidationResult(false, $"Length must be equal to {Max}");
-                return CurrentResult;
+                return ValidationFailed($"Length must be equal to {Max}");
             }
 
             string commonErrMsg = $"Length should be between ({Min} - {Max}) Characters";
 
             if(str.Length > Max && Max >= 0)
             {
-                CurrentResult = new ValidationResult(false, Min >= 0 ? commonErrMsg : $"Length must be lesser than {Max}");
-                return CurrentResult;
+                return ValidationFailed(Min >= 0 ? commonErrMsg : $"Length must be lesser than {Max}");
             }
 
 
             if(str.Length < Min && Min >= 0)
             {
-                CurrentResult = new ValidationResult(false, Max >= 0 ? commonErrMsg : $"Length must be greater than {Min}");
-                return CurrentResult;
+                return ValidationFailed(Max >= 0 ? commonErrMsg : $"Length must be greater than {Min}");
             }
 
-            return CurrentResult;
+            return ValidationSucces();
         }
 
         public override string StringRepresentation

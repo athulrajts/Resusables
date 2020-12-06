@@ -8,7 +8,7 @@ namespace KEI.Infrastructure.PeriodicTasks
     public abstract class PeriodicTask : BindableBase, IPeriodicTask, IDisposable
     {
         private const int MINUTE_TO_MS_FACTOR = 60000;
-        private object executeLock = new object();
+        private readonly object executeLock = new object();
         private Timer _timer;
 
         #region IPeriodicTask Members
@@ -35,8 +35,11 @@ namespace KEI.Infrastructure.PeriodicTasks
         }
 
         public virtual bool CanExecute() => true;
+        
         protected abstract void InternalExecute();
+        
         protected abstract void InitializeParameters();
+        
         public void Pause()
         {
             _timer.Enabled = false;
@@ -53,8 +56,10 @@ namespace KEI.Infrastructure.PeriodicTasks
         {
             lock (executeLock)
             {
-                if (!CanExecute())
+                if (CanExecute() == false)
+                {
                     return;
+                }
 
                 InternalExecute();
 
@@ -74,24 +79,18 @@ namespace KEI.Infrastructure.PeriodicTasks
             var timeSinceLastExecution = DateTime.Now - LastExecutedOn;
             bool needExecute = false;
 
-            switch (Period)
+            needExecute = Period switch
             {
-                case Period.OneDay:
-                    needExecute = timeSinceLastExecution.TotalDays > 0;
-                    break;
-                case Period.OneWeek:
-                    needExecute = timeSinceLastExecution.TotalDays > 7;
-                    break;
-                case Period.OneMonth:
-                    needExecute = timeSinceLastExecution.TotalDays > 30;
-                    break;
-                default:
-                    needExecute = timeSinceLastExecution.TotalMinutes > (int)Period;
-                    break;
-            }
+                Period.OneDay => timeSinceLastExecution.TotalDays > 0,
+                Period.OneWeek => timeSinceLastExecution.TotalDays > 7,
+                Period.OneMonth => timeSinceLastExecution.TotalDays > 30,
+                _ => timeSinceLastExecution.TotalMinutes > (int)Period,
+            };
 
             if (needExecute)
+            {
                 await Task.Run(() => Execute());
+            }
 
             _timer.Start();
         }

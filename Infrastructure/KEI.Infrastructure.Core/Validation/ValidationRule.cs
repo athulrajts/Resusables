@@ -83,7 +83,7 @@ namespace KEI.Infrastructure.Validation
 
         protected bool SetValidationProperty<T>(ref T store, T value, [CallerMemberName] string property ="")
         {
-            var propertySet = SetProperty<T>(ref store, value, property);
+            var propertySet = SetProperty(ref store, value, property);
 
             if(propertySet)
             {

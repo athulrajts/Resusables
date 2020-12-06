@@ -25,8 +25,6 @@ namespace KEI.Infrastructure.Localizer
 
         public string GetLocalizedString(string name)
         {
-            if (string.IsNullOrEmpty(name))
-                return string.Empty;
 
 #if DEBUG
             if (_keys.Contains(name) == false)
@@ -37,7 +35,9 @@ namespace KEI.Infrastructure.Localizer
 #endif
 
             if (currentCulture == "en")
+            {
                 return name;
+            }
 
             var key = name.Replace(" ", "_");
 
@@ -48,8 +48,6 @@ namespace KEI.Infrastructure.Localizer
 
         public string GetLocalizedString(string name, params object[] args)
         {
-            if (string.IsNullOrEmpty(name))
-                return string.Empty;
 
 #if DEBUG
             if (_keys.Contains(name) == false)
@@ -60,7 +58,9 @@ namespace KEI.Infrastructure.Localizer
 #endif
 
             if (currentCulture == "en")
+            {
                 return string.Format(name, args);
+            }
 
             var key = name.Replace(" ", "_");
 

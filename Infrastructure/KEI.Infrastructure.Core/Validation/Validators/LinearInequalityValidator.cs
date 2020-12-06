@@ -48,9 +48,10 @@ namespace KEI.Infrastructure.Validation
 
             string str = value.ToString();
 
-            double dVal = 0;
-            if (!double.TryParse(str, out dVal))
+            if (!double.TryParse(str, out double dVal))
+            {
                 return ValidationFailed($"{str} cannot be parsed to {typeof(double).FullName}");
+            }
 
             switch (Ineqaulity)
             {

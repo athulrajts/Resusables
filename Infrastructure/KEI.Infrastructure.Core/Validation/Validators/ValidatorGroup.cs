@@ -1,4 +1,5 @@
-﻿using System.Xml.Serialization;
+﻿using System;
+using System.Xml.Serialization;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
@@ -32,7 +33,7 @@ namespace KEI.Infrastructure.Validation
                 {
                     isValid = false;
 
-                    if (!CascadeValidations)
+                    if (CascadeValidations == false)
                     {
                         return new ValidationResult(false, result.ErrorMessage);
                     }
@@ -59,17 +60,23 @@ namespace KEI.Infrastructure.Validation
         public override bool Equals(object obj)
         {
             if (obj.GetType() != GetType())
+            {
                 return false;
+            }
 
             var other = obj as ValidatorGroup;
 
             if (Rules.Count != other.Rules.Count)
+            {
                 return false;
+            }
 
             for (int i = 0; i < Rules.Count; i++)
             {
-                if (!Rules[i].Equals(other.Rules[i]))
+                if (Rules[i].Equals(other.Rules[i]) == false)
+                {
                     return false;
+                }
             }
 
             return true;
@@ -78,10 +85,7 @@ namespace KEI.Infrastructure.Validation
 
         public override int GetHashCode()
         {
-            var hashCode = 1740439574;
-            hashCode = hashCode * -1521134295 + base.GetHashCode();
-            hashCode = hashCode * -1521134295 + EqualityComparer<ObservableCollection<ValidationRule>>.Default.GetHashCode(Rules);
-            return hashCode;
+            return HashCode.Combine(base.GetHashCode(), Rules);
         }
 
         public static implicit operator ValidatorGroup(ValidationBuilder builder) => builder.Validator;

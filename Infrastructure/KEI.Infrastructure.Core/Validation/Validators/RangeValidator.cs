@@ -61,16 +61,15 @@ namespace KEI.Infrastructure.Validation
                 MinValue = minValueGetter();
 
             string str = value.ToString();
-            double temp = 0;
-
             double upperLimit = ExcludeMaxValue ? MaxValue - 1 : MaxValue;
             double lowerLimit = ExcludeMinValue ? MinValue + 1 : MinValue;
             string errMsg = $"Value should be in the range ({lowerLimit},{upperLimit})";
             string invErrMsg = $"Value should not be in the range ({lowerLimit},{upperLimit})";
 
-            if (!double.IsPositiveInfinity(MaxValue))
+            double temp;
+            if (double.IsPositiveInfinity(MaxValue) == false)
             {
-                if(double.TryParse(str, out temp))
+                if (double.TryParse(str, out temp))
                 {
                     if (Invert)
                     {
@@ -89,7 +88,7 @@ namespace KEI.Infrastructure.Validation
                 }
             }
 
-            if (!double.IsNegativeInfinity(MinValue))
+            if (double.IsNegativeInfinity(MinValue) == false)
             {
                 if (double.TryParse(str, out temp))
                 {

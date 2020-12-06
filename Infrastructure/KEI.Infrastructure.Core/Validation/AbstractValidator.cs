@@ -5,10 +5,10 @@ using System.Collections.Generic;
 
 namespace KEI.Infrastructure.Validation
 {
-    public class AbstractValidator<T>
+    public abstract class AbstractValidator<T>
     {
-        private PropertyInfo[] properties;
-        private Dictionary<string, ValidatorGroup> validators = new Dictionary<string, ValidatorGroup>();
+        private readonly PropertyInfo[] properties;
+        private readonly Dictionary<string, ValidatorGroup> validators = new Dictionary<string, ValidatorGroup>();
 
         public AbstractValidator()
         {

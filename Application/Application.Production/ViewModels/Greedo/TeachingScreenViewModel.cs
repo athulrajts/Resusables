@@ -39,7 +39,7 @@ namespace Application.Production.ViewModels
             _camerConfig = configManager.GetConfig(ConfigKeys.Camera);
             _viewService = viewService;
 
-            Geometries = XmlHelper.Deserialize<ShapeGeometryCollection>("Configs/reference.cfg");
+            Geometries = XmlHelper.DeserializeFromFile<ShapeGeometryCollection>("Configs/reference.cfg");
 
             Commands.Add(new Screen.ScreenCommand
             {
@@ -94,7 +94,7 @@ namespace Application.Production.ViewModels
         private DelegateCommand saveROICommand;
         public DelegateCommand SaveROICommand =>
             saveROICommand ?? (saveROICommand = new DelegateCommand(ExecuteSaveROICommand));
-        void ExecuteSaveROICommand() => XmlHelper.Serialize(XmlHelper.Serialize(Geometries, "Configs/reference.cfg"));
+        void ExecuteSaveROICommand() => XmlHelper.SerializeToString(XmlHelper.SerializeToFile(Geometries, "Configs/reference.cfg"));
 
         #endregion
 

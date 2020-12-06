@@ -35,7 +35,7 @@ namespace KEI.Infrastructure.Helpers
         public static bool CreateDirectoryIfNotExist(string path)
         {
             var dir = Path.GetDirectoryName(path);
-            if (!Directory.Exists(dir))
+            if (Directory.Exists(dir) == false)
             {
                 try
                 {

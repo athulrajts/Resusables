@@ -76,7 +76,7 @@ namespace Application.Core.Modules
         {
             CurrentRecipe.GetValue($"{ApplicationMode.Production} DB", ref productionDBSetup);
 
-            var xml = XmlHelper.Serialize(productionDBSetup);
+            var xml = XmlHelper.SerializeToString(productionDBSetup);
             CurrentRecipe.GetValue($"{ApplicationMode.Engineering} DB", ref engineeringDBSetup);
 
             RecipeLoaded?.Invoke(this, CurrentRecipe);

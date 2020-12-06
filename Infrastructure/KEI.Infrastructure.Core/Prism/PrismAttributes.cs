@@ -24,10 +24,6 @@ namespace KEI.Infrastructure.Prism
         }
     }
 
-    [AttributeUsage(validOn: AttributeTargets.Class)]
-    public class RegisterTypeAttribute : Attribute { }
-
-
     [AttributeUsage(validOn: AttributeTargets.Class, Inherited = true)]
     public class RegisterSingletonAttribute : Attribute
     {

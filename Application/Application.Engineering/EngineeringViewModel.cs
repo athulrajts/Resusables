@@ -47,12 +47,12 @@ namespace Application.Engineering
 
             var configPath = PathUtils.GetPath(@"Configs/view.view");
 
-            Sections = XmlHelper.Deserialize<ObservableCollection<ContentSectionModel>>(configPath);
+            Sections = XmlHelper.DeserializeFromFile<ObservableCollection<ContentSectionModel>>(configPath);
 
             if(Sections is null)
             {
                 Sections = GetDefaultSections();
-                XmlHelper.Serialize(Sections, configPath);
+                XmlHelper.SerializeToFile(Sections, configPath);
             }
 
             viewMemory = Sections.Select(x => x.IsChecked).ToArray();
@@ -227,7 +227,7 @@ namespace Application.Engineering
             if (string.IsNullOrEmpty(file))
                 return;
 
-            if(XmlHelper.Deserialize<ObservableCollection<ContentSectionModel>>(file) is ObservableCollection<ContentSectionModel> layout)
+            if(XmlHelper.DeserializeFromFile<ObservableCollection<ContentSectionModel>>(file) is ObservableCollection<ContentSectionModel> layout)
             {
                 Sections = layout;
             }
@@ -254,7 +254,7 @@ namespace Application.Engineering
             saveLayoutCommand ?? (saveLayoutCommand = new DelegateCommand(ExecuteSaveLayoutCommand));
 
         void ExecuteSaveLayoutCommand()
-            => _viewService.SaveFile((file) => XmlHelper.Serialize(Sections), "Layout file | *.view");
+            => _viewService.SaveFile((file) => XmlHelper.SerializeToString(Sections), "Layout file | *.view");
 
         #endregion
 

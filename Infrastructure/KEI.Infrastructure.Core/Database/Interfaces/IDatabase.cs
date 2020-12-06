@@ -5,12 +5,12 @@ namespace KEI.Infrastructure.Database
 {
     public interface IDatabase
     {
-        void AddRecord(params IDatabaseContext[] results);
-        void StartSession(DatabaseSetup s);
-        IDatabaseWritter DatabaseWritter { get; }
-        IEnumerable<DatabaseColumn> GetSchema();
-        void CreateNew();
-        DataTable GetData();
+        public void AddRecord(params IDatabaseContext[] results);
+        public void StartSession(DatabaseSetup s);
+        public IDatabaseWritter DatabaseWritter { get; }
+        public IEnumerable<DatabaseColumn> GetSchema();
+        public void CreateNew();
+        public DataTable GetData();
     }
 
     public enum DatabaseCreationMode

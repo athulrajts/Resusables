@@ -1,12 +1,21 @@
-﻿using KEI.Infrastructure;
-
-namespace KEI.Infrastructure
+﻿namespace KEI.Infrastructure
 {
     /// <summary>
-    /// PropertyObject implementation for <see cref="int"/>
+    /// PropertyObject implementation for <see cref="double"/>
     /// </summary>
-    internal class IntPropertyObject : PropertyObject<int>
+    internal class DoublePropertyObject : PropertyObject<double>
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        public DoublePropertyObject(string name, double value)
+        {
+            Name = name;
+            Value = value;
+        }
+
         /// <summary>
         /// Implementation for <see cref="PropertyObject.Editor"/>
         /// </summary>
@@ -15,7 +24,7 @@ namespace KEI.Infrastructure
         /// <summary>
         /// Implementation for <see cref="DataObject.Type"/>
         /// </summary>
-        public override string Type => "int";
+        public override string Type => "double";
 
         /// <summary>
         /// Implementation for <see cref="DataObject.CanConvertFromString(string)"/>
@@ -24,7 +33,7 @@ namespace KEI.Infrastructure
         /// <returns></returns>
         public override bool CanConvertFromString(string value)
         {
-            return int.TryParse(value, out _);
+            return double.TryParse(value, out _);
         }
 
         /// <summary>
@@ -34,7 +43,7 @@ namespace KEI.Infrastructure
         /// <returns></returns>
         public override object ConvertFromString(string value)
         {
-            return int.TryParse(value, out int tmp)
+            return double.TryParse(value, out double tmp)
                 ? tmp
                 : null;
         }
@@ -45,7 +54,7 @@ namespace KEI.Infrastructure
         /// <param name="value"></param>
         protected override void OnStringValueChanged(string value)
         {
-            if(int.TryParse(value, out _value))
+            if(double.TryParse(value, out _value))
             {
                 RaisePropertyChanged(nameof(Value));
             }

@@ -6,18 +6,18 @@ namespace KEI.Infrastructure.Helpers
 {
     public static class EncryptionHelper
     {
-        private static byte[] sm_PassKey = null;
+        private static byte[] _passKey = null;
         private static byte[] PassKey
         {
             get
             {
-                if (sm_PassKey == null)
+                if (_passKey == null)
                 {
                     HashAlgorithm algorithm = new MD5CryptoServiceProvider();
-                    sm_PassKey = algorithm.ComputeHash(Encoding.UTF8.GetBytes("kei_pw_key"));
+                    _passKey = algorithm.ComputeHash(Encoding.UTF8.GetBytes("kei_pw_key"));
                 }
 
-                return sm_PassKey;
+                return _passKey;
             }
         }
 
@@ -26,11 +26,12 @@ namespace KEI.Infrastructure.Helpers
             if (string.IsNullOrEmpty(p_Value))
                 return string.Empty;
 
-            var TDES = new TripleDESCryptoServiceProvider();
-
-            TDES.Key = PassKey;
-            TDES.Mode = CipherMode.ECB;
-            TDES.Padding = PaddingMode.PKCS7;
+            var TDES = new TripleDESCryptoServiceProvider
+            {
+                Key = PassKey,
+                Mode = CipherMode.ECB,
+                Padding = PaddingMode.PKCS7
+            };
 
             byte[] passToEncrypt = Encoding.UTF8.GetBytes(p_Value);
 
@@ -49,15 +50,17 @@ namespace KEI.Infrastructure.Helpers
 
         public static string Decrypt(string p_Value)
         {
-            var TDES = new TripleDESCryptoServiceProvider();
-
-            TDES.Key = PassKey;
-            TDES.Mode = CipherMode.ECB;
-            TDES.Padding = PaddingMode.PKCS7;
+            var TDES = new TripleDESCryptoServiceProvider
+            {
+                Key = PassKey,
+                Mode = CipherMode.ECB,
+                Padding = PaddingMode.PKCS7
+            };
 
             byte[] passToDecrypt = Convert.FromBase64String(p_Value);
 
             byte[] byteRes = null;
+            
             try
             {
                 byteRes = TDES.CreateDecryptor().TransformFinalBlock(passToDecrypt, 0, passToDecrypt.Length);

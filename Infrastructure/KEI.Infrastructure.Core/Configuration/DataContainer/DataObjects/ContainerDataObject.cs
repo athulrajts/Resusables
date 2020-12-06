@@ -108,6 +108,10 @@ namespace KEI.Infrastructure
 
         #region XmlSerialization members
 
+        protected override void InitializeObject()
+        {
+            Value = new DataContainer();
+        }
 
         /// <summary>
         /// Implementation for <see cref="DataObject.ReadXmlElement(string, XmlReader)"/>
@@ -155,7 +159,7 @@ namespace KEI.Infrastructure
             }
             else if (elementName == nameof(TypeInfo))
             {
-                Value.UnderlyingType = reader.ReadObjectXML<TypeInfo>();
+                Value.UnderlyingType = reader.ReadObjectXml<TypeInfo>();
 
                 return true;
             }
@@ -184,7 +188,7 @@ namespace KEI.Infrastructure
 
             if (Value.UnderlyingType is not null)
             {
-                writer.WriteObjectXML(Value.UnderlyingType);
+                writer.WriteObjectXml(Value.UnderlyingType);
             }
 
             foreach (var obj in Value)

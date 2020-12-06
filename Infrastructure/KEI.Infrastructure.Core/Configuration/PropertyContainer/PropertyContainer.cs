@@ -1,15 +1,12 @@
-﻿using KEI.Infrastructure.Helpers;
-using System;
-using System.Collections;
+﻿using System.Linq;
+using System.Xml.Serialization;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Linq;
-using System.Xml.Serialization;
 
 namespace KEI.Infrastructure
 {
     [XmlRoot("DataContainer")]
-    public class PropertyContainer : PropertyContainerBase, INotifyCollectionChanged
+    public class PropertyContainer : PropertyContainerBase
     {
         /// <summary>
         /// Storage structure for all data stored inside this object
@@ -41,7 +38,7 @@ namespace KEI.Infrastructure
         /// <returns></returns>
         public static IPropertyContainer FromFile(string path)
         {
-            if (XmlHelper.Deserialize<PropertyContainer>(path) is PropertyContainer dc)
+            if (XmlHelper.DeserializeFromFile<PropertyContainer>(path) is PropertyContainer dc)
             {
                 dc.FilePath = path;
 
@@ -68,7 +65,7 @@ namespace KEI.Infrastructure
         /// </summary>
         /// <returns></returns>
         public override object Clone()
-            => XmlHelper.DeserializeFromString<PropertyContainer>(XmlHelper.Serialize(this));
+            => XmlHelper.DeserializeFromString<PropertyContainer>(XmlHelper.SerializeToString(this));
 
         /// <summary>
         /// Implementation for <see cref="IDataContainer.Find(string)"/>
@@ -113,14 +110,5 @@ namespace KEI.Infrastructure
 
             RaiseCollectionChanged(NotifyCollectionChangedAction.Remove, removedItem);
         }
-
-        #region INotifyCollectionChanged Members
-
-        public event NotifyCollectionChangedEventHandler CollectionChanged;
-
-        private void RaiseCollectionChanged(NotifyCollectionChangedAction action, object changedItem)
-            => CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(action, changedItem));
-
-        #endregion
     }
 }

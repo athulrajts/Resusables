@@ -1,5 +1,4 @@
-﻿using KEI.Infrastructure.Configuration;
-using Prism.Ioc;
+﻿using Prism.Ioc;
 using System.Collections.Generic;
 using System.IO;
 

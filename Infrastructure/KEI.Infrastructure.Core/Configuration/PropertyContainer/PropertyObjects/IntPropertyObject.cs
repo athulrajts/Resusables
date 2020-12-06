@@ -1,10 +1,21 @@
 ﻿namespace KEI.Infrastructure
 {
     /// <summary>
-    /// PropertyObject implementation for <see cref="char"/>
+    /// PropertyObject implementation for <see cref="int"/>
     /// </summary>
-    internal class CharPropertyObject : PropertyObject<char>
+    internal class IntPropertyObject : PropertyObject<int>
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        public IntPropertyObject(string name, int value)
+        {
+            Name = name;
+            Value = value;
+        }
+
         /// <summary>
         /// Implementation for <see cref="PropertyObject.Editor"/>
         /// </summary>
@@ -13,7 +24,7 @@
         /// <summary>
         /// Implementation for <see cref="DataObject.Type"/>
         /// </summary>
-        public override string Type => "char";
+        public override string Type => "int";
 
         /// <summary>
         /// Implementation for <see cref="DataObject.CanConvertFromString(string)"/>
@@ -22,7 +33,7 @@
         /// <returns></returns>
         public override bool CanConvertFromString(string value)
         {
-            return char.TryParse(value, out _);
+            return int.TryParse(value, out _);
         }
 
         /// <summary>
@@ -32,18 +43,18 @@
         /// <returns></returns>
         public override object ConvertFromString(string value)
         {
-            return char.TryParse(value, out char tmp)
+            return int.TryParse(value, out int tmp)
                 ? tmp
                 : null;
         }
 
         /// <summary>
-        /// Implemenatation for <see cref="DataObject.OnStringValueChanged(string)"/>
+        /// Implementation for <see cref="DataObject.OnStringValueChanged(string)"/>
         /// </summary>
         /// <param name="value"></param>
         protected override void OnStringValueChanged(string value)
         {
-            if (char.TryParse(value, out _value))
+            if(int.TryParse(value, out _value))
             {
                 RaisePropertyChanged(nameof(Value));
             }

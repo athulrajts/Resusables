@@ -6,6 +6,17 @@
     internal class StringPropertyObject : PropertyObject<string>
     {
         /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        public StringPropertyObject(string name, string value)
+        {
+            Name = name;
+            Value = value;
+        }
+
+        /// <summary>
         /// Implementation for <see cref="PropertyObject.Editor"/>
         /// </summary>
         public override EditorType Editor => EditorType.String;
@@ -32,7 +43,7 @@
         protected override void OnStringValueChanged(string value)
         {
             _value = value;
-            RaisePropertyChanged(nameof(value));
+            RaisePropertyChanged(nameof(Value));
         }
     }
 }

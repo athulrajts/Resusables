@@ -67,7 +67,7 @@ namespace KEI.Infrastructure.Database
         private bool NeedToLoadDataTable()
         {
             /// Loading DB for the first time
-            if (_table == null || _table.Columns.Count == 0)
+            if (_table is null || _table.Columns.Count == 0)
             {
                 LoadDataTable();
             }
@@ -166,6 +166,7 @@ namespace KEI.Infrastructure.Database
 
         private IEnumerable<DatabaseColumn> GetResultColumns()
             => _setup.Schema.Where(x => typeof(AggregateDatabaseColumn).IsAssignableFrom(x.GetType()) == false);
+        
         private IEnumerable<AggregateDatabaseColumn> GetAggregateColumns()
             => _setup.Schema.Where(x => x is AggregateDatabaseColumn && x.GetType() != typeof(PassFailDatabaseColumn))
                .Cast<AggregateDatabaseColumn>();

@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq.Expressions;
 using KEI.Infrastructure.Types;
 
 namespace KEI.Infrastructure
 {
-    public interface IDataContainer : INotifyPropertyChanged
+    public interface IDataContainer : INotifyPropertyChanged, INotifyCollectionChanged
     {
-        public string FilePath { get; set; }
+        public string FilePath { get; }
         public string Name { get; set; }
         public TypeInfo UnderlyingType { get; set; }
         public int Count { get; }
@@ -32,7 +33,7 @@ namespace KEI.Infrastructure
         public bool Merge(IDataContainer data);
         public void Add(DataObject obj);
         public void Remove(DataObject obj);
-        
+
         public bool RemoveBinding<T>(string propertyKey, Expression<Func<T>> expression);
         public bool SetBinding<T>(string propertyKey, Expression<Func<T>> expression, BindingMode mode = BindingMode.TwoWay);
         public bool SetBinding<T>(Expression<Func<T>> expression, BindingMode mode = BindingMode.TwoWay);

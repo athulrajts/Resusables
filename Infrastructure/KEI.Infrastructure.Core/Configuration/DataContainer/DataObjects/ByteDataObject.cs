@@ -8,6 +8,17 @@ namespace KEI.Infrastructure
     internal class ByteDataObject : DataObject<byte>, IWriteToBinaryStream
     {
         /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        public ByteDataObject(string name, byte value)
+        {
+            Name = name;
+            Value = value;
+        }
+
+        /// <summary>
         /// Implementation for <see cref="DataObject.Type"/>
         /// </summary>
         public override string Type => "byte";

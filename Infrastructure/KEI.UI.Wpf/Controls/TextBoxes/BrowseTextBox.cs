@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -64,25 +66,14 @@ namespace KEI.UI.Wpf.Controls
 
 
 
-        public string Filter
+        public FilterCollection Filters
         {
-            get { return (string)GetValue(FilterProperty); }
-            set { SetValue(FilterProperty, value); }
+            get { return (FilterCollection)GetValue(FiltersProperty); }
+            set { SetValue(FiltersProperty, value); }
         }
 
-        public static readonly DependencyProperty FilterProperty =
-            DependencyProperty.Register("Filter", typeof(string), typeof(BrowseTextBox), new PropertyMetadata(""));
-
-
-
-        public string FilterDescription
-        {
-            get { return (string)GetValue(FilterDescriptionProperty); }
-            set { SetValue(FilterDescriptionProperty, value); }
-        }
-
-        public static readonly DependencyProperty FilterDescriptionProperty =
-            DependencyProperty.Register("FilterDescription", typeof(string), typeof(BrowseTextBox), new PropertyMetadata(""));
+        public static readonly DependencyProperty FiltersProperty =
+            DependencyProperty.Register("Filters", typeof(FilterCollection), typeof(BrowseTextBox), new PropertyMetadata(new FilterCollection()));
 
 
 
@@ -127,14 +118,28 @@ namespace KEI.UI.Wpf.Controls
                 EnsureValidNames = true,
                 Multiselect = false,
                 ShowPlacesList = true,
-                IsFolderPicker = Type == BrowseType.Folder ? true : false,
+                IsFolderPicker = Type == BrowseType.Folder,
                 DefaultDirectory = AppDomain.CurrentDomain.BaseDirectory,
                 InitialDirectory = AppDomain.CurrentDomain.BaseDirectory
             };
 
-            if (!string.IsNullOrEmpty(FilterDescription) && !string.IsNullOrEmpty(Filter) && Type == BrowseType.File)
+            if(string.IsNullOrEmpty(Text) == false)
             {
-                dlg.Filters.Add(new CommonFileDialogFilter(FilterDescription, Filter));
+                try
+                {
+                    dlg.DefaultDirectory = Path.GetDirectoryName(Path.GetFullPath(Text));
+                    dlg.InitialDirectory = Path.GetDirectoryName(Path.GetFullPath(Text));
+                }
+                catch { }
+            }
+
+
+            if (Type == BrowseType.File)
+            {
+                foreach (var filter in Filters)
+                {
+                    dlg.Filters.Add(new CommonFileDialogFilter(filter.Description, filter.Extenstion));
+                }
             }
 
             if (dlg.ShowDialog() == CommonFileDialogResult.Ok)
@@ -149,4 +154,7 @@ namespace KEI.UI.Wpf.Controls
         File,
         Folder
     }
+
+    public record Filter(string Description, string Extenstion);
+    public class FilterCollection : List<Filter> { }
 }

@@ -5,7 +5,7 @@ namespace KEI.Infrastructure.Localizer
     public class LocalizationManager
     {
         private static LocalizationManager localizationManager;
-        public static LocalizationManager Instance => localizationManager ?? (localizationManager = new LocalizationManager());
+        public static LocalizationManager Instance => localizationManager ??= new LocalizationManager();
 
         private readonly Dictionary<string, IStringLocalizer> _localizers = new Dictionary<string, IStringLocalizer>();
         public IStringLocalizer this[string assemblyName] => _localizers.ContainsKey(assemblyName) ? _localizers[assemblyName] : null;

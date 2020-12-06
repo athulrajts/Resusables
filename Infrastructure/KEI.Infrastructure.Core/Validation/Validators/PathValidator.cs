@@ -24,24 +24,21 @@ namespace KEI.Infrastructure.Validation
 
             if (string.IsNullOrEmpty(str))
             {
-                CurrentResult = new ValidationResult(false, "Path cannot be empty");
-                return CurrentResult;
+                return ValidationFailed("Path cannot be empty");
             }
 
             if (Mode == PathValidationMode.File)
             {
-                if (!File.Exists(str))
+                if (File.Exists(str) == false)
                 {
-                    CurrentResult = new ValidationResult(false, $"Path \"{str}\" does not exisit");
-                    return CurrentResult;
+                    return ValidationFailed($"File \"{str}\" does not exisit");
                 }
             }
             else
             {
-                if (!Directory.Exists(str))
+                if (Directory.Exists(str) == false)
                 {
-                    CurrentResult = new ValidationResult(false, $"Path \"{str}\" does not exisit");
-                    return CurrentResult;
+                    return ValidationFailed($"Directory \"{str}\" does not exisit");
                 }
             }
 

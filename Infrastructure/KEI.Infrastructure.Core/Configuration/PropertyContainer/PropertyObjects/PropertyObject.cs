@@ -24,6 +24,16 @@ namespace KEI.Infrastructure
         public string Description { get; set; }
 
         /// <summary>
+        /// Category of Data when displayed in a property grid
+        /// </summary>
+        public string Category { get; set; }
+
+        /// <summary>
+        /// Name shown in property grid
+        /// </summary>
+        public string DisplayName { get; set; }
+
+        /// <summary>
         /// Property to indicate whether this Object stores
         /// a Valid object of <see cref="Type"/>
         /// </summary>
@@ -78,6 +88,18 @@ namespace KEI.Infrastructure
                 writer.WriteAttributeString(BROWSE_ATTRIBUTE, BrowseOption.ToString());
             }
 
+            // Write DisplayName if have we have one
+            if(string.IsNullOrEmpty(DisplayName) == false)
+            {
+                writer.WriteElementString(nameof(DisplayName), DisplayName);
+            }
+
+            // Write Category if we have one
+            if(string.IsNullOrEmpty(Category) == false)
+            {
+                writer.WriteElementString(nameof(Category), Category);
+            }
+
             // Write description if we have one
             if(string.IsNullOrEmpty(Description) == false)
             {
@@ -87,7 +109,7 @@ namespace KEI.Infrastructure
             // Write validation if we have one
             if(Validation is not null)
             {
-                writer.WriteObjectXML(Validation);
+                writer.WriteObjectXml(Validation);
             }
 
         }
@@ -127,11 +149,24 @@ namespace KEI.Infrastructure
 
                 return true;
             }
+            // Read display name
+            else if (elementName == nameof(DisplayName))
+            {
+                DisplayName = reader.ReadElementContentAsString();
 
+                return true;
+            }
+            // Read category
+            else if (elementName == nameof(Category))
+            {
+                Category = reader.ReadElementContentAsString();
+
+                return true;
+            }
             // Read Validations
             else if (elementName == "Validations")
             {
-                Validation = reader.ReadObjectXML<ValidatorGroup>();
+                Validation = reader.ReadObjectXml<ValidatorGroup>();
 
                 return true;
             }
@@ -161,6 +196,27 @@ namespace KEI.Infrastructure
             return this;
         }
 
+        /// <summary>
+        /// Helper function to set DisplayName in <see cref="PropertyContainerBuilder"/>
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public PropertyObject SetDisplayName(string name)
+        {
+            DisplayName = name;
+            return this;
+        }
+
+        /// <summary>
+        /// Helper function to set Category in <see cref="PropertyContainerBuilder"/>
+        /// </summary>
+        /// <param name="category"></param>
+        /// <returns></returns>
+        public PropertyObject SetCategory(string category)
+        {
+            Category = category;
+            return this;
+        }
     }
 
     /// <summary>
@@ -180,6 +236,11 @@ namespace KEI.Infrastructure
             {
                 if (EqualityComparer<T>.Default.Equals(_value, value) == true)
                 {
+                    if(stringValue != _value?.ToString())
+                    {
+                        stringValue = _value?.ToString();
+                    }
+
                     return;
                 }
 

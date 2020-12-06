@@ -5,6 +5,7 @@ using System.Xml.Schema;
 using System.Xml.Serialization;
 using System.Collections.Generic;
 using Prism.Mvvm;
+using System.Collections;
 
 namespace KEI.Infrastructure
 {
@@ -115,6 +116,8 @@ namespace KEI.Infrastructure
         /// <param name="reader">XmlReader to read</param>
         public virtual void ReadXml(XmlReader reader)
         {
+            InitializeObject();
+
             // Read all the attributes.
             ReadXmlAttrubutes(reader);
 
@@ -190,7 +193,12 @@ namespace KEI.Infrastructure
         {
             /// value held by this object is an <see cref="IDataContainer"/>
             /// starting tag is "DataContainer", otherwise starting tag is <see cref="START_ELEMENT"/> ("Data")
-            string elementName = (GetValue() is IDataContainer) ? "DataContainer" : START_ELEMENT;
+            string elementName = GetValue() switch
+            {
+                IDataContainer => "DataContainer",
+                IList => "DataContainerList",
+                _ => START_ELEMENT
+            };
 
             // write start tag
             writer.WriteStartElement(elementName);
@@ -223,6 +231,8 @@ namespace KEI.Infrastructure
         /// </summary>
         /// <param name="value"></param>
         protected virtual void OnStringValueChanged(string value) { }
+
+        protected virtual void InitializeObject() { }
     }
 
     /// <summary>
@@ -248,12 +258,26 @@ namespace KEI.Infrastructure
                 _value = value;
 
                 // update string value whenever our value changes
-                stringValue = _value?.ToString();
+                stringValue = ConvertToString(_value);
 
                 RaisePropertyChanged(nameof(Value));
                 RaisePropertyChanged(nameof(StringValue));
             }
         }
+
+        /// <summary>
+        /// Convert value held to string
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value"></param>
+        /// <returns></returns>
+#pragma warning disable CS0693 // Type parameter has the same name as the type parameter from outer type
+        public virtual string ConvertToString<T>(T value)
+        {
+            return value?.ToString();
+        }
+#pragma warning restore CS0693 // Type parameter has the same name as the type parameter from outer type
+
 
         /// <summary>
         /// Gets value held by object

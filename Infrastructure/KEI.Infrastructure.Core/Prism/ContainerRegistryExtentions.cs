@@ -31,16 +31,20 @@ namespace KEI.Infrastructure.Prism
         {
             foreach (var service in services)
             {
-                if (service.ServiceType == null || service.ImplementationType == null)
+                if (service.ServiceType is null || service.ImplementationType is null)
+                {
                     continue;
+                }
 
                 registry.RegisterSingleton(service.ServiceType.GetUnderlyingType(), service.ImplementationType.GetUnderlyingType());
             }
 
             foreach (var service in services)
             {
-                if (service.ServiceType == null || service.ImplementationType == null)
+                if (service.ServiceType is null || service.ImplementationType is null)
+                {
                     continue;
+                }
 
                 ServiceManager.RegisterService(service.ServiceType.GetUnderlyingType());
             }

@@ -114,8 +114,8 @@ namespace KEI.Infrastructure.Core.Tests
             IDataContainer data = DataContainerBuilder.CreateObject("Untitiled", obj);
             IPropertyContainer property = PropertyContainerBuilder.CreateObject("Untitled", obj);
 
-            var serializedData = XmlHelper.Serialize(data);
-            var serializedProperty = XmlHelper.Serialize(property);
+            var serializedData = XmlHelper.SerializeToString(data);
+            var serializedProperty = XmlHelper.SerializeToString(property);
 
             var recreatedData = XmlHelper.DeserializeFromString<DataContainer>(serializedData);
             var recreatedProperty = XmlHelper.DeserializeFromString<PropertyContainer>(serializedProperty);

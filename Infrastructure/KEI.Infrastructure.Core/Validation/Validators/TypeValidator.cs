@@ -14,6 +14,7 @@ namespace KEI.Infrastructure.Validation
             get => string.IsNullOrEmpty(TypeString) ? null : Type.GetType(TypeString);
             set => TypeString = value?.AssemblyQualifiedName;
         }
+
         public override ValidationResult Validate(object value)
         {
             if(Type == null)
@@ -21,8 +22,10 @@ namespace KEI.Infrastructure.Validation
 
             TypeConverter converter = TypeDescriptor.GetConverter(Type);
 
-            if (!converter.IsValid(value?.ToString()))
+            if (converter.IsValid(value?.ToString()) == false)
+            {
                 return ValidationFailed($"{value} is not convertable to {Type.FullName}");
+            }
 
             return ValidationSucces();
         }

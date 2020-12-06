@@ -8,6 +8,17 @@ namespace KEI.Infrastructure
     internal class FloatDataObject : DataObject<float>, IWriteToBinaryStream
     {
         /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        public FloatDataObject(string name, float value)
+        {
+            Name = name;
+            Value = value;
+        }
+
+        /// <summary>
         /// Implementation for <see cref="DataObject.Type"/>
         /// </summary>
         public override string Type => "float";

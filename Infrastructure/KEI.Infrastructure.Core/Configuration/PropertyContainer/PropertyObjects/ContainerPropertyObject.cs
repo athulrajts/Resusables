@@ -60,6 +60,11 @@ namespace KEI.Infrastructure
         /// </summary>
         public override EditorType Editor => EditorType.Object;
 
+        protected override void InitializeObject()
+        {
+            Value = new PropertyContainer();
+        }
+
         /// <summary>
         /// Implementation for <see cref="DataObject.ReadXmlElement(string, XmlReader)"/>
         /// </summary>
@@ -68,6 +73,11 @@ namespace KEI.Infrastructure
         /// <returns></returns>
         protected override bool ReadXmlElement(string elementName, XmlReader reader)
         {
+            if(base.ReadXmlElement(elementName, reader))
+            {
+                return true;
+            }
+
             // Read inner property
             if(elementName == START_ELEMENT)
             {
@@ -113,7 +123,7 @@ namespace KEI.Infrastructure
             // Read TypInfo if exists
             else if(elementName == nameof(TypeInfo))
             {
-                Value.UnderlyingType = reader.ReadObjectXML<TypeInfo>();
+                Value.UnderlyingType = reader.ReadObjectXml<TypeInfo>();
 
                 return true;
             }
@@ -145,10 +155,22 @@ namespace KEI.Infrastructure
                 writer.WriteElementString(nameof(Description), Description);
             }
 
+            // Write category
+            if(string.IsNullOrEmpty(Category) == false)
+            {
+                writer.WriteElementString(nameof(Category), Category);
+            }
+
+            // Write display Name
+            if(string.IsNullOrEmpty(DisplayName) == false)
+            {
+                writer.WriteElementString(nameof(DisplayName), DisplayName);
+            }
+
             // Write type if this based on an object
             if (Value.UnderlyingType is not null)
             {
-                writer.WriteObjectXML(Value.UnderlyingType);
+                writer.WriteObjectXml(Value.UnderlyingType);
             }
 
             // Write inner properties

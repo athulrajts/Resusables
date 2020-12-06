@@ -1,10 +1,21 @@
 ﻿namespace KEI.Infrastructure
 {
     /// <summary>
-    /// PropertyObject Implementation for <see cref="byte"/>
+    /// PropertyObject implementation for <see cref="float"/>
     /// </summary>
-    internal class BytePropertyObject : PropertyObject<byte>
+    internal class FloatPropertyObject : PropertyObject<float>
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        public FloatPropertyObject(string name, float value)
+        {
+            Name = name;
+            Value = value;
+        }
+
         /// <summary>
         /// Implementation for <see cref="PropertyObject.Editor"/>
         /// </summary>
@@ -13,7 +24,7 @@
         /// <summary>
         /// Implementation for <see cref="DataObject.Type"/>
         /// </summary>
-        public override string Type => "byte";
+        public override string Type => "float";
 
         /// <summary>
         /// Implementation for <see cref="DataObject.CanConvertFromString(string)"/>
@@ -22,7 +33,7 @@
         /// <returns></returns>
         public override bool CanConvertFromString(string value)
         {
-            return byte.TryParse(value, out _);
+            return float.TryParse(value, out _);
         }
 
         /// <summary>
@@ -32,7 +43,7 @@
         /// <returns></returns>
         public override object ConvertFromString(string value)
         {
-            return byte.TryParse(value, out byte tmp)
+            return float.TryParse(value, out float tmp)
                 ? tmp
                 : null;
         }
@@ -43,7 +54,7 @@
         /// <param name="value"></param>
         protected override void OnStringValueChanged(string value)
         {
-            if(byte.TryParse(value, out _value))
+            if(float.TryParse(value, out _value))
             {
                 RaisePropertyChanged(nameof(Value));
             }

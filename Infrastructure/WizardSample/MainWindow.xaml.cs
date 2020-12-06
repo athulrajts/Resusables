@@ -58,8 +58,8 @@ namespace WizardSample
 
             //dc.Add(new ContainerDataObject("dc", dcInner));
 
-            var s = XmlHelper.Serialize(pc);
-            var s2 = XmlHelper.Serialize(dc);
+            var s = XmlHelper.SerializeToString(pc);
+            var s2 = XmlHelper.SerializeToString(dc);
 
             var pcout = XmlHelper.DeserializeFromString<PropertyContainer>(s);
 

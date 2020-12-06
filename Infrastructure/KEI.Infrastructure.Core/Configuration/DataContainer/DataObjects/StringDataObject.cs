@@ -9,6 +9,17 @@ namespace KEI.Infrastructure
     internal class StringDataObject : DataObject<string>, IWriteToBinaryStream
     {
         /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        public StringDataObject(string name, string value)
+        {
+            Name = name;
+            Value = value;
+        }
+
+        /// <summary>
         /// Implementation for <see cref="DataObject.Type"/>
         /// </summary>
         public override string Type => "string";

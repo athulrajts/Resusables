@@ -11,6 +11,18 @@ namespace KEI.Infrastructure
     internal class EnumDataObject : DataObject<Enum>, IWriteToBinaryStream
     {
         /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        public EnumDataObject(string name, Enum value)
+        {
+            Name = name;
+            Value = value;
+            EnumType = value?.GetType();
+        }
+
+        /// <summary>
         /// Implementation for <see cref="DataObject.Type"/>
         /// </summary>
         public override string Type => "enum";
@@ -28,16 +40,19 @@ namespace KEI.Infrastructure
         /// <returns></returns>
         protected override bool ReadXmlElement(string elementName, XmlReader reader)
         {
-            bool read = false;
+            if (base.ReadXmlElement(elementName, reader) == true)
+            {
+                return true;
+            }
 
             if (elementName == nameof(TypeInfo))
             {
-                EnumType = reader.ReadObjectXML<TypeInfo>();
+                EnumType = reader.ReadObjectXml<TypeInfo>();
 
-                read = true;
+                return true;
             }
 
-            return read;
+            return false;
         }
 
         /// <summary>
@@ -56,7 +71,7 @@ namespace KEI.Infrastructure
         {
             base.WriteXmlInternal(writer);
 
-            writer.WriteObjectXML(new TypeInfo(EnumType));
+            writer.WriteObjectXml(new TypeInfo(EnumType));
         }
 
         /// <summary>

@@ -18,39 +18,38 @@ namespace KEI.Infrastructure.Database.Models
 
         public override bool IsValid(string value)
         {
-            var retValue = true;
-
             if (HasPassFailCriteria == false)
+            {
                 return true;
+            }
 
             if (value is null || string.IsNullOrEmpty(value))
-                return true;
+            {
+                return false;
+            }
 
             double doubleValue = double.Parse(value);
 
-            switch (LowerPassFailCriteria)
+
+            bool retValue = LowerPassFailCriteria switch
             {
-                case Ineqaulity.GreaterThan:
-                    retValue = doubleValue > LowerPassFailValue;
-                    break;
-                case Ineqaulity.GreaterThanOrEqualTo:
-                    retValue = doubleValue >= LowerPassFailValue;
-                    break;
-            }
+                Ineqaulity.GreaterThan => doubleValue > LowerPassFailValue,
+                Ineqaulity.GreaterThanOrEqualTo => doubleValue >= LowerPassFailValue,
+                _ => true
+            };
 
             if (retValue == false)
-                return false;
-
-
-            switch (UpperPassFailCriteria)
             {
-                case Ineqaulity.LessThan:
-                    retValue = doubleValue < UpperPassFailValue;
-                    break;
-                case Ineqaulity.LessThanOrEqualTo:
-                    retValue = doubleValue <= UpperPassFailValue;
-                    break;
+                return false;
             }
+
+
+            retValue = UpperPassFailCriteria switch
+            {
+                Ineqaulity.LessThan => doubleValue < UpperPassFailValue,
+                Ineqaulity.LessThanOrEqualTo => doubleValue <= UpperPassFailValue,
+                _ => true
+            };
 
             return retValue;
         }

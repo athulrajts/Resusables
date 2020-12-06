@@ -36,7 +36,6 @@
     <Compile Remove="Configuration\PropertyContainer\PropertyContainer2.cs" />
     <Compile Remove="Server\CommandServerBkp.cs" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="Prism.Core" Version="8.0.0.1909" />
   </ItemGroup>

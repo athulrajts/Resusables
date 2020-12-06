@@ -9,6 +9,13 @@ namespace KEI.Infrastructure
     /// </summary>
     internal class EnumPropertyObject : PropertyObject<Enum>
     {
+        public EnumPropertyObject(string name, Enum value)
+        {
+            Name = name;
+            Value = value;
+            EnumType = value?.GetType();
+        }
+
         /// <summary>
         /// Type of enum held by this object
         /// </summary>
@@ -59,9 +66,14 @@ namespace KEI.Infrastructure
         /// <returns></returns>
         protected override bool ReadXmlElement(string elementName, XmlReader reader)
         {
+            if(base.ReadXmlElement(elementName, reader) == true)
+            {
+                return true;
+            }
+
             if(elementName == nameof(TypeInfo))
             {
-                EnumType = reader.ReadObjectXML<TypeInfo>();
+                EnumType = reader.ReadObjectXml<TypeInfo>();
 
                 return true;
             }
@@ -85,7 +97,7 @@ namespace KEI.Infrastructure
         {
             base.WriteXmlInternal(writer);
 
-            writer.WriteObjectXML(new TypeInfo(EnumType));
+            writer.WriteObjectXml(new TypeInfo(EnumType));
         }
 
         /// <summary>

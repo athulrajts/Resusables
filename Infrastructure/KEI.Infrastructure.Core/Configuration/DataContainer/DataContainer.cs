@@ -8,7 +8,7 @@ namespace KEI.Infrastructure
     /// <summary>
     /// Concrete implementation for <see cref="IDataContainer"/>
     /// </summary>
-    public class DataContainer : DataContainerBase, INotifyCollectionChanged
+    public class DataContainer : DataContainerBase
     {
         /// <summary>
         /// Storage structure for all data stored inside this object
@@ -130,7 +130,7 @@ namespace KEI.Infrastructure
         /// <returns><see cref="DataDictionary"/> deserilized from path</returns>
         public static DataContainer FromFile(string path)
         {
-            if (XmlHelper.Deserialize<DataContainer>(path) is DataContainer dc)
+            if (XmlHelper.DeserializeFromFile<DataContainer>(path) is DataContainer dc)
             {
                 dc.FilePath = path;
                 return dc;
@@ -138,14 +138,5 @@ namespace KEI.Infrastructure
 
             return null;
         }
-
-        #region INotifyCollectionChanged Members
-
-        public event NotifyCollectionChangedEventHandler CollectionChanged;
-
-        private void RaiseCollectionChanged(NotifyCollectionChangedAction action, object changedItem)
-            => CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(action, changedItem));
-
-        #endregion
     }
 }

@@ -26,6 +26,10 @@
         Bool,
 
         /// <summary>
+        /// For colors
+        /// </summary>
+        Color,
+        /// <summary>
         /// Encapsulates a string type, Property Editors should show a File Browser as Editor
         /// </summary>
         File,
@@ -39,6 +43,11 @@
         /// For types which are composed of one or more of the above types
         /// </summary>
         Object,
+
+        /// <summary>
+        /// User defined editor
+        /// </summary>
+        Custom,
     }
 
     /// <summary>

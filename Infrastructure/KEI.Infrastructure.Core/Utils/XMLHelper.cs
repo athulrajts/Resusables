@@ -15,20 +15,24 @@ namespace KEI.Infrastructure
         /// <param name="data">object to serialize</param>
         /// <param name="filePath">file path to serialize to</param>
         /// <returns>Is success</returns>
-        public static bool Serialize(object data, string filePath)
+        public static bool SerializeToFile<T>(T data, string filePath)
         {
             try
             {
+                if(string.IsNullOrEmpty(filePath))
+                {
+                    throw new Exception("Invalid path");
+                }
+
                 var dir = Path.GetDirectoryName(filePath);
-                if (string.IsNullOrEmpty(dir) == false && Directory.Exists(dir) == false)
+                if (Directory.Exists(dir) == false)
                 {
                     Directory.CreateDirectory(dir);
                 }
 
                 using FileStream fileStream = new FileStream(filePath, FileMode.Create);
-                XmlSerializer serializer = new XmlSerializer(data.GetType());
-                serializer.Serialize(fileStream, data);
-                fileStream.Close();
+                XmlSerializer serializer = new XmlSerializer(typeof(T));
+                serializer.Serialize(fileStream, data, new XmlSerializerNamespaces(new[] { XmlQualifiedName.Empty }));
                 return true;
             }
             catch (Exception ex)
@@ -44,7 +48,7 @@ namespace KEI.Infrastructure
         /// <typeparam name="T">Type of of object</typeparam>
         /// <param name="data">Data to serialize</param>
         /// <returns>XML string</returns>
-        public static string Serialize<T>(T data)
+        public static string SerializeToString<T>(T data)
         {
             try
             {
@@ -76,64 +80,35 @@ namespace KEI.Infrastructure
         /// <typeparam name="T">Type of Object</typeparam>
         /// <param name="filePath">file to deserialize from</param>
         /// <returns>.NET Object</returns>
-        public static T Deserialize<T>(string filePath)
+        public static T DeserializeFromFile<T>(string filePath)
         {
-            if (File.Exists(filePath))
-            {
-
-                try
-                {
-                    using var fileStream = new FileStream(filePath, FileMode.Open);
-                    XmlSerializer serializer = new XmlSerializer(typeof(T));
-                    object data = serializer.Deserialize(fileStream);
-                    fileStream.Close();
-                    if (data != null && data is T t)
-                    {
-                        return t;
-                    }
-                    return default;
-                }
-                catch (Exception ex)
-                {
-                    Logger.Error($"Unable to deserialize \"{filePath}\" to {typeof(T).FullName}", ex);
-                    return default;
-                }
-            }
-            return default;
+            return (T)DeserializeFromFile(filePath, typeof(T));
         }
 
-        public static object Deserialize(string filePath, Type type)
+        public static object DeserializeFromFile(string filePath, Type type)
         {
-            if (File.Exists(filePath))
+            if(File.Exists(filePath) == false)
             {
-
-                try
-                {
-                    using var fileStream = new FileStream(filePath, FileMode.Open);
-                    XmlSerializer serializer = new XmlSerializer(type);
-                    object data = serializer.Deserialize(fileStream);
-                    fileStream.Close();
-                    if (data != null && data is { } o)
-                    {
-                        return o;
-                    }
-                    return default;
-                }
-                catch (Exception ex)
-                {
-                    Logger.Error($"Unable to deserialize \"{filePath}\" to {type.FullName}", ex);
-                    return default;
-                }
+                return default;
             }
-            return default;
+            try
+            {
+                using var fileStream = new FileStream(filePath, FileMode.Open);
+                XmlSerializer serializer = new XmlSerializer(type);
+                object data = serializer.Deserialize(fileStream);
+                return data;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Unable to deserialize \"{filePath}\" to {type.FullName}", ex);
+                return default;
+            }
         }
 
 
         public static T DeserializeFromString<T>(string xml)
         {
-            var serializer = new XmlSerializer(typeof(T));
-            using var reader = new StringReader(xml);
-            return (T)serializer.Deserialize(reader);
+            return (T)DeserializeFromString(typeof(T), xml);
         }
 
         public static object DeserializeFromString(Type type, string xml)
@@ -144,19 +119,18 @@ namespace KEI.Infrastructure
         }
 
 
-        public static T ReadObjectXML<T>(this XmlReader reader, bool inplace = true)
+        public static T ReadObjectXml<T>(this XmlReader reader, bool inplace = true)
         {
-            var s = new XmlSerializer(typeof(T));
-            return (T)s.Deserialize(inplace ? reader : reader.ReadSubtree());
+            return (T)ReadObjectXml(reader, typeof(T), inplace);
         }
 
-        public static object ReadObjectXML(this XmlReader reader, Type type, bool inplace = true)
+        public static object ReadObjectXml(this XmlReader reader, Type type, bool inplace = true)
         {
             var s = new XmlSerializer(type);
             return s.Deserialize(inplace ? reader : reader.ReadSubtree());
         }
 
-        public static void WriteObjectXML<T>(this XmlWriter writer, T obj)
+        public static void WriteObjectXml<T>(this XmlWriter writer, T obj)
         {
             var s = new XmlSerializer(obj.GetType());
             s.Serialize(writer, obj, new XmlSerializerNamespaces(new[] { XmlQualifiedName.Empty }));

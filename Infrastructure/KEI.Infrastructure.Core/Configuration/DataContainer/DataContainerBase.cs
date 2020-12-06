@@ -2,22 +2,25 @@
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Dynamic;
 using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
-using Prism.Mvvm;
+using System.Runtime.CompilerServices;
 using KEI.Infrastructure.Logging;
+using System.Collections.ObjectModel;
 
 namespace KEI.Infrastructure
 {
     /// <summary>
     /// Base class for <see cref="DataContainer"/> and <see cref="PropertyContainer"/>
     /// </summary>
-    public abstract class DataContainerBase : BindableBase, IDataContainer, IXmlSerializable, IEnumerable
+    public abstract class DataContainerBase : DynamicObject, IDataContainer, ICustomTypeDescriptor, IXmlSerializable, IEnumerable
     {
         #region Properties
 
@@ -26,12 +29,10 @@ namespace KEI.Infrastructure
         /// </summary>
         public string Name { get; set; }
 
-
         /// <summary>
         /// The path from which this object was deserialised from
         /// </summary>
-        public string FilePath { get; set; }
-
+        public string FilePath { get; internal set; }
 
         /// <summary>
         /// Represents Type that this instance can be cast into
@@ -46,6 +47,7 @@ namespace KEI.Infrastructure
 
         #endregion
 
+        #region Manipulation
 
         /// <summary>
         /// Gets Data Value from a DataContainer object
@@ -93,6 +95,30 @@ namespace KEI.Infrastructure
         }
 
         /// <summary>
+        /// Merge two DataContainers
+        /// </summary>
+        /// <param name="right"></param>
+        /// <returns></returns>
+        public bool Merge(IDataContainer right)
+        {
+            List<Action> actions = new List<Action>();
+
+            AddNewItems(this, right, ref actions);
+
+            RemoveOldItems(this, right, ref actions);
+
+            // Store updated config if changes were made.
+            if (actions.Any())
+            {
+                actions.ForEach(action => action());
+
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Serializes DataContainer object to an XML file to the given path
         /// </summary>
         /// <param name="path">file path to store the config</param>
@@ -101,7 +127,7 @@ namespace KEI.Infrastructure
         {
             FilePath = path;
 
-            if (XmlHelper.Serialize(this, path) == false)
+            if (XmlHelper.SerializeToFile(this, path) == false)
             {
                 ViewService.Warn($"Unable to Write config \"{Name}\" ");
                 return false;
@@ -123,6 +149,38 @@ namespace KEI.Infrastructure
         /// <returns>Is Found</returns>
         public virtual bool ContainsData(string key) => Find(key) is DataObject;
 
+        /// <summary>
+        /// Gets <see cref="PropertyObject"/> with given name
+        /// </summary>
+        /// <param name="key">name of <see cref="PropertyObject"/></param>
+        /// <returns>reference of <see cref="PropertyObject"/></returns>
+        public DataObject FindRecursive(string key)
+        {
+            var split = key.Split('.');
+
+            if (split.Length == 1)
+            {
+                return Find(key);
+            }
+            else
+            {
+                object temp = null;
+                GetValue(split.First(), ref temp);
+
+                if (temp is IDataContainer dc)
+                {
+                    return dc.Find(string.Join(".", split.Skip(1)));
+                }
+                else
+                {
+                    throw new Exception("Nested configs should be of type IDataContainer");
+                }
+            }
+        }
+
+        #endregion
+
+        #region Morphing
 
         /// <summary>
         /// Maps this contents of this objects to a class objected
@@ -146,7 +204,7 @@ namespace KEI.Infrastructure
                 {
                     var data = Find(prop.Name);
 
-                    if(data is null)
+                    if (data is null)
                     {
                         continue;
                     }
@@ -157,24 +215,23 @@ namespace KEI.Infrastructure
                         {
                             continue;
                         }
-
-                        if (typeof(IList).IsAssignableFrom(prop.PropertyType))
+                        
+                        prop.SetValue(result, dc.Morph());
+                    }
+                    else if(data.Type == "dcl" && data.GetValue() is ObservableCollection<IDataContainer> oc)
+                    {
+                        var listType = data.GetType().GetProperty("CollectionType").GetValue(data) as Type;
+                        
+                        if (listType is not null)
                         {
-                            var list = (IList)Activator.CreateInstance(dc.UnderlyingType);
+                            var list = (IList)Activator.CreateInstance(listType);
 
-                            foreach (var listItem in dc)
+                            foreach (var item in oc)
                             {
-                                if (listItem.GetValue() is IDataContainer li)
-                                {
-                                    list.Add(li.Morph());
-                                }
+                                list.Add(item.Morph());
                             }
 
                             prop.SetValue(result, list);
-                        }
-                        else
-                        {
-                            prop.SetValue(result, dc.Morph());
                         }
                     }
                     else if (data is not null)
@@ -233,171 +290,22 @@ namespace KEI.Infrastructure
         /// <returns></returns>
         public T Morph<T>() => (T)Morph();
 
-        /// <summary>
-        /// Allows <see cref="IDataContainer"/> to be used in foreach loop
-        /// </summary>
-        /// <returns></returns>
-        public abstract IEnumerator<DataObject> GetEnumerator();
-
-
-        /// <summary>
-        /// Get all keys in this object
-        /// Is not recursives, will not provide keys for child <see cref="IDataContainer"/>
-        /// </summary>
-        /// <returns></returns>
-        public abstract IEnumerable<string> GetKeys();
-
-        #region Bubble Up Property Changed Notifications from Children
-
-        /// <summary>
-        /// Attaches PropertyChanged listeners to newly added Properties
-        /// Removes PropertyChanged listeners from removed Properties
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        protected void Data_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
-            {
-                foreach (var item in e.NewItems.Cast<DataObject>())
-                {
-                    item.PropertyChanged += OnPropertyChangedRaised;
-
-                    if (item.GetValue() is IDataContainer dc)
-                    {
-                        dc.PropertyChanged += OnPropertyChangedRaised;
-                    }
-                }
-            }
-            else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
-            {
-                foreach (var item in e.OldItems.Cast<DataObject>())
-                {
-                    item.PropertyChanged -= OnPropertyChangedRaised;
-
-                    if (item.GetValue() is IDataContainer dc)
-                    {
-                        dc.PropertyChanged -= OnPropertyChangedRaised;
-                    }
-                }
-            }
-        }
-
-        private void OnPropertyChangedRaised(object sender, PropertyChangedEventArgs e)
-        {
-            string propName = e.PropertyName;
-
-            /// If sender is one of our children, pass the event on up the tree.
-            if (sender is DataObject o && e.PropertyName == "Value")
-            {
-                RaisePropertyChanged(o.Name);
-            }
-
-            /// If one of our childrens value is <see cref="IDataContainer"/>
-            /// We need to handle propertychanged for our grandchildren also
-            else if (sender is IDataContainer dc)
-            {
-                var split = propName.Split('.');
-
-                if (split.FirstOrDefault() == dc.Name)
-                {
-                    RaisePropertyChanged(propName);
-                }
-                else
-                {
-                    //Create full name, $(parent).$(child)
-                    RaisePropertyChanged($"{dc.Name}.{propName}");
-                }
-
-            }
-        }
-
         #endregion
 
-        /// <summary>
-        /// Merge two DataContainers
-        /// </summary>
-        /// <param name="right"></param>
-        /// <returns></returns>
-        public bool Merge(IDataContainer right)
-        {
-            List<Action> actions = new List<Action>();
-
-            AddNewItems(this, right, ref actions);
-
-            RemoveOldItems(this, right, ref actions);
-
-            // Store updated config if changes were made.
-            if (actions.Count > 0)
-            {
-                actions.ForEach(action => action());
-
-                return true;
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// helper methods to merge datacontainers
-        /// </summary>
-        /// <param name="workingCopy">left</param>
-        /// <param name="workingBase">right</param>
-        /// <param name="addActions"></param>
-        private void AddNewItems(IDataContainer workingCopy, IDataContainer workingBase, ref List<Action> addActions)
-        {
-            foreach (var item in workingBase)
-            {
-                if (workingCopy.ContainsData(item.Name) == false)
-                {
-                    addActions.Add(() => workingCopy.Add(item));
-
-                    Logger.Info($"Added new property {item.Name} = {item.StringValue}");
-                }
-                else if (item is ContainerDataObject baseChild)
-                {
-                    AddNewItems(workingCopy.Get<IDataContainer>(item.Name), baseChild.Value, ref addActions);
-                }
-
-            }
-        }
-
-
-        /// <summary>
-        /// helper methods to merge datacontainers
-        /// </summary>
-        /// <param name="workingCopy">left</param>
-        /// <param name="workingBase">right</param>
-        /// <param name="addActions"></param>
-        private void RemoveOldItems(IDataContainer workingCopy, IDataContainer workingBase, ref List<Action> removeActions)
-        {
-            foreach (var item in workingCopy)
-            {
-                if (workingBase.ContainsData(item.Name) == false)
-                {
-                    removeActions.Add(() => workingCopy.Remove(item));
-
-                    Logger.Info($"Removed property {item.Name} = {item.StringValue}");
-                }
-                else if (item is ContainerDataObject baseChild)
-                {
-                    RemoveOldItems(workingCopy.Get<IDataContainer>(item.Name), baseChild.Value, ref removeActions);
-                }
-            }
-        }
+        #region Abstract Functions
 
         /// <summary>
         /// Adds DataObject to datacontainer
         /// </summary>
         /// <param name="obj"></param>
         public abstract void Add(DataObject obj);
-        
+
         /// <summary>
         /// Removes DataObject from datacontainer
         /// </summary>
         /// <param name="name"></param>
         public abstract void Remove(DataObject name);
-        
+
         /// <summary>
         /// Gets a DataObject from this datacontainer
         /// </summary>
@@ -406,129 +314,21 @@ namespace KEI.Infrastructure
         public abstract DataObject Find(string key);
 
         /// <summary>
-        /// Gets <see cref="PropertyObject"/> with given name
+        /// Allows <see cref="IDataContainer"/> to be used in foreach loop
         /// </summary>
-        /// <param name="key">name of <see cref="PropertyObject"/></param>
-        /// <returns>reference of <see cref="PropertyObject"/></returns>
-        public DataObject FindRecursive(string key)
-        {
-            var split = key.Split('.');
+        /// <returns></returns>
+        public abstract IEnumerator<DataObject> GetEnumerator();
 
-            if (split.Length == 1)
-            {
-                return Find(key);
-            }
-            else
-            {
-                object temp = null;
-                GetValue(split.First(), ref temp);
-
-                if (temp is IDataContainer dc)
-                {
-                    return dc.Find(string.Join(".", split.Skip(1)));
-                }
-                else
-                {
-                    throw new Exception("Nested configs should be of type IDataContainer");
-                }
-            }
-        }
-
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-        #region IXmlSerializable Members
-
-        public XmlSchema GetSchema() => null;
-
-        public virtual void ReadXml(XmlReader reader)
-        {
-            // Read attribute name
-            if (reader.GetAttribute(DataObject.KEY_ATTRIBUTE) is string s)
-            {
-                Name = s;
-            }
-
-            // read to content
-            reader.Read();
-
-            while (reader.EOF == false)
-            {
-                // nothing of value skip.
-                if (reader.NodeType != XmlNodeType.Element)
-                {
-                    reader.Read();
-                }
-
-                // start of a DataObject
-                else if (reader.Name == DataObject.START_ELEMENT)
-                {
-                    // Get DataObject to read.
-                    var obj = DataObjectFactory.GetDataObject(reader.GetAttribute(DataObject.TYPE_ID_ATTRIBUTE));
-
-                    if (obj is not null)
-                    {
-                        using var newReader = XmlReader.Create(new StringReader(reader.ReadOuterXml()));
-
-                        newReader.Read();
-
-                        obj.ReadXml(newReader);
-
-                        Add(obj);
-                    }
-                }
-
-                // start of ContainerDataObject
-                else if (reader.Name == "DataContainer")
-                {
-                    // get a ContainerDataObject to start reading.
-                    var obj = (ContainerDataObject)DataObjectFactory.GetDataObject("dc");
-
-                    if (obj is not null)
-                    {
-                        obj.Value = new DataContainer();
-
-                        using var newReader = XmlReader.Create(new StringReader(reader.ReadOuterXml()));
-
-                        newReader.Read();
-
-                        obj.ReadXml(newReader);
-
-                        Add(obj);
-                    }
-                }
-
-                // Start of Underlying type
-                // for Datacontainers created from .NET objects
-                else if (reader.Name == nameof(Types.TypeInfo))
-                {
-                    UnderlyingType = reader.ReadObjectXML<Types.TypeInfo>();
-                }
-            }
-        }
-
-        public virtual void WriteXml(XmlWriter writer)
-        {
-            // write name as attribute if we have a name
-            if (string.IsNullOrEmpty(Name) == false)
-            {
-                writer.WriteAttributeString(DataObject.KEY_ATTRIBUTE, Name);
-            }
-
-            // write underlying type if this was created from a .NET object
-            if (UnderlyingType is not null)
-            {
-                writer.WriteObjectXML(UnderlyingType);
-            }
-
-            // write all the dataobjects
-            foreach (var obj in this)
-            {
-                obj.WriteXml(writer);
-            }
-        }
+        /// <summary>
+        /// Get all keys in this object
+        /// Is not recursives, will not provide keys for child <see cref="IDataContainer"/>
+        /// </summary>
+        /// <returns></returns>
+        public abstract IEnumerable<string> GetKeys();
 
         #endregion
 
+        #region Binding Members
 
         /// <summary>
         /// Adds binding
@@ -569,7 +369,7 @@ namespace KEI.Infrastructure
         }
 
         /// <summary>
-        /// Adds binding
+        /// Adds binding based on convention, Uses the name of bound property in VM as key in IDataContainer
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="expression"><see cref="MemberExpression"/> that gets CLR property </param>
@@ -640,6 +440,12 @@ namespace KEI.Infrastructure
             return true;
         }
 
+        /// <summary>
+        /// Removes binding based on convention, Uses the name of bound property in VM as key in IDataContainer
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
         public bool RemoveBinding<T>(Expression<Func<T>> expression)
         {
             var memberExpression = expression.Body as MemberExpression;
@@ -666,7 +472,529 @@ namespace KEI.Infrastructure
 
             return true;
         }
-    }
 
+        #endregion
+
+        #region DynamicObect Overrides
+
+        /// <summary>
+        /// Called by WPF binding to get value of binding
+        /// </summary>
+        /// <param name="binder"></param>
+        /// <param name="result"></param>
+        /// <returns></returns>
+        public override bool TryGetMember(GetMemberBinder binder, out object result)
+        {
+            // Check if it's an actual member
+            bool ret = base.TryGetMember(binder, out result);
+
+            // else It's a dynamic member
+            if (ret == false)
+            {
+                /// find <see cref="DataObject"/> corresponding to the binding
+                if (Find(binder.Name) is DataObject data)
+                {
+                    // get value
+                    result = data.GetValue();
+
+                    ret = true;
+                }
+                // don't have member
+                else
+                {
+                    ret = false;
+                }
+            }
+
+            return ret;
+        }
+
+        /// <summary>
+        /// Called by WPF binding to set value of a binding
+        /// </summary>
+        /// <param name="binder"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public override bool TrySetMember(SetMemberBinder binder, object value)
+        {
+            // Check if it's an actual member
+            bool ret = base.TrySetMember(binder, value);
+
+            // else It's a dynamic member
+            if (ret == false)
+            {
+                /// find <see cref="DataObject"/> corresponding to the binding
+                if (Find(binder.Name) is DataObject data)
+                {
+                    // set value
+                    data.SetValue(value);
+
+                    ret = true;
+                }
+                // don't have member
+                else
+                {
+                    ret = false;
+                }
+            }
+
+            return ret;
+        }
+
+        /// <summary>
+        /// Implementation for <see cref="DynamicObject.GetDynamicMemberNames"/>
+        /// </summary>
+        /// <returns></returns>
+        public override IEnumerable<string> GetDynamicMemberNames()
+        {
+            return GetKeys();
+        }
+
+        #endregion
+
+        #region IXmlSerializable Members
+
+        public XmlSchema GetSchema() => null;
+
+        public virtual void ReadXml(XmlReader reader)
+        {
+            // Read attribute name
+            if (reader.GetAttribute(DataObject.KEY_ATTRIBUTE) is string s)
+            {
+                Name = s;
+            }
+
+            // read to content
+            reader.Read();
+
+            while (reader.EOF == false)
+            {
+                // nothing of value skip.
+                if (reader.NodeType != XmlNodeType.Element)
+                {
+                    reader.Read();
+                }
+
+                // start of a DataObject
+                else if (reader.Name == DataObject.START_ELEMENT)
+                {
+                    // Get DataObject to read.
+                    var obj = DataObjectFactory.GetDataObject(reader.GetAttribute(DataObject.TYPE_ID_ATTRIBUTE));
+
+                    if (obj is not null)
+                    {
+                        using var newReader = XmlReader.Create(new StringReader(reader.ReadOuterXml()));
+
+                        newReader.Read();
+
+                        obj.ReadXml(newReader);
+
+                        Add(obj);
+                    }
+                }
+
+                // start of ContainerDataObject
+                else if (reader.Name == "DataContainer")
+                {
+                    // get a ContainerDataObject to start reading.
+                    var obj = DataObjectFactory.GetDataObject("dc");
+
+                    if (obj is not null)
+                    {
+                        using var newReader = XmlReader.Create(new StringReader(reader.ReadOuterXml()));
+
+                        newReader.Read();
+
+                        obj.ReadXml(newReader);
+
+                        Add(obj);
+                    }
+                }
+
+                // start of ContainerDataObject
+                else if (reader.Name == "DataContainerList")
+                {
+                    var obj = DataObjectFactory.GetDataObject("dcl");
+
+                    if (obj is not null)
+                    {
+                        using var newReader = XmlReader.Create(new StringReader(reader.ReadOuterXml()));
+
+                        newReader.Read();
+
+                        obj.ReadXml(newReader);
+
+                        Add(obj);
+                    }
+                }
+
+                // Start of Underlying type
+                // for Datacontainers created from .NET objects
+                else if (reader.Name == nameof(Types.TypeInfo))
+                {
+                    UnderlyingType = reader.ReadObjectXml<Types.TypeInfo>();
+                }
+            }
+        }
+
+        public virtual void WriteXml(XmlWriter writer)
+        {
+            // write name as attribute if we have a name
+            if (string.IsNullOrEmpty(Name) == false)
+            {
+                writer.WriteAttributeString(DataObject.KEY_ATTRIBUTE, Name);
+            }
+
+            // write underlying type if this was created from a .NET object
+            if (UnderlyingType is not null)
+            {
+                writer.WriteObjectXml(UnderlyingType);
+            }
+
+            // write all the dataobjects
+            foreach (var obj in this)
+            {
+                obj.WriteXml(writer);
+            }
+        }
+
+        #endregion
+
+        #region INotifyCollectionChanged Members
+
+        public event NotifyCollectionChangedEventHandler CollectionChanged;
+        protected void RaiseCollectionChanged(NotifyCollectionChangedAction action, object changedItem)
+            => CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(action, changedItem));
+
+        #endregion
+
+        #region INotifyPropertyChanged Memmbers
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        public void RaisePropertyChanged([CallerMemberName] string property = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
+        }
+
+        public bool SetProperty<T>(ref T storage, T value, [CallerMemberName] string property = "")
+        {
+            if (EqualityComparer<T>.Default.Equals(storage, value) == true)
+            {
+                return false;
+            }
+
+            storage = value;
+
+            RaisePropertyChanged(property);
+
+            return true;
+        }
+
+        #endregion
+
+        #region IEnumerable Members
+
+        /// <summary>
+        /// Implementation for <see cref="IEnumerable.GetEnumerator"/>
+        /// </summary>
+        /// <returns></returns>
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        #endregion
+
+        #region ICustomTypeDescriptor Members
+
+        /// <summary>
+        /// Implementation for <see cref="ICustomTypeDescriptor.GetComponentName"/>
+        /// </summary>
+        /// <returns></returns>
+        public string GetComponentName()
+        {
+            return TypeDescriptor.GetComponentName(this, true);
+        }
+
+        /// <summary>
+        /// Implementation for <see cref="ICustomTypeDescriptor.GetDefaultEvent"/>
+        /// </summary>
+        /// <returns></returns>
+        public EventDescriptor GetDefaultEvent()
+        {
+            return TypeDescriptor.GetDefaultEvent(this, true);
+        }
+
+        /// <summary>
+        /// Implementation for <see cref="ICustomTypeDescriptor.GetClassName"/>
+        /// </summary>
+        /// <returns></returns>
+        public string GetClassName()
+        {
+            return TypeDescriptor.GetClassName(this, true);
+        }
+
+        /// <summary>
+        /// Implementation for <see cref="ICustomTypeDescriptor.GetEvents(Attribute[])"/>
+        /// </summary>
+        /// <param name="attributes"></param>
+        /// <returns></returns>
+        public EventDescriptorCollection GetEvents(Attribute[] attributes)
+        {
+            return TypeDescriptor.GetEvents(this, attributes, true);
+        }
+
+        /// <summary>
+        /// Implementation for <see cref="ICustomTypeDescriptor.GetEvents"/>
+        /// </summary>
+        /// <returns></returns>
+        EventDescriptorCollection ICustomTypeDescriptor.GetEvents()
+        {
+            return TypeDescriptor.GetEvents(this, true);
+        }
+
+        /// <summary>
+        /// Implementation for <see cref="ICustomTypeDescriptor.GetConverter"/>
+        /// </summary>
+        /// <returns></returns>
+        public TypeConverter GetConverter()
+        {
+            return TypeDescriptor.GetConverter(this, true);
+        }
+
+        /// <summary>
+        /// Implementation for <see cref="ICustomTypeDescriptor.GetPropertyOwner(PropertyDescriptor)"/>
+        /// </summary>
+        /// <param name="pd"></param>
+        /// <returns></returns>
+        public object GetPropertyOwner(PropertyDescriptor pd)
+        {
+            return this;
+        }
+
+        /// <summary>
+        /// Imlplementation for <see cref="ICustomTypeDescriptor.GetAttributes"/>
+        /// </summary>
+        /// <returns></returns>
+        public AttributeCollection GetAttributes()
+        {
+            return TypeDescriptor.GetAttributes(this, true);
+        }
+
+        /// <summary>
+        /// Implementation for <see cref="ICustomTypeDescriptor.GetEditor(Type)"/>
+        /// </summary>
+        /// <param name="editorBaseType"></param>
+        /// <returns></returns>
+        public object GetEditor(Type editorBaseType)
+        {
+            return TypeDescriptor.GetEditor(this, editorBaseType, true);
+        }
+
+        /// <summary>
+        /// Implementation for <see cref="ICustomTypeDescriptor.GetDefaultProperty"/>
+        /// </summary>
+        /// <returns></returns>
+        public PropertyDescriptor GetDefaultProperty()
+        {
+            return null;
+        }
+
+        /// <summary>
+        /// Implementation for <see cref="ICustomTypeDescriptor.GetProperties"/>
+        /// </summary>
+        /// <returns></returns>
+        PropertyDescriptorCollection ICustomTypeDescriptor.GetProperties()
+        {
+            return ((ICustomTypeDescriptor)this).GetProperties(Array.Empty<Attribute>());
+        }
+
+        /// <summary>
+        /// Implementation for <see cref="ICustomTypeDescriptor.GetProperties(Attribute[])"/>
+        /// </summary>
+        /// <param name="attributes"></param>
+        /// <returns></returns>
+        public PropertyDescriptorCollection GetProperties(Attribute[] attributes)
+        {
+            ArrayList properties = new ArrayList();
+            
+            foreach (DataObject data in this)
+            {
+                var attrs = new List<Attribute>();
+
+                // add attributes for property grid
+                if (data is PropertyObject po)
+                {
+                    // add description attribute
+                    if (string.IsNullOrEmpty(po.Description) == false)
+                    {
+                        attrs.Add(new DescriptionAttribute(po.Description));
+                    }
+                    
+                    // add display name attribute
+                    if (string.IsNullOrEmpty(po.DisplayName) == false)
+                    {
+                        attrs.Add(new DisplayNameAttribute(po.DisplayName));
+                    }
+
+                    // add category attribute
+                    if (string.IsNullOrEmpty(po.Category) == false)
+                    {
+                        attrs.Add(new CategoryAttribute(po.Category));
+                    }
+
+                    // add browsable/readonly attributes
+                    attrs.Add(po.BrowseOption switch
+                    {
+                        BrowseOptions.Browsable => new BrowsableAttribute(true),
+                        BrowseOptions.NonBrowsable => new BrowsableAttribute(false),
+                        BrowseOptions.NonEditable => new ReadOnlyAttribute(true),
+                        _ => throw new NotImplementedException()
+                    });
+
+                    /// add editor attribute
+                    /// custom editors should be registered using <see cref="CustomUITypeEditorMapping.RegisterEditor{TEditor}(string)"/>
+                    if (CustomUITypeEditorMapping.GetEditorType(po.GetType()) is Type t)
+                    {
+                        attrs.Add(new EditorAttribute(t, t));
+                    }
+
+                    /// add type converter attribute
+                    /// custom type converters should be registered using <see cref="CustomUITypeEditorMapping.RegisterConverter{TConverter}(string)"/>
+                    if (CustomUITypeEditorMapping.GetConverterType(po.GetType()) is Type ct)
+                    {
+                        attrs.Add(new TypeConverterAttribute(ct));
+                    }
+
+                }
+
+                /// Create property descriptor
+                properties.Add(new DataObjectPropertyDescriptor(data, attrs.ToArray()));
+            }
+
+            PropertyDescriptor[] props = (PropertyDescriptor[])properties.ToArray(typeof(PropertyDescriptor));
+
+            return new PropertyDescriptorCollection(props);
+        }
+
+        #endregion
+
+        #region Private Functions
+
+        /// <summary>
+        /// helper methods to merge datacontainers
+        /// </summary>
+        /// <param name="workingCopy">left</param>
+        /// <param name="workingBase">right</param>
+        /// <param name="addActions"></param>
+        private void AddNewItems(IDataContainer workingCopy, IDataContainer workingBase, ref List<Action> addActions)
+        {
+            foreach (var item in workingBase)
+            {
+                if (workingCopy.ContainsData(item.Name) == false)
+                {
+                    addActions.Add(() => workingCopy.Add(item));
+
+                    Logger.Info($"Added new property {item.Name} = {item.StringValue}");
+                }
+                else if (item is ContainerDataObject baseChild)
+                {
+                    AddNewItems(workingCopy.Get<IDataContainer>(item.Name), baseChild.Value, ref addActions);
+                }
+
+            }
+        }
+
+
+        /// <summary>
+        /// helper methods to merge datacontainers
+        /// </summary>
+        /// <param name="workingCopy">left</param>
+        /// <param name="workingBase">right</param>
+        /// <param name="addActions"></param>
+        private void RemoveOldItems(IDataContainer workingCopy, IDataContainer workingBase, ref List<Action> removeActions)
+        {
+            foreach (var item in workingCopy)
+            {
+                if (workingBase.ContainsData(item.Name) == false)
+                {
+                    removeActions.Add(() => workingCopy.Remove(item));
+
+                    Logger.Info($"Removed property {item.Name} = {item.StringValue}");
+                }
+                else if (item is ContainerDataObject baseChild)
+                {
+                    RemoveOldItems(workingCopy.Get<IDataContainer>(item.Name), baseChild.Value, ref removeActions);
+                }
+            }
+        }
+
+        #endregion
+
+        #region Bubble PropertyChanged Notifications
+
+        /// <summary>
+        /// Attaches PropertyChanged listeners to newly added Properties
+        /// Removes PropertyChanged listeners from removed Properties
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        protected void Data_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Add)
+            {
+                foreach (var item in e.NewItems.Cast<DataObject>())
+                {
+                    item.PropertyChanged += OnPropertyChangedRaised;
+
+                    if (item.GetValue() is IDataContainer dc)
+                    {
+                        dc.PropertyChanged += OnPropertyChangedRaised;
+                    }
+                }
+            }
+            else if (e.Action == NotifyCollectionChangedAction.Remove)
+            {
+                foreach (var item in e.OldItems.Cast<DataObject>())
+                {
+                    item.PropertyChanged -= OnPropertyChangedRaised;
+
+                    if (item.GetValue() is IDataContainer dc)
+                    {
+                        dc.PropertyChanged -= OnPropertyChangedRaised;
+                    }
+                }
+            }
+        }
+
+        private void OnPropertyChangedRaised(object sender, PropertyChangedEventArgs e)
+        {
+            string propName = e.PropertyName;
+
+            /// If sender is one of our children, pass the event on up the tree.
+            if (sender is DataObject o && e.PropertyName == "Value")
+            {
+                RaisePropertyChanged(o.Name);
+            }
+
+            /// If one of our childrens value is <see cref="IDataContainer"/>
+            /// We need to handle propertychanged for our grandchildren also
+            else if (sender is IDataContainer dc)
+            {
+                var split = propName.Split('.');
+
+                if (split.FirstOrDefault() == dc.Name)
+                {
+                    RaisePropertyChanged(propName);
+                }
+                else
+                {
+                    //Create full name, $(parent).$(child)
+                    RaisePropertyChanged($"{dc.Name}.{propName}");
+                }
+
+            }
+        }
+
+        #endregion
+
+    }
 
 }

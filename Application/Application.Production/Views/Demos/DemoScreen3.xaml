@@ -6,6 +6,8 @@
              xmlns:prism="http://prismlibrary.com/"
              xmlns:local="clr-namespace:Application.Production.Views"
              xmlns:w="clr-namespace:KEI.UI.Wpf.Controls.Configuration;assembly=KEI.UI.Wpf"
+             xmlns:wpf="http://gesinfotek.com/wpf"
+             xmlns:xc="http://schemas.xceed.com/wpf/xaml/toolkit"
              prism:ViewModelLocator.AutoWireViewModel="True"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
@@ -15,6 +17,13 @@
             <ColumnDefinition/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <w:PropertyGrid EditingObject="{Binding SamplePropertyContainer}"/>
+
+        <xc:PropertyGrid SelectedObject="{Binding SamplePropertyContainer}"
+                         ShowTitle="False"/>
+
+        <xc:PropertyGrid SelectedObject="{Binding TestObject}"
+                         ShowTitle="False"
+                         Grid.Column="2"/>
+
     </Grid>
 </UserControl>

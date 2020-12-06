@@ -47,7 +47,7 @@ namespace KEI.Infrastructure.Configuration
         #region Public Functions
         public bool LoadConfig()
         {
-            var intermediateConfig = XmlHelper.Deserialize<DataContainer>(ConfigPath);
+            var intermediateConfig = XmlHelper.DeserializeFromFile<DataContainer>(ConfigPath);
 
             if (intermediateConfig == null || string.IsNullOrEmpty(ConfigPath))
             {
@@ -82,7 +82,7 @@ namespace KEI.Infrastructure.Configuration
             {
                 if(Config is IList listConfig)
                 {
-                    if(XmlHelper.Serialize(listConfig.ToListDataContainer(ConfigName), path) == false)
+                    if(XmlHelper.SerializeToFile(listConfig.ToListDataContainer(ConfigName), path) == false)
                     {
                         Logger.Error($"Unable to Store Config \"{ConfigName}\"");
                         return false;
@@ -92,7 +92,7 @@ namespace KEI.Infrastructure.Configuration
             }
             else
             {
-                if (XmlHelper.Serialize(Config.ToDataContainer(ConfigName), path) == false)
+                if (XmlHelper.SerializeToFile(Config.ToDataContainer(ConfigName), path) == false)
                 {
                     Logger.Error($"Unable to Store Config \"{ConfigName}\"");
                     return false;

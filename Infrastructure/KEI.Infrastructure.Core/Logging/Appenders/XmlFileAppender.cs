@@ -20,7 +20,7 @@ namespace KEI.Infrastructure.Logging
             try
             {
                 using var sw = new StreamWriter(FilePath, append: true) { AutoFlush = true };
-                sw.WriteLine(XmlHelper.Serialize(msg));
+                sw.WriteLine(XmlHelper.SerializeToString(msg));
             }
             catch (Exception) { }
         }

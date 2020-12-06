@@ -141,7 +141,7 @@ namespace KEI.Infrastructure
         {
             base.WriteXmlInternal(writer);
 
-            writer.WriteObjectXML(Value.Type);
+            writer.WriteObjectXml(Value.Type);
 
             foreach (var opt in Value.Option)
             {
@@ -157,9 +157,14 @@ namespace KEI.Infrastructure
         /// <returns></returns>
         protected override bool ReadXmlElement(string elementName, XmlReader reader)
         {
-            if(elementName == nameof(TypeInfo))
+            if (base.ReadXmlElement(elementName, reader) == true)
             {
-                ListType = reader.ReadObjectXML<TypeInfo>();
+                return true;
+            }
+
+            if (elementName == nameof(TypeInfo))
+            {
+                ListType = reader.ReadObjectXml<TypeInfo>();
 
                 ElementType = Value.Type = ListType.GetGenericArguments()[0];
 
@@ -189,6 +194,11 @@ namespace KEI.Infrastructure
             {
                 RaisePropertyChanged(nameof(Value));
             }
+        }
+
+        protected override void InitializeObject()
+        {
+            Value = new Selector();
         }
 
     }

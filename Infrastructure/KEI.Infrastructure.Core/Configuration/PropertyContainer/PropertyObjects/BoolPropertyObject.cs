@@ -1,19 +1,30 @@
 ﻿namespace KEI.Infrastructure
 {
     /// <summary>
-    /// PropertyObject implementation for <see cref="float"/>
+    /// PropertyObject implementation for <see cref="bool"/>
     /// </summary>
-    internal class FloatPropertyObject : PropertyObject<float>
+    internal class BoolPropertyObject : PropertyObject<bool>
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        public BoolPropertyObject(string name, bool value)
+        {
+            Name = name;
+            Value = value;
+        }
+
         /// <summary>
         /// Implementation for <see cref="PropertyObject.Editor"/>
         /// </summary>
-        public override EditorType Editor => EditorType.String;
+        public override EditorType Editor => EditorType.Bool;
 
         /// <summary>
         /// Implementation for <see cref="DataObject.Type"/>
         /// </summary>
-        public override string Type => "float";
+        public override string Type => "bool";
 
         /// <summary>
         /// Implementation for <see cref="DataObject.CanConvertFromString(string)"/>
@@ -22,7 +33,7 @@
         /// <returns></returns>
         public override bool CanConvertFromString(string value)
         {
-            return float.TryParse(value, out _);
+            return bool.TryParse(value, out _);
         }
 
         /// <summary>
@@ -32,7 +43,7 @@
         /// <returns></returns>
         public override object ConvertFromString(string value)
         {
-            return float.TryParse(value, out float tmp)
+            return bool.TryParse(value, out bool tmp)
                 ? tmp
                 : null;
         }
@@ -43,10 +54,11 @@
         /// <param name="value"></param>
         protected override void OnStringValueChanged(string value)
         {
-            if(float.TryParse(value, out _value))
+            if(bool.TryParse(value, out _value))
             {
                 RaisePropertyChanged(nameof(Value));
             }
+
         }
     }
 }

@@ -25,7 +25,7 @@ namespace ServiceEditor.ViewModels
 
             Services = new ObservableCollection<ServiceInfo>(provider.GetServices());
 
-            SelectedServices = XmlHelper.Deserialize<ObservableCollection<ServiceInfo>>(FilePath) ?? new ObservableCollection<ServiceInfo>();
+            SelectedServices = XmlHelper.DeserializeFromFile<ObservableCollection<ServiceInfo>>(FilePath) ?? new ObservableCollection<ServiceInfo>();
 
             // Add required services
             foreach (var requiredService in Services.Where(x => x.IsRequired))
@@ -78,7 +78,7 @@ namespace ServiceEditor.ViewModels
 
         void ExecuteSaveServiceConfigCommand()
         {
-            if(XmlHelper.Serialize(SelectedServices, FilePath) == true)
+            if(XmlHelper.SerializeToFile(SelectedServices, FilePath) == true)
             {
                 _viewService.Inform("Config updated !");
             }
@@ -133,7 +133,7 @@ namespace ServiceEditor.ViewModels
                 return;
             }
 
-            if(XmlHelper.Deserialize<ObservableCollection<ServiceInfo>>(fileName) is ObservableCollection<ServiceInfo> cfg)
+            if(XmlHelper.DeserializeFromFile<ObservableCollection<ServiceInfo>>(fileName) is ObservableCollection<ServiceInfo> cfg)
             {
                 SelectedServices = cfg;
                 SetImplementations();

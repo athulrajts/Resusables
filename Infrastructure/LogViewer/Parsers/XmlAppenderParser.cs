@@ -21,7 +21,7 @@ namespace LogViewer.Parsers
 
             while(reader.ReadToFollowing(nameof(LogEvent)))
             {
-                result.Add(reader.ReadObjectXML<LogEvent>());
+                result.Add(reader.ReadObjectXml<LogEvent>());
             }
 
             return result;

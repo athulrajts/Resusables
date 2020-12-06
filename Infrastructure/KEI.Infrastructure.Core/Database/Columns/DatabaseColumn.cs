@@ -5,11 +5,11 @@ using System.ComponentModel;
 using System.Xml.Serialization;
 using Prism.Mvvm;
 using System.Data;
-using System.Collections.Generic;
 
 namespace KEI.Infrastructure.Database
 {
     public interface IDatabaseContext { }
+    
     public class DatabaseColumn : BindableBase
     {
         public DatabaseColumn(PropertyInfo propInfo)
@@ -88,15 +88,7 @@ namespace KEI.Infrastructure.Database
 
         public override int GetHashCode()
         {
-            var hashCode = 1904988409;
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Name);
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(FullName);
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(DisplayName);
-            hashCode = hashCode * -1521134295 + HasPassFailCriteria.GetHashCode();
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Namespace);
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Unit);
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(HeaderString);
-            return hashCode;
+            return HashCode.Combine(Name, FullName, DisplayName, HasPassFailCriteria, Namespace, Unit, HeaderString);
         }
     }
 

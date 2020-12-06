@@ -15,7 +15,6 @@ namespace KEI.Infrastructure.Prism
     /// types to the container based on
     /// <see cref="RegisterSingletonAttribute"/>
     /// <see cref="RegisterForNavigationAttribute"/>
-    /// <see cref="RegisterTypeAttribute"/>
     /// <see cref="RegisterWithRegionAttribute"/>
     /// Also does a named registration a <see cref="ResourceManagerStringLocalizer"/> as an implementation for <see cref="IStringLocalizer"/> which
     /// will be used by <see cref="LocalizationManager"/>
@@ -24,7 +23,6 @@ namespace KEI.Infrastructure.Prism
     {
         private readonly IEnumerable<Type> _typesForNavigation;
         private readonly IEnumerable<Type> _typesForViewRegistration;
-        private readonly IEnumerable<Type> _typesForRegistration;
         private readonly IEnumerable<Type> _typesForSingletonRegistration;
         private readonly string name;
         private readonly List<Type> _typesForResolve = new List<Type>();
@@ -46,22 +44,15 @@ namespace KEI.Infrastructure.Prism
             
             //Get Views/ViewModels to register for navigation
             _typesForNavigation = _assemblyTypes
-                .Where(t => t.GetCustomAttributes<RegisterForNavigationAttribute>()
-                .Count() > 0);
+                .Where(t => t.GetCustomAttributes<RegisterForNavigationAttribute>().Any());
 
             _typesForViewRegistration = _assemblyTypes
-                .Where(t => t.GetCustomAttributes<RegisterWithRegionAttribute>()
-                .Count() > 0);
-
-            _typesForRegistration = _assemblyTypes
-                .Where(t => t.GetCustomAttributes<RegisterTypeAttribute>()
-                .Count() > 0);
+                .Where(t => t.GetCustomAttributes<RegisterWithRegionAttribute>().Any());
 
             _typesForSingletonRegistration = _assemblyTypes
-                .Where(t => t.GetCustomAttributes<RegisterSingletonAttribute>()
-                .Count() > 0);
+                .Where(t => t.GetCustomAttributes<RegisterSingletonAttribute>().Any());
 
-            int count = _typesForNavigation.Count() + _typesForViewRegistration.Count() + _typesForRegistration.Count() + _typesForSingletonRegistration.Count();
+            int count = _typesForNavigation.Count() + _typesForViewRegistration.Count()  + _typesForSingletonRegistration.Count();
 
             SplashScreenLogger.Instance.Log($"{name}: {count} type(s) found !");
 
@@ -82,12 +73,6 @@ namespace KEI.Infrastructure.Prism
             SplashScreenLogger.Instance.Log($"{name}: Registering Types..");
 
             containerRegistry.RegisterInstance<IStringLocalizer>(new ResourceManagerStringLocalizer(GetType().Assembly), name);
-
-            // Register Types for registeration
-            foreach (var t in _typesForRegistration)
-            {
-                containerRegistry.Register(t);
-            }
 
             // Register Types for Singleton Registration
             foreach (var t in _typesForSingletonRegistration)

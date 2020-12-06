@@ -162,12 +162,12 @@ namespace ApplicationShell
         {
             var serviceConfigPath = PathUtils.GetPath("Configs/Services.cfg");
 
-            var selectedService = XmlHelper.Deserialize<ObservableCollection<ServiceInfo>>(serviceConfigPath);
+            var selectedService = XmlHelper.DeserializeFromFile<ObservableCollection<ServiceInfo>>(serviceConfigPath);
 
             if (selectedService == null)
             {
                 selectedService = GetDefaultServices();
-                XmlHelper.Serialize(new ObservableCollection<ServiceInfo>(selectedService), serviceConfigPath);
+                XmlHelper.SerializeToFile(new ObservableCollection<ServiceInfo>(selectedService), serviceConfigPath);
             }
 
             return selectedService;

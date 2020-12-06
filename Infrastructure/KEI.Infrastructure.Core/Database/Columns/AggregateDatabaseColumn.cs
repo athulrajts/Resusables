@@ -8,6 +8,7 @@ namespace KEI.Infrastructure.Database.Models
         {
             Namespace = "Aggregate";
         }
+
         public abstract void UpdateCell(DataRow dataRow);
     }
 }

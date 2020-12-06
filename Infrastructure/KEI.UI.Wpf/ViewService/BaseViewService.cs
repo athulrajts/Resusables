@@ -13,6 +13,7 @@ using KEI.UI.Wpf.ViewService.Dialogs;
 using KEI.UI.Wpf.Controls.ObjectEditors;
 using KEI.UI.Wpf.ViewService.Views;
 using KEI.UI.Wpf.ViewService.ViewModels;
+using System.Drawing.Design;
 
 namespace KEI.UI.Wpf.ViewService
 {
@@ -253,6 +254,12 @@ namespace KEI.UI.Wpf.ViewService
             registry.RegisterSingleton<IHotkeyService, HotkeyService>();
             registry.RegisterDialog<ConfigsChangedDialog>();
             registry.RegisterInstance<IStringLocalizer>(new ResourceManagerStringLocalizer(Assembly.GetExecutingAssembly()), Assembly.GetExecutingAssembly().GetName().Name);
+
+
+            CustomUITypeEditorMapping.RegisterEditor<Controls.PropertyGridEditors.FileNameEditor>("file");
+            CustomUITypeEditorMapping.RegisterEditor<Controls.PropertyGridEditors.FolderNameEditor>("folder");
+            CustomUITypeEditorMapping.RegisterEditor<Controls.PropertyGridEditors.ColorEditor>("color");
+            CustomUITypeEditorMapping.RegisterEditor<Controls.PropertyGridEditors.PropertyGridEditor>("dc");
 
             Infrastructure.ViewService.Service = ContainerLocator.Container.Resolve<IViewService>();
         }

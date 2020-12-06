@@ -5,6 +5,7 @@ using KEI.Infrastructure.Helpers;
 
 namespace KEI.Infrastructure
 {
+
     /// <summary>
     /// Class use to build <see cref="PropertyContainer"/> Objects
     /// </summary>
@@ -42,12 +43,13 @@ namespace KEI.Infrastructure
         public static PropertyContainerBuilder Create(string name, string filename = "")
             => new PropertyContainerBuilder(name, filename);
 
-        public static PropertyContainerBuilder Create() 
+        public static PropertyContainerBuilder Create()
             => new PropertyContainerBuilder();
 
         #endregion
 
         public static IPropertyContainer FromFile(string path) => PropertyContainer.FromFile(path);
+
 
         public PropertyContainerBuilder Property(string name, object value)
         {
@@ -56,7 +58,7 @@ namespace KEI.Infrastructure
                 return this;
             }
 
-            if(DataObjectFactory.GetPropertyObjectFor(name, value) is PropertyObject obj)
+            if (DataObjectFactory.GetPropertyObjectFor(name, value) is PropertyObject obj)
             {
                 config.Add(obj);
 
@@ -66,9 +68,42 @@ namespace KEI.Infrastructure
             return this;
         }
 
+        public PropertyContainerBuilder FileProperty(string name, string value, params Tuple<string,string>[] filters)
+        {
+            if (config.ContainsData(name) || value is null)
+            {
+                return this;
+            }
+
+            var obj = new FilePropertyObject(name, value, filters);
+
+            config.Add(obj);
+
+            lastCreatedObject = obj;
+
+            return this;
+        }
+
+        public PropertyContainerBuilder FolderProperty(string name, string value)
+        {
+            if (config.ContainsData(name) || value is null)
+            {
+                return this;
+            }
+
+            var obj = new FolderPropertyObject(name, value);
+
+            config.Add(obj);
+
+            lastCreatedObject = obj;
+
+            return this;
+        }
+
+
         public PropertyContainerBuilder SetDescription(string description)
         {
-            if(lastCreatedObject is not null)
+            if (lastCreatedObject is not null)
             {
                 lastCreatedObject.SetDescription(description);
             }
@@ -81,6 +116,26 @@ namespace KEI.Infrastructure
             if (lastCreatedObject is not null)
             {
                 lastCreatedObject.SetBrowsePermission(option);
+            }
+
+            return this;
+        }
+
+        public PropertyContainerBuilder SetDisplayName(string name)
+        {
+            if (lastCreatedObject is not null)
+            {
+                lastCreatedObject.SetDisplayName(name);
+            }
+
+            return this;
+        }
+
+        public PropertyContainerBuilder SetCategory(string category)
+        {
+            if (lastCreatedObject is not null)
+            {
+                lastCreatedObject.SetCategory(category);
             }
 
             return this;
@@ -120,8 +175,8 @@ namespace KEI.Infrastructure
                 {
                     continue;
                 }
-                
-                objContainer.Property(prop, value); 
+
+                objContainer.Property(prop, value);
             }
 
             return objContainer.Build();

@@ -5,7 +5,6 @@ using System.Collections;
 using System.ComponentModel;
 using System.Collections.Generic;
 using KEI.Infrastructure.Validation;
-using KEI.Infrastructure.Configuration;
 using KEI.Infrastructure.Validation.Attributes;
 
 namespace KEI.Infrastructure.Helpers
@@ -70,8 +69,10 @@ namespace KEI.Infrastructure.Helpers
         {
             var attributes = info.GetCustomAttributes<ValidationAttribute>();
 
-            if (attributes.Count() == 0)
+            if (attributes.Any() == false)
+            {
                 return null;
+            }
 
             var builder = ValidationBuilder.Create();
 

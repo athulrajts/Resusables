@@ -8,6 +8,17 @@ namespace KEI.Infrastructure
     internal class BoolDataObject : DataObject<bool>, IWriteToBinaryStream
     {
         /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        public BoolDataObject(string name, bool value)
+        {
+            Name = name;
+            Value = value;
+        }
+
+        /// <summary>
         /// Implementation for <see cref="DataObject.Type"/>
         /// </summary>
         public override string Type => "bool";

@@ -83,12 +83,27 @@ namespace KEI.Infrastructure
                 // start of ContainerPropertyObject
                 else if (reader.Name == "DataContainer")
                 {
-                    var obj = (ContainerPropertyObject)DataObjectFactory.GetPropertyObject("dc");
+                    var obj = DataObjectFactory.GetPropertyObject("dc");
 
                     if (obj is not null)
                     {
-                        obj.Value = new PropertyContainer();
+                        using var newReader = XmlReader.Create(new StringReader(reader.ReadOuterXml()));
 
+                        newReader.Read();
+
+                        obj.ReadXml(newReader);
+
+                        Add(obj);
+                    }
+                }
+
+                // start of ContainerPropertyObject
+                else if (reader.Name == "DataContainerList")
+                {
+                    var obj = DataObjectFactory.GetPropertyObject("dcl");
+
+                    if (obj is not null)
+                    {
                         using var newReader = XmlReader.Create(new StringReader(reader.ReadOuterXml()));
 
                         newReader.Read();
@@ -103,7 +118,7 @@ namespace KEI.Infrastructure
                 // for Datacontainers created from .NET objects
                 else if (reader.Name == nameof(Types.TypeInfo))
                 {
-                    UnderlyingType = reader.ReadObjectXML<Types.TypeInfo>();
+                    UnderlyingType = reader.ReadObjectXml<Types.TypeInfo>();
                 }
             }
         }

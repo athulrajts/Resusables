@@ -42,10 +42,8 @@ namespace KEI.Infrastructure.Database
         public void Write(DataRow row)
         {
             var str = string.Join(",", row.ItemArray.Select(x => x));
-            using (var sw = new StreamWriter(DestinationPath, append: true) { AutoFlush = true })
-            {
-                sw.WriteLine(str);
-            }
+            using var sw = new StreamWriter(DestinationPath, append: true) { AutoFlush = true };
+            sw.WriteLine(str);
         }
 
         /// <summary>
@@ -60,8 +58,8 @@ namespace KEI.Infrastructure.Database
             var now = DateTime.Now;
 
             DestinationPath = _setup.CreationMode == DatabaseCreationMode.EveryTest
-                ? Path.Combine(directory, $"{fileName}_[{now.ToString("dd-MMM-yyyy")}]_[{now.ToString("HH_mm_ss")}].csv")
-                : Path.Combine(directory, $"{fileName}_[{now.ToString("dd-MMM-yyyy")}].csv");
+                ? Path.Combine(directory, $"{fileName}_[{now:dd-MMM-yyyy}]_[{now:HH_mm_ss}].csv")
+                : Path.Combine(directory, $"{fileName}_[{now:dd-MMM-yyyy}].csv");
 
             return File.Exists(DestinationPath);
         }
@@ -76,8 +74,8 @@ namespace KEI.Infrastructure.Database
             var now = DateTime.Now;
 
             DestinationPath = _setup.CreationMode == DatabaseCreationMode.EveryTest
-                ? Path.Combine(directory, $"{fileName}_[{now.ToString("dd-MMM-yyyy")}]_[{now.ToString("HH_mm_ss")}].csv")
-                : Path.Combine(directory, $"{fileName}_[{now.ToString("dd-MMM-yyyy")}].csv");
+                ? Path.Combine(directory, $"{fileName}_[{now:dd-MMM-yyyy}]_[{now:HH_mm_ss}].csv")
+                : Path.Combine(directory, $"{fileName}_[{now:dd-MMM-yyyy}].csv");
 
             var schema = _setup.Schema;
             string headers = string.Join(",", schema.Select(x => x.DisplayName));
@@ -104,14 +102,13 @@ namespace KEI.Infrastructure.Database
 
             FileHelper.CreateDirectoryIfNotExist(DestinationPath);
 
-            using (var sw = new StreamWriter(DestinationPath) { AutoFlush = true })
-            {
-                sw.WriteLine(headers);
-                sw.WriteLine(units);
-                sw.WriteLine(lower);
-                sw.WriteLine(upper);
-                sw.WriteLine(empty);
-            }
+            using var sw = new StreamWriter(DestinationPath) { AutoFlush = true };
+            
+            sw.WriteLine(headers);
+            sw.WriteLine(units);
+            sw.WriteLine(lower);
+            sw.WriteLine(upper);
+            sw.WriteLine(empty);
         }
     }
 }

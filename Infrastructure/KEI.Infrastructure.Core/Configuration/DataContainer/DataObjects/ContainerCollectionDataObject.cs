@@ -81,16 +81,22 @@ namespace KEI.Infrastructure
         }
 
         /// <summary>
-        /// Implementation for <see cref="DataObject.WriteXmlInternal(XmlWriter)"/>
+        /// Implementation for <see cref="DataObject.GetStartElementName"/>
+        /// </summary>
+        /// <returns></returns>
+        protected override string GetStartElementName()
+        {
+            return ContainerDataObject.DC_START_ELEMENT_NAME;
+        }
+
+        /// <summary>
+        /// Implementation for <see cref="DataObject.WriteXmlContent(XmlWriter)"/>
         /// </summary>
         /// <param name="writer"></param>
-        protected override void WriteXmlInternal(XmlWriter writer)
+        protected override void WriteXmlContent(XmlWriter writer)
         {
-            // Write name
-            if (string.IsNullOrEmpty(Name) == false)
-            {
-                writer.WriteAttributeString(KEY_ATTRIBUTE, Name);
-            }
+            // Write base impl
+            base.WriteXmlContent(writer);
 
             // Write collection type
             if (CollectionType is not null)
@@ -113,26 +119,37 @@ namespace KEI.Infrastructure
         /// <returns></returns>
         protected override bool ReadXmlElement(string elementName, XmlReader reader)
         {
+            // call base
             if (base.ReadXmlElement(elementName, reader))
             {
                 return true;
             }
 
-            if (elementName == "DataContainer")
+            // Read DataObject Implementation
+            if (elementName == ContainerDataObject.DC_START_ELEMENT_NAME)
             {
-                using var newReader = XmlReader.Create(new StringReader(reader.ReadOuterXml()));
-                newReader.Read();
+                var obj = DataObjectFactory.GetDataObject("dc");
 
-                var dco = DataObjectFactory.GetDataObject("dc");
-                dco.ReadXml(newReader);
+                if (obj is ContainerDataObject cdo)
+                {
+                    using var newReader = XmlReader.Create(new StringReader(reader.ReadOuterXml()));
 
-                Value.Add(dco.GetValue() as DataContainer);
+                    newReader.Read();
 
-                return true;
+                    cdo.ReadXml(newReader);
+
+                    Value.Add(cdo.Value);
+
+                    return true;
+                }
             }
+
+            // Read type info
             else if (elementName == nameof(TypeInfo))
             {
                 CollectionType = reader.ReadObjectXml<TypeInfo>();
+
+                return true;
             }
 
             return false;

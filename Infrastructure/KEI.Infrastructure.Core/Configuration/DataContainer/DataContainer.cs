@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Xml.Serialization;
 
 namespace KEI.Infrastructure
 {
     /// <summary>
     /// Concrete implementation for <see cref="IDataContainer"/>
     /// </summary>
+    [XmlRoot("DataContainer")]
     public class DataContainer : DataContainerBase
     {
         /// <summary>

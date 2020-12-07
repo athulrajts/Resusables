@@ -11,7 +11,12 @@ namespace KEI.Infrastructure
     /// </summary>
     internal class ContainerPropertyObject : PropertyObject
     {
-        public IDataContainer Value { get; set; }
+        private IDataContainer _value;
+        public IDataContainer Value
+        {
+            get { return _value; }
+            set { SetProperty(ref _value, value); }
+        }
 
         /// <summary>
         /// Constructor to initialize with <see cref="IDataContainer"/>
@@ -39,18 +44,6 @@ namespace KEI.Infrastructure
         }
 
         /// <summary>
-        /// Constructor to initialize with <see cref="IList"/>
-        /// List is converter to <see cref="IDataContainer"/> using <see cref="PropertyContainerBuilder.CreateList(string, IList)"/>
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="value"></param>
-        public ContainerPropertyObject(string name, IList value)
-        {
-            Name = name;
-            Value = PropertyContainerBuilder.CreateList(name, value);
-        }
-
-        /// <summary>
         /// Implementation for <see cref="DataObject.Type"/>
         /// </summary>
         public override string Type => "dc";
@@ -60,6 +53,18 @@ namespace KEI.Infrastructure
         /// </summary>
         public override EditorType Editor => EditorType.Object;
 
+        /// <summary>
+        /// Implementation for <see cref="DataObject.GetStartElementName"/>
+        /// </summary>
+        /// <returns></returns>
+        protected override string GetStartElementName()
+        {
+            return ContainerDataObject.DC_START_ELEMENT_NAME;
+        }
+
+        /// <summary>
+        /// Implementation for <see cref="DataObject.InitializeObject"/>
+        /// </summary>
         protected override void InitializeObject()
         {
             Value = new PropertyContainer();
@@ -73,100 +78,50 @@ namespace KEI.Infrastructure
         /// <returns></returns>
         protected override bool ReadXmlElement(string elementName, XmlReader reader)
         {
-            if(base.ReadXmlElement(elementName, reader))
+            // call base implementation
+            if (base.ReadXmlElement(elementName, reader))
             {
                 return true;
             }
 
-            // Read inner property
-            if(elementName == START_ELEMENT)
-            {
-                var obj = DataObjectFactory.GetPropertyObject(reader.GetAttribute(TYPE_ID_ATTRIBUTE));
-
-                if (obj is not null)
-                {
-                    // get PropertyObject identified by type attribute 
-                    using var newReader = XmlReader.Create(new StringReader(reader.ReadOuterXml()));
-
-                    newReader.Read();
-
-                    obj.ReadXml(newReader);
-
-                    Value.Add(obj);
-                }
-
-                return true;
-            }
-
-            // Reader inner property container
-            else if(elementName == "DataContainer")
-            {
-                // get ContainerPropertyObject
-                var obj = (ContainerPropertyObject)DataObjectFactory.GetPropertyObject("dc");
-
-                if (obj is not null)
-                {
-                    obj.Value = new PropertyContainer();
-
-                    using var newReader = XmlReader.Create(new StringReader(reader.ReadOuterXml()));
-
-                    newReader.Read();
-
-                    obj.ReadXml(newReader);
-
-                    Value.Add(obj);
-                }
-
-                return true;
-            }
-
-            // Read TypInfo if exists
-            else if(elementName == nameof(TypeInfo))
+            /// Read underlying type for <see cref="ContainerDataObject"/> created from CLR objects
+            if (elementName == nameof(TypeInfo))
             {
                 Value.UnderlyingType = reader.ReadObjectXml<TypeInfo>();
 
                 return true;
             }
 
+            /// Read <see cref="DataObject"/> implementation
+            else
+            {
+                if (DataObjectFactory.GetPropertyObject(reader.GetAttribute(TYPE_ID_ATTRIBUTE)) is DataObject obj)
+                {
+                    using var newReader = XmlReader.Create(new StringReader(reader.ReadOuterXml()));
+
+                    newReader.Read();
+
+                    obj.ReadXml(newReader);
+
+                    Value.Add(obj);
+
+                    return true;
+                }
+                else
+                {
+                    // Skip
+                }
+            }
+
             return false;
         }
 
         /// <summary>
-        /// Implemementation for <see cref="DataObject.WriteXmlInternal(XmlWriter)"/>
+        /// Implemementation for <see cref="DataObject.WriteXmlContent(XmlWriter)"/>
         /// </summary>
         /// <param name="writer"></param>
-        protected override void WriteXmlInternal(XmlWriter writer)
+        protected override void WriteXmlContent(XmlWriter writer)
         {
-            // Write name
-            if(string.IsNullOrEmpty(Name) == false)
-            {
-                writer.WriteAttributeString(KEY_ATTRIBUTE, Name);
-            }
-
-            // Write browse Option
-            if (BrowseOption != BrowseOptions.Browsable)
-            {
-                writer.WriteAttributeString(BROWSE_ATTRIBUTE, BrowseOption.ToString());
-            }
-
-            // Write description
-            if (string.IsNullOrEmpty(Description) == false)
-            {
-                writer.WriteElementString(nameof(Description), Description);
-            }
-
-            // Write category
-            if(string.IsNullOrEmpty(Category) == false)
-            {
-                writer.WriteElementString(nameof(Category), Category);
-            }
-
-            // Write display Name
-            if(string.IsNullOrEmpty(DisplayName) == false)
-            {
-                writer.WriteElementString(nameof(DisplayName), DisplayName);
-            }
-
             // Write type if this based on an object
             if (Value.UnderlyingType is not null)
             {

@@ -119,7 +119,7 @@ namespace KEI.Infrastructure
             InitializeObject();
 
             // Read all the attributes.
-            ReadXmlAttrubutes(reader);
+            ReadXmlAttributes(reader);
 
             reader.Read();
 
@@ -156,7 +156,7 @@ namespace KEI.Infrastructure
         /// as default implementation
         /// </summary>
         /// <param name="reader"></param>
-        protected virtual void ReadXmlAttrubutes(XmlReader reader)
+        protected virtual void ReadXmlAttributes(XmlReader reader)
         {
             Name = reader.GetAttribute(KEY_ATTRIBUTE);
 
@@ -186,28 +186,39 @@ namespace KEI.Infrastructure
         protected virtual void OnXmlReadingCompleted() { }
 
         /// <summary>
+        /// Name of starting tag when writing as Xml
+        /// </summary>
+        /// <returns></returns>
+        protected virtual string GetStartElementName() { return START_ELEMENT; }
+
+        /// <summary>
         /// Writes value to an XmlWriter
         /// </summary>
         /// <param name="writer"></param>
         public virtual void WriteXml(XmlWriter writer)
         {
-            /// value held by this object is an <see cref="IDataContainer"/>
-            /// starting tag is "DataContainer", otherwise starting tag is <see cref="START_ELEMENT"/> ("Data")
-            string elementName = GetValue() switch
-            {
-                IDataContainer => "DataContainer",
-                IList => "DataContainerList",
-                _ => START_ELEMENT
-            };
-
             // write start tag
-            writer.WriteStartElement(elementName);
+            writer.WriteStartElement(GetStartElementName());
 
-            // write state of object
-            WriteXmlInternal(writer);
+            // write attributes
+            WriteXmlAttributes(writer);
+
+            // write content
+            WriteXmlContent(writer);
 
             // write end tag
             writer.WriteEndElement();
+        }
+
+        protected virtual void WriteXmlAttributes(XmlWriter writer)
+        {
+            writer.WriteAttributeString(TYPE_ID_ATTRIBUTE, Type);
+            writer.WriteAttributeString(KEY_ATTRIBUTE, Name);
+
+            if (string.IsNullOrEmpty(StringValue) == false)
+            {
+                writer.WriteAttributeString(VALUE_ATTRIBUTE, StringValue);
+            }
         }
 
         /// <summary>
@@ -215,12 +226,7 @@ namespace KEI.Infrastructure
         /// Writes <see cref="Type"/>, <see cref="Name"/>  and <see cref="StringValue"/> as attributes by default
         /// </summary>
         /// <param name="writer"></param>
-        protected virtual void WriteXmlInternal(XmlWriter writer)
-        {
-            writer.WriteAttributeString(TYPE_ID_ATTRIBUTE, Type);
-            writer.WriteAttributeString(KEY_ATTRIBUTE, Name);
-            writer.WriteAttributeString(VALUE_ATTRIBUTE, StringValue);
-        }
+        protected virtual void WriteXmlContent(XmlWriter writer) { }
 
         #endregion
 
@@ -250,7 +256,7 @@ namespace KEI.Infrastructure
             get { return _value; }
             set
             {
-                if(EqualityComparer<T>.Default.Equals(_value, value) == true)
+                if (EqualityComparer<T>.Default.Equals(_value, value) == true)
                 {
                     return;
                 }
@@ -271,12 +277,10 @@ namespace KEI.Infrastructure
         /// <typeparam name="T"></typeparam>
         /// <param name="value"></param>
         /// <returns></returns>
-#pragma warning disable CS0693 // Type parameter has the same name as the type parameter from outer type
-        public virtual string ConvertToString<T>(T value)
+        public virtual string ConvertToString(T value)
         {
             return value?.ToString();
         }
-#pragma warning restore CS0693 // Type parameter has the same name as the type parameter from outer type
 
 
         /// <summary>
@@ -292,7 +296,7 @@ namespace KEI.Infrastructure
         /// <returns></returns>
         public override bool SetValue(object value)
         {
-            if (value.GetType() != typeof(T))
+            if (value is not T)
             {
                 return false;
             }

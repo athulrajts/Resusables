@@ -21,9 +21,47 @@
         <xc:PropertyGrid SelectedObject="{Binding SamplePropertyContainer}"
                          ShowTitle="False"/>
 
-        <xc:PropertyGrid SelectedObject="{Binding TestObject}"
-                         ShowTitle="False"
-                         Grid.Column="2"/>
+        <Canvas Grid.Column="1" Grid.ColumnSpan="2" Margin="20" Background="White">
+           
+            <Rectangle Fill="{Binding SamplePropertyContainer.Fill, Converter={wpf:ColorToBrushConverter}}"
+                       Stroke="{Binding SamplePropertyContainer.Stroke, Converter={wpf:ColorToBrushConverter}}"
+                       StrokeThickness="{Binding SamplePropertyContainer.StrokeThickness}"
+                       Height="{Binding SamplePropertyContainer.Height}"
+                       Width="{Binding SamplePropertyContainer.Width}"
+                       Canvas.Left="{Binding SamplePropertyContainer.X}"
+                       Canvas.Top="{Binding SamplePropertyContainer.Y}">
+                <Rectangle.Style>
+                    <Style TargetType="Rectangle">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding SamplePropertyContainer.Shape}" Value="Rectangle">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Rectangle.Style>
+            </Rectangle>
+
+            <Ellipse Fill="{Binding SamplePropertyContainer.Fill, Converter={wpf:ColorToBrushConverter}}"
+                       Stroke="{Binding SamplePropertyContainer.Stroke, Converter={wpf:ColorToBrushConverter}}"
+                       StrokeThickness="{Binding SamplePropertyContainer.StrokeThickness}"
+                       Height="{Binding SamplePropertyContainer.Height}"
+                       Width="{Binding SamplePropertyContainer.Width}"
+                       Canvas.Left="{Binding SamplePropertyContainer.X}"
+                       Canvas.Top="{Binding SamplePropertyContainer.Y}">
+                <Ellipse.Style>
+                    <Style TargetType="Ellipse">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding SamplePropertyContainer.Shape}" Value="Ellipse">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Ellipse.Style>
+            </Ellipse>
+
+        </Canvas>
 
     </Grid>
 </UserControl>

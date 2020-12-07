@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Collections;
 using KEI.Infrastructure.Helpers;
+using System.Collections.Generic;
 
 namespace KEI.Infrastructure
 {
@@ -182,25 +183,16 @@ namespace KEI.Infrastructure
             return objContainer.Build();
         }
 
-        public static IPropertyContainer CreateList(string name, IList list)
+        public static IEnumerable<IPropertyContainer> CreateList(string name, IList list)
         {
             if (list is null)
             {
                 return null;
             }
 
-            var listConfig = new PropertyContainerBuilder(name);
+            var dataObj = new ContainerCollectionPropertyObject(name, list);
 
-            listConfig.SetUnderlyingType(list.GetType());
-
-            int count = 0;
-            foreach (var obj in list)
-            {
-                listConfig.Property($"{obj.GetType().Name}[{count}]", obj);
-                count++;
-            }
-
-            return listConfig.Build();
+            return dataObj.Value as IEnumerable<IPropertyContainer>;
         }
 
 

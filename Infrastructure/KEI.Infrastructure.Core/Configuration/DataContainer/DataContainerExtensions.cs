@@ -64,6 +64,11 @@ namespace KEI.Infrastructure
 
         public static T Get<T>(this IDataContainer dc, string key)
         {
+            if(dc is null)
+            {
+                throw new NullReferenceException();
+            }
+
             var retValue = default(T);
 
             dc.GetValue(key, ref retValue);
@@ -73,6 +78,11 @@ namespace KEI.Infrastructure
 
         public static void Put(this IDataContainer dc, string key, object value)
         {
+            if(dc is null)
+            {
+                throw new NullReferenceException();
+            }
+
             if (dc.ContainsData(key))
             {
                 dc.SetValue(key, value);
@@ -116,7 +126,7 @@ namespace KEI.Infrastructure
         #endregion
 
 
-        public static IDataContainer ToListDataContainer(this IList list, string name = "UntitledList")
+        public static IEnumerable<IDataContainer> ToListDataContainer(this IList list, string name = "UntitledList")
         {
             return DataContainerBuilder.CreateList(name, list);
         }
@@ -133,7 +143,7 @@ namespace KEI.Infrastructure
             return PropertyContainerBuilder.CreateObject(name, obj);
         }
 
-        public static IPropertyContainer ToListPropertyContainer(this IList list, string name = "UntitledList")
+        public static IEnumerable<IPropertyContainer> ToListPropertyContainer(this IList list, string name = "UntitledList")
         {
             return PropertyContainerBuilder.CreateList(name, list);
         }

@@ -1,4 +1,6 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
+using System.Reflection;
 using TypeInfo = KEI.Infrastructure.Types.TypeInfo;
 
 namespace KEI.Infrastructure
@@ -18,12 +20,26 @@ namespace KEI.Infrastructure
 
         public DataContainerBuilder Data(string name, object value)
         {
-            if (config.ContainsData(name) || value is null)
+            if (config.ContainsData(name) || value is null || string.IsNullOrWhiteSpace(value.ToString()))
             {
                 return this;
             }
 
             config.Add(DataObjectFactory.GetDataObjectFor(name, value));
+
+            return this;
+        }
+
+        private DataContainerBuilder Data(PropertyInfo pi, object obj)
+        {
+            var value = pi.GetValue(obj);
+
+            if(value is null || string.IsNullOrEmpty(value.ToString()))
+            {
+                return this;
+            }
+
+            config.Add(DataObjectFactory.GetDataObjectFor(pi.Name, value));
 
             return this;
         }
@@ -48,31 +64,22 @@ namespace KEI.Infrastructure
                     continue;
                 }
 
-                objContainer.Data(prop.Name, prop.GetValue(value));
+                objContainer.Data(prop, value);
             }
 
             return objContainer.Build();
         }
 
-        public static IDataContainer CreateList(string name, IList list)
+        public static IEnumerable<IDataContainer> CreateList(string name, IList list)
         {
             if (list is null)
             {
                 return null;
             }
 
-            var listConfig = new DataContainerBuilder(name);
-            
-            listConfig.SetUnderlyingType(list.GetType());
+            var dataObject = new ContainerCollectionDataObject(name, list);
 
-            int count = 0;
-            foreach (var obj in list)
-            {
-                listConfig.Data($"{obj.GetType().Name}[{count}]", obj);
-                count++;
-            }
-
-            return listConfig.Build();
+            return dataObject.Value;
         }
 
         public static IDataContainer FromFile(string path) => DataContainer.FromFile(path);

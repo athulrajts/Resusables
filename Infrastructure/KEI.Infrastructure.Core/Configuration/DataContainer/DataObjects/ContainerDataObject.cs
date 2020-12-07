@@ -11,6 +11,8 @@ namespace KEI.Infrastructure
     /// </summary>
     internal class ContainerDataObject : DataObject, IWriteToBinaryStream
     {
+        public const string DC_START_ELEMENT_NAME = "DataContainer";
+
         public IDataContainer Value { get; set; }
 
         /// <summary>
@@ -36,18 +38,6 @@ namespace KEI.Infrastructure
             Name = name;
 
             Value = DataContainerBuilder.CreateObject(name, value);
-        }
-
-        /// <summary>
-        /// Constructor to create object of any <see cref="IList"/> implementation
-        /// converts given object to IDataContainer using <see cref="DataContainerBuilder.CreateList(string, IList)"/>
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="value"></param>
-        public ContainerDataObject(string name, IList value)
-        {
-            Name = name;
-            Value = DataContainerBuilder.CreateList(name, value);
         }
 
         /// <summary>
@@ -113,6 +103,11 @@ namespace KEI.Infrastructure
             Value = new DataContainer();
         }
 
+        protected override string GetStartElementName()
+        {
+            return DC_START_ELEMENT_NAME;
+        }
+
         /// <summary>
         /// Implementation for <see cref="DataObject.ReadXmlElement(string, XmlReader)"/>
         /// </summary>
@@ -121,47 +116,39 @@ namespace KEI.Infrastructure
         /// <returns></returns>
         protected override bool ReadXmlElement(string elementName, XmlReader reader)
         {
-            if (elementName == START_ELEMENT)
+            // call base implementation
+            if(base.ReadXmlElement(elementName, reader))
             {
-                var obj = DataObjectFactory.GetDataObject(reader.GetAttribute(TYPE_ID_ATTRIBUTE));
-
-                if (obj is not null)
-                {
-                    using var newReader = XmlReader.Create(new StringReader(reader.ReadOuterXml()));
-
-                    newReader.Read();
-
-                    obj.ReadXml(newReader);
-
-                    Value.Add(obj);
-                }
-
                 return true;
             }
-            else if (elementName == "DataContainer")
-            {
-                var obj = (ContainerDataObject)DataObjectFactory.GetDataObject("dc");
 
-                if (obj is not null)
-                {
-                    obj.Value = new DataContainer();
-
-                    using var newReader = XmlReader.Create(new StringReader(reader.ReadOuterXml()));
-
-                    newReader.Read();
-
-                    obj.ReadXml(newReader);
-
-                    Value.Add(obj);
-                }
-
-                return true;
-            }
-            else if (elementName == nameof(TypeInfo))
+            /// Read underlying type for <see cref="ContainerDataObject"/> created from CLR objects
+            if (elementName == nameof(TypeInfo))
             {
                 Value.UnderlyingType = reader.ReadObjectXml<TypeInfo>();
 
                 return true;
+            }
+
+            /// Read <see cref="DataObject"/> implementation
+            else
+            {
+                if (DataObjectFactory.GetDataObject(reader.GetAttribute(TYPE_ID_ATTRIBUTE)) is DataObject obj)
+                {
+                    using var newReader = XmlReader.Create(new StringReader(reader.ReadOuterXml()));
+
+                    newReader.Read();
+
+                    obj.ReadXml(newReader);
+
+                    Value.Add(obj);
+
+                    return true;
+                }
+                else
+                {
+                    //
+                }
             }
 
             return false;
@@ -176,16 +163,11 @@ namespace KEI.Infrastructure
         }
 
         /// <summary>
-        /// Implementation for <see cref="DataObject.WriteXmlInternal(XmlWriter)"/>
+        /// Implementation for <see cref="DataObject.WriteXmlContent(XmlWriter)"/>
         /// </summary>
         /// <param name="writer"></param>
-        protected override void WriteXmlInternal(XmlWriter writer)
+        protected override void WriteXmlContent(XmlWriter writer)
         {
-            if (string.IsNullOrEmpty(Name) == false)
-            {
-                writer.WriteAttributeString(KEY_ATTRIBUTE, Name);
-            }
-
             if (Value.UnderlyingType is not null)
             {
                 writer.WriteObjectXml(Value.UnderlyingType);

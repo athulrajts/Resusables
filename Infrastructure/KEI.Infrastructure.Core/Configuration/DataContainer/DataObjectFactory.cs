@@ -140,11 +140,6 @@ namespace KEI.Infrastructure
         /// <returns></returns>
         public static DataObject GetDataObjectFor(string name, object value, params object[] args)
         {
-            if(value is null)
-            {
-                throw new NullReferenceException();
-            }
-
             Type valueType = value.GetType();
 
             if(typeDataObjMapping.ContainsKey(valueType))

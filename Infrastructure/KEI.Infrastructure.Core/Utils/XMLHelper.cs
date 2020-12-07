@@ -15,7 +15,7 @@ namespace KEI.Infrastructure
         /// <param name="data">object to serialize</param>
         /// <param name="filePath">file path to serialize to</param>
         /// <returns>Is success</returns>
-        public static bool SerializeToFile<T>(T data, string filePath)
+        public static bool SerializeToFile(object data, string filePath)
         {
             try
             {
@@ -31,8 +31,8 @@ namespace KEI.Infrastructure
                 }
 
                 using FileStream fileStream = new FileStream(filePath, FileMode.Create);
-                XmlSerializer serializer = new XmlSerializer(typeof(T));
-                serializer.Serialize(fileStream, data, new XmlSerializerNamespaces(new[] { XmlQualifiedName.Empty }));
+                XmlSerializer serializer = new XmlSerializer(data.GetType());
+                serializer.Serialize(fileStream, data);
                 return true;
             }
             catch (Exception ex)

@@ -20,6 +20,7 @@ namespace KEI.Infrastructure
     /// <summary>
     /// Base class for <see cref="DataContainer"/> and <see cref="PropertyContainer"/>
     /// </summary>
+    [XmlRoot("DataContainer")]
     public abstract class DataContainerBase : DynamicObject, IDataContainer, ICustomTypeDescriptor, IXmlSerializable, IEnumerable
     {
         #region Properties
@@ -554,6 +555,11 @@ namespace KEI.Infrastructure
 
         #region IXmlSerializable Members
 
+        protected virtual DataObject GetUnitializedDataObject(string type)
+        {
+            return DataObjectFactory.GetDataObject(type);
+        }
+
         public XmlSchema GetSchema() => null;
 
         public virtual void ReadXml(XmlReader reader)
@@ -575,65 +581,42 @@ namespace KEI.Infrastructure
                     reader.Read();
                 }
 
-                // start of a DataObject
-                else if (reader.Name == DataObject.START_ELEMENT)
-                {
-                    // Get DataObject to read.
-                    var obj = DataObjectFactory.GetDataObject(reader.GetAttribute(DataObject.TYPE_ID_ATTRIBUTE));
-
-                    if (obj is not null)
-                    {
-                        using var newReader = XmlReader.Create(new StringReader(reader.ReadOuterXml()));
-
-                        newReader.Read();
-
-                        obj.ReadXml(newReader);
-
-                        Add(obj);
-                    }
-                }
-
-                // start of ContainerDataObject
-                else if (reader.Name == "DataContainer")
-                {
-                    // get a ContainerDataObject to start reading.
-                    var obj = DataObjectFactory.GetDataObject("dc");
-
-                    if (obj is not null)
-                    {
-                        using var newReader = XmlReader.Create(new StringReader(reader.ReadOuterXml()));
-
-                        newReader.Read();
-
-                        obj.ReadXml(newReader);
-
-                        Add(obj);
-                    }
-                }
-
-                // start of ContainerDataObject
-                else if (reader.Name == "DataContainerList")
-                {
-                    var obj = DataObjectFactory.GetDataObject("dcl");
-
-                    if (obj is not null)
-                    {
-                        using var newReader = XmlReader.Create(new StringReader(reader.ReadOuterXml()));
-
-                        newReader.Read();
-
-                        obj.ReadXml(newReader);
-
-                        Add(obj);
-                    }
-                }
-
                 // Start of Underlying type
-                // for Datacontainers created from .NET objects
+                // for DataObjects created from taking CLR objects as reference
                 else if (reader.Name == nameof(Types.TypeInfo))
                 {
                     UnderlyingType = reader.ReadObjectXml<Types.TypeInfo>();
                 }
+                
+                // We're reading a DataObject implementation
+                else
+                {
+                    string dataObjectType = reader.GetAttribute(DataObject.TYPE_ID_ATTRIBUTE);
+
+                    /// Get uninitialized Object based on <see cref="DataObject.TYPE_ID_ATTRIBUTE"/>
+                    if(GetUnitializedDataObject(dataObjectType) is DataObject obj)
+                    {
+                        /// need to create a new XmlReader so that <see cref="DataObject"/> implementation
+                        /// can read till end.
+                        using var newReader = XmlReader.Create(new StringReader(reader.ReadOuterXml()));
+
+                        // move to content
+                        newReader.Read();
+
+                        obj.ReadXml(newReader);
+
+                        Add(obj);
+                    }
+                    else
+                    {
+                        /// Unsupoprted DataObject implementation
+                        /// 3rd Party Implementation should Register themselves to <see cref="DataObjectFactory"/>
+                        /// using <see cref="DataObjectFactory.RegisterDataObject{T}"/> or <see cref="DataObjectFactory.RegisterPropertyObject{T}"/>
+                        /// If no implementation is found in Factory, skip 
+
+                    }
+                }    
+
             }
         }
 

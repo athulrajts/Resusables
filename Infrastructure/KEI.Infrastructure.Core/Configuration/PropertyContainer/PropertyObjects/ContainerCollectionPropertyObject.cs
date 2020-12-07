@@ -24,7 +24,7 @@ namespace KEI.Infrastructure
             int count = 0;
             foreach (var item in value)
             {
-                Value.Add((PropertyContainer)PropertyContainerBuilder.CreateObject($"{name}[{count++}]", item));
+                Value.Add(PropertyContainerBuilder.CreateObject($"{name}[{count++}]", item));
             }
 
             CollectionType = value.GetType();
@@ -86,40 +86,22 @@ namespace KEI.Infrastructure
         }
 
         /// <summary>
-        /// Implementation for <see cref="DataObject.WriteXmlInternal(XmlWriter)"/>
+        /// Implementation for <see cref="DataObject.GetStartElementName"/>
+        /// </summary>
+        /// <returns></returns>
+        protected override string GetStartElementName()
+        {
+            return ContainerDataObject.DC_START_ELEMENT_NAME;
+        }
+
+        /// <summary>
+        /// Implementation for <see cref="DataObject.WriteXmlContent(XmlWriter)"/>
         /// </summary>
         /// <param name="writer"></param>
-        protected override void WriteXmlInternal(XmlWriter writer)
+        protected override void WriteXmlContent(XmlWriter writer)
         {
-            // Write name
-            if (string.IsNullOrEmpty(Name) == false)
-            {
-                writer.WriteAttributeString(KEY_ATTRIBUTE, Name);
-            }
-
-            // Write browse Option
-            if (BrowseOption != BrowseOptions.Browsable)
-            {
-                writer.WriteAttributeString(BROWSE_ATTRIBUTE, BrowseOption.ToString());
-            }
-
-            // Write description
-            if (string.IsNullOrEmpty(Description) == false)
-            {
-                writer.WriteElementString(nameof(Description), Description);
-            }
-
-            // Write category
-            if (string.IsNullOrEmpty(Category) == false)
-            {
-                writer.WriteElementString(nameof(Category), Category);
-            }
-
-            // Write display Name
-            if (string.IsNullOrEmpty(DisplayName) == false)
-            {
-                writer.WriteElementString(nameof(DisplayName), DisplayName);
-            }
+            // Write base impl
+            base.WriteXmlContent(writer);
 
             // Write collection type
             if (CollectionType is not null)
@@ -142,26 +124,37 @@ namespace KEI.Infrastructure
         /// <returns></returns>
         protected override bool ReadXmlElement(string elementName, XmlReader reader)
         {
+            // call base
             if(base.ReadXmlElement(elementName, reader))
             {
                 return true;
             }
 
-            if(elementName == "DataContainer")
+            /// Read DataObject implementation
+            if (elementName == ContainerDataObject.DC_START_ELEMENT_NAME)
             {
-                using var newReader = XmlReader.Create(new StringReader(reader.ReadOuterXml()));
-                newReader.Read();
-                
-                var dco = DataObjectFactory.GetPropertyObject("dc");
-                dco.ReadXml(newReader);
+                var obj = DataObjectFactory.GetPropertyObject("dc");
 
-                Value.Add(dco.GetValue() as PropertyContainer);
+                if (obj is ContainerPropertyObject cdo)
+                {
+                    using var newReader = XmlReader.Create(new StringReader(reader.ReadOuterXml()));
+
+                    newReader.Read();
+
+                    cdo.ReadXml(newReader);
+
+                    Value.Add(cdo.Value);
+                }
 
                 return true;
             }
+
+            /// Read type info
             else if(elementName == nameof(TypeInfo))
             {
                 CollectionType = reader.ReadObjectXml<TypeInfo>();
+
+                return true;
             }
 
             return false;

@@ -64,12 +64,12 @@ namespace KEI.Infrastructure
         }
 
         /// <summary>
-        /// Implementation for <see cref="DataObject.WriteXmlInternal(XmlWriter)"/>
+        /// Implementation for <see cref="DataObject.WriteXmlContent(XmlWriter)"/>
         /// </summary>
         /// <param name="writer"></param>
-        protected override void WriteXmlInternal(XmlWriter writer)
+        protected override void WriteXmlContent(XmlWriter writer)
         {
-            base.WriteXmlInternal(writer);
+            base.WriteXmlContent(writer);
 
             writer.WriteObjectXml(new TypeInfo(EnumType));
         }

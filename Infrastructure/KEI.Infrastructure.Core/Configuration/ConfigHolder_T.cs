@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Prism.Mvvm;
 using KEI.Infrastructure.Logging;
+using System.Xml;
 
 namespace KEI.Infrastructure.Configuration
 {
@@ -55,9 +56,20 @@ namespace KEI.Infrastructure.Configuration
                 return false;
             }
 
-            if (typeof(IEnumerable).IsAssignableFrom(typeof(T)))
+            if (typeof(IList).IsAssignableFrom(typeof(T)))
             {
-                Config = (T)intermediateConfig.MorphList();
+                Config = new T();
+
+                if(Config is IList l)
+                {
+                    foreach (var item in intermediateConfig)
+                    {
+                        if(item.GetValue() is IDataContainer dc)
+                        {
+                            l.Add(dc.Morph());
+                        }
+                    }
+                }
             }
             else
             {
@@ -82,12 +94,18 @@ namespace KEI.Infrastructure.Configuration
             {
                 if(Config is IList listConfig)
                 {
-                    if(XmlHelper.SerializeToFile(listConfig.ToListDataContainer(ConfigName), path) == false)
+                    var dc = DataContainerBuilder.Create(ConfigName);
+                    foreach (var item in listConfig.ToListDataContainer(ConfigName))
+                    {
+                        dc.Data(item.Name, item);
+                    }
+
+                    if (XmlHelper.SerializeToFile(dc.Build(), path) == false)
                     {
                         Logger.Error($"Unable to Store Config \"{ConfigName}\"");
                         return false;
                     }
-                    
+
                 }
             }
             else

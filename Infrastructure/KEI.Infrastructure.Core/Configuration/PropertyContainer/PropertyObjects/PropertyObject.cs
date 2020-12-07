@@ -14,7 +14,8 @@ namespace KEI.Infrastructure
     public abstract class PropertyObject : DataObject
     {
         // xml strings
-        public const string BROWSE_ATTRIBUTE = "browse"; 
+        public const string BROWSE_ATTRIBUTE = "browse";
+        public const string CATEGORY_ATTRIBUTE = "category";
 
         #region Properties
 
@@ -72,21 +73,33 @@ namespace KEI.Infrastructure
 
         #endregion
 
-        /// <summary>
-        /// Implementation for <see cref="DataObject.WriteXmlInternal(XmlWriter)"/>
-        /// </summary>
-        /// <param name="writer"></param>
-        protected override void WriteXmlInternal(XmlWriter writer)
+        protected override void WriteXmlAttributes(XmlWriter writer)
         {
-            // write base implementation
-            base.WriteXmlInternal(writer);
+            base.WriteXmlAttributes(writer);
 
             /// Only write browse option if it's value is not <see cref="BrowseOptions.Browsable"/>
             /// Most of the properties is expected to be browsable so only write if it's not that to decrease file length
-            if(BrowseOption != BrowseOptions.Browsable)
+            if (BrowseOption != BrowseOptions.Browsable)
             {
                 writer.WriteAttributeString(BROWSE_ATTRIBUTE, BrowseOption.ToString());
             }
+
+            // Write Category if we have one
+            if (string.IsNullOrEmpty(Category) == false)
+            {
+                writer.WriteAttributeString(CATEGORY_ATTRIBUTE, Category);
+            }
+
+        }
+
+        /// <summary>
+        /// Implementation for <see cref="DataObject.WriteXmlContent(XmlWriter)"/>
+        /// </summary>
+        /// <param name="writer"></param>
+        protected override void WriteXmlContent(XmlWriter writer)
+        {
+            // write base implementation
+            base.WriteXmlContent(writer);
 
             // Write DisplayName if have we have one
             if(string.IsNullOrEmpty(DisplayName) == false)
@@ -94,14 +107,8 @@ namespace KEI.Infrastructure
                 writer.WriteElementString(nameof(DisplayName), DisplayName);
             }
 
-            // Write Category if we have one
-            if(string.IsNullOrEmpty(Category) == false)
-            {
-                writer.WriteElementString(nameof(Category), Category);
-            }
-
             // Write description if we have one
-            if(string.IsNullOrEmpty(Description) == false)
+            if (string.IsNullOrEmpty(Description) == false)
             {
                 writer.WriteElementString(nameof(Description), Description);
             }
@@ -115,13 +122,13 @@ namespace KEI.Infrastructure
         }
 
         /// <summary>
-        /// Implementation for <see cref="DataObject.ReadXmlAttrubutes(XmlReader)"/>
+        /// Implementation for <see cref="DataObject.ReadXmlAttributes(XmlReader)"/>
         /// </summary>
         /// <param name="reader"></param>
-        protected override void ReadXmlAttrubutes(XmlReader reader)
+        protected override void ReadXmlAttributes(XmlReader reader)
         {
             // do base implementation
-            base.ReadXmlAttrubutes(reader);
+            base.ReadXmlAttributes(reader);
 
             // read browse option
             if (reader.GetAttribute(BROWSE_ATTRIBUTE) is string attr)
@@ -131,6 +138,12 @@ namespace KEI.Infrastructure
             else
             {
                 BrowseOption = BrowseOptions.Browsable;
+            }
+
+            // read category
+            if(reader.GetAttribute(CATEGORY_ATTRIBUTE) is string category)
+            {
+                Category = category;
             }
         }
 
@@ -267,7 +280,7 @@ namespace KEI.Infrastructure
         /// <returns></returns>
         public override bool SetValue(object value)
         {
-            if (value.GetType() != typeof(T))
+            if (value is not T)
             {
                 return false;
             }

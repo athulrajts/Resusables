@@ -1,4 +1,5 @@
-﻿using System;
+﻿using KEI.UI.Wpf.Converters;
+using System;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
@@ -26,29 +27,6 @@ namespace KEI.UI.Wpf.Controls.PropertyGridEditors
         protected override IValueConverter CreateValueConverter()
         {
             return new ColorConverter();
-        }
-
-        class ColorConverter : IValueConverter
-        {
-            public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-            {
-                if(value is Infrastructure.Color c)
-                {
-                    return System.Windows.Media.Color.FromRgb(c.R, c.G, c.B);
-                }
-
-                return DependencyProperty.UnsetValue;
-            }
-
-            public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-            {
-                if(value is System.Windows.Media.Color c)
-                {
-                    return new Infrastructure.Color(c.R, c.G, c.B);
-                }
-
-                return DependencyProperty.UnsetValue;
-            }
         }
     }
 }

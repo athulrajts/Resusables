@@ -66,7 +66,7 @@ namespace Application.Production.ViewModels
             var dbPath = PathUtils.GetPath("Database/Test.csv");
             if (File.Exists(dbSetupPath))
             {
-                setup = PropertyContainerBuilder.FromFile(dbSetupPath).Morph<DatabaseSetup>();
+                setup = DataContainerBuilder.FromFile(dbSetupPath).Morph<DatabaseSetup>();
             }
             else
             {
@@ -77,7 +77,7 @@ namespace Application.Production.ViewModels
                     Schema = DatabaseSchema.SchemaFor<DatabaseItem>().ToList()
                 };
 
-                setup.ToPropertyContainer("DB").Store(dbSetupPath);
+                DataContainerBuilder.CreateObject("DB", setup).Store(dbSetupPath);
             }
 
             _database.StartSession(setup);
@@ -89,7 +89,7 @@ namespace Application.Production.ViewModels
         {
             EditDatabaseCommand = new DelegateCommand(() =>
             {
-                var setupConfig = setup.ToPropertyContainer("DB");
+                var setupConfig = DataContainerBuilder.CreateObject("DB", setup);
                 var vm = new DatabaseSetupViewModel(_viewService, setupConfig, typeof(DatabaseItem));
 
                 // for demo, shoud not reference UI in viewmodel

@@ -3,7 +3,7 @@
     /// <summary>
     /// PropertyObject implementation for <see cref="float"/>
     /// </summary>
-    internal class FloatPropertyObject : PropertyObject<float>
+    internal class FloatPropertyObject : PropertyObject<float>, INumericPropertyObject
     {
         /// <summary>
         /// Constructor
@@ -17,14 +17,14 @@
         }
 
         /// <summary>
-        /// Implementation for <see cref="PropertyObject.Editor"/>
-        /// </summary>
-        public override EditorType Editor => EditorType.String;
-
-        /// <summary>
         /// Implementation for <see cref="DataObject.Type"/>
         /// </summary>
         public override string Type => "float";
+
+        /// <summary>
+        /// Increment for editors
+        /// </summary>
+        public object Increment { get; set; }
 
         /// <summary>
         /// Implementation for <see cref="DataObject.CanConvertFromString(string)"/>
@@ -54,7 +54,7 @@
         /// <param name="value"></param>
         protected override void OnStringValueChanged(string value)
         {
-            if(float.TryParse(value, out _value))
+            if (float.TryParse(value, out _value))
             {
                 RaisePropertyChanged(nameof(Value));
             }

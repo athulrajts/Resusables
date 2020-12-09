@@ -17,11 +17,6 @@
         }
 
         /// <summary>
-        /// Implementation for <see cref="PropertyObject.Editor"/>
-        /// </summary>
-        public override EditorType Editor => EditorType.String;
-
-        /// <summary>
         /// Implementation for <see cref="DataObject.Type"/>
         /// </summary>
         public override string Type => "char";

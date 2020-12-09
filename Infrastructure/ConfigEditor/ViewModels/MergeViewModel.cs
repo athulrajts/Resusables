@@ -103,8 +103,8 @@ namespace ConfigEditor.ViewModels
 
         void ExecuteRefreshMergeCommand()
         {
-            var left = PropertyContainerBuilder.FromFile(LeftPath) ?? DataContainer.FromFile(LeftPath).ToPropertyContainer();
-            var right = PropertyContainerBuilder.FromFile(RightPath) ?? DataContainer.FromFile(RightPath).ToPropertyContainer();
+            var left = PropertyContainerBuilder.FromFile(LeftPath);
+            var right = PropertyContainerBuilder.FromFile(RightPath);
 
             if(left == null || right == null)
             {

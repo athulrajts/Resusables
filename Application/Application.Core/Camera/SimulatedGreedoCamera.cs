@@ -71,8 +71,8 @@ namespace Application.Core.Camera
 
         protected override PropertyContainerBuilder DefineConfigShape()
         {
-            return PropertyContainerBuilder.Create(ConfigName, ConfigPath)
-                .Property("CapturedImagesFolder", @".\Images\CapturedImages\");
+            return PropertyContainerBuilder.Create(ConfigName)
+                .Object("CapturedImagesFolder", @".\Images\CapturedImages\");
         }
     }
 }

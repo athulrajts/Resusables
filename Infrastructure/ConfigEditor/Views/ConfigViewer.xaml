@@ -4,7 +4,9 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:ap="clr-namespace:KEI.UI.Wpf.AttachedProperties;assembly=KEI.UI.Wpf"
+             xmlns:c="clr-namespace:ConfigEditor.Converters"
              xmlns:model="clr-namespace:ConfigEditor.Models"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -14,14 +16,14 @@
                          VerticalContentAlignment="Center"
                          TextWrapping="Wrap"
                          AcceptsReturn="True"
-                         Text="{Binding ValueString}">
+                         Text="{Binding StringValue}">
             </TextBox>
         </DataTemplate>
 
         <!--For Boolean-->
         <DataTemplate x:Key="BooleanTemplate">
             <CheckBox DataContext="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContentControl}}" 
-                          IsChecked="{Binding ValueString}"
+                          IsChecked="{Binding StringValue}"
                           VerticalAlignment="Center"
                           HorizontalAlignment="Left"/>
         </DataTemplate>
@@ -29,8 +31,8 @@
         <!--For Enumerations-->
         <DataTemplate x:Key="EnumTemplate">
             <ComboBox DataContext="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContentControl}}" 
-                          ItemsSource="{Binding Value.Option}"
-                          SelectedValue="{Binding ValueString}"
+                          ItemsSource="{Binding Value, Converter={c:EnumToValuesConverter}, Mode=OneWay}"
+                          SelectedItem="{Binding ValueString}"
                           VerticalContentAlignment="Center">
                 <ComboBox.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -92,7 +94,10 @@
 
         <!--Selected Tree Node-->
         <Border Grid.Column="1" Grid.Row="1">
-            <DataGrid CanUserAddRows="False"
+            <xctk:PropertyGrid SelectedObject="{Binding SelectedNode.Container}"
+                               ShowTitle="False">
+            </xctk:PropertyGrid>
+            <!--<DataGrid CanUserAddRows="False"
                       AutoGenerateColumns="False"
                       AlternatingRowBackground="{StaticResource AlternatingRowBrush}"
                       ItemsSource="{Binding SelectedNode.DataItems}"
@@ -107,10 +112,10 @@
                                         <Style TargetType="ContentControl">
                                             <Setter Property="ContentTemplate" Value="{StaticResource StringAndNumericTemplate}"/>
                                             <Style.Triggers>
-                                                <DataTrigger Binding="{Binding Editor}" Value="Bool">
+                                                <DataTrigger Binding="{Binding Type}" Value="bool">
                                                     <Setter Property="ContentTemplate" Value="{StaticResource BooleanTemplate}"/>
                                                 </DataTrigger>
-                                                <DataTrigger Binding="{Binding Editor}" Value="Enum">
+                                                <DataTrigger Binding="{Binding Type}" Value="enum">
                                                     <Setter Property="ContentTemplate" Value="{StaticResource EnumTemplate}"/>
                                                 </DataTrigger>
                                             </Style.Triggers>
@@ -121,12 +126,12 @@
                         </DataGridTemplateColumn.CellEditingTemplate>
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding ValueString}" Padding="5 0"/>
+                                <TextBlock Text="{Binding StringValue}" Padding="5 0"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
                 </DataGrid.Columns>
-            </DataGrid>
+            </DataGrid>-->
         </Border>
     </Grid>
 </UserControl>

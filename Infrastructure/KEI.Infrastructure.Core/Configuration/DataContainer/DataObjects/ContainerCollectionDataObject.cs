@@ -4,6 +4,7 @@ using System.Xml;
 using System.Collections;
 using System.Collections.ObjectModel;
 using KEI.Infrastructure.Types;
+using System.Collections.Generic;
 
 namespace KEI.Infrastructure
 {
@@ -24,10 +25,16 @@ namespace KEI.Infrastructure
             int count = 0;
             foreach (var item in value)
             {
-                Value.Add((DataContainer)DataContainerBuilder.CreateObject($"{name}[{count++}]", item));
+                Value.Add(DataContainerBuilder.CreateObject($"{name}[{count++}]", item));
             }
 
             CollectionType = value.GetType();
+        }
+
+        public ContainerCollectionDataObject(string name, ObservableCollection<IDataContainer> value)
+        {
+            Name = name;
+            Value = value;
         }
 
         /// <summary>
@@ -89,6 +96,8 @@ namespace KEI.Infrastructure
             return ContainerDataObject.DC_START_ELEMENT_NAME;
         }
 
+        protected override bool CanWriteValueAsXmlAttribute() { return false; }
+
         /// <summary>
         /// Implementation for <see cref="DataObject.WriteXmlContent(XmlWriter)"/>
         /// </summary>
@@ -105,7 +114,7 @@ namespace KEI.Infrastructure
             }
 
             // Write values
-            foreach (var dc in Value)
+            foreach (IDataContainer dc in Value)
             {
                 new ContainerDataObject(dc.Name, dc).WriteXml(writer);
             }

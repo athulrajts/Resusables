@@ -27,8 +27,8 @@ namespace ConfigEditor.Models
             MergedModel = new ObservableCollection<MergeItem>();
             AllItems = new ObservableCollection<MergeItem>();
 
-            var leftDic = Left.ToDictionary();
-            var rightDic = Right.ToDictionary();
+            var leftDic = Left.ToFlatDictionary();
+            var rightDic = Right.ToFlatDictionary();
 
             var allKeys = leftDic.Keys.Union(rightDic.Keys);
 
@@ -61,8 +61,8 @@ namespace ConfigEditor.Models
         public IPropertyContainer Merge(MergeOption shape)
         {
             IPropertyContainer dc = null;
-            var leftData = Left.ToDictionary();
-            var rightData = Right.ToDictionary();
+            var leftData = Left.ToFlatDictionary();
+            var rightData = Right.ToFlatDictionary();
             var diff = AllItems.Where(x => x.IsDifferent).Select(x => x.Key);
 
             if(shape == MergeOption.Left)

@@ -40,14 +40,6 @@ namespace KEI.Infrastructure
         /// </summary>
         public bool IsValid { get; private set; }
 
-
-        /// <summary>
-        /// Helps a property editors to choose what control to be used to
-        /// edits this objects value.
-        /// </summary>
-        [Browsable(false)]
-        public abstract EditorType Editor { get; }
-
         /// <summary>
         /// Validations for this property
         /// </summary>

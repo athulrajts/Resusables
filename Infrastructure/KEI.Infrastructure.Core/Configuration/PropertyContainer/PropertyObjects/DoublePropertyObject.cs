@@ -1,10 +1,14 @@
-﻿namespace KEI.Infrastructure
+﻿using System.Xml;
+
+namespace KEI.Infrastructure
 {
     /// <summary>
     /// PropertyObject implementation for <see cref="double"/>
     /// </summary>
-    internal class DoublePropertyObject : PropertyObject<double>
+    internal class DoublePropertyObject : PropertyObject<double> , INumericPropertyObject
     {
+        const double DEFAULT_INCREMENT = 0.1;
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -17,14 +21,14 @@
         }
 
         /// <summary>
-        /// Implementation for <see cref="PropertyObject.Editor"/>
-        /// </summary>
-        public override EditorType Editor => EditorType.String;
-
-        /// <summary>
         /// Implementation for <see cref="DataObject.Type"/>
         /// </summary>
         public override string Type => "double";
+
+        /// <summary>
+        /// Increment for editors
+        /// </summary>
+        public object Increment { get; set; }
 
         /// <summary>
         /// Implementation for <see cref="DataObject.CanConvertFromString(string)"/>
@@ -46,6 +50,36 @@
             return double.TryParse(value, out double tmp)
                 ? tmp
                 : null;
+        }
+
+        /// <summary>
+        /// Implementation for <see cref="DataObject.WriteXmlContent(XmlWriter)"/>
+        /// </summary>
+        /// <param name="writer"></param>
+        protected override void WriteXmlContent(XmlWriter writer)
+        {
+            base.WriteXmlContent(writer);
+
+            if(Increment is double d && d != DEFAULT_INCREMENT)
+            {
+                writer.WriteElementString(nameof(Increment), d.ToString());
+            }
+
+        }
+
+        protected override bool ReadXmlElement(string elementName, XmlReader reader)
+        {
+            if(base.ReadXmlElement(elementName, reader))
+            {
+                return true;
+            }
+
+            if(elementName == nameof(Increment))
+            {
+                Increment = reader.ReadElementContentAsDouble();
+            }
+
+            return false;
         }
 
         /// <summary>

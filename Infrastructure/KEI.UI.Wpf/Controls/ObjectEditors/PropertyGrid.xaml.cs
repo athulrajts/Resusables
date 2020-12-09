@@ -130,7 +130,9 @@ namespace KEI.UI.Wpf.Controls.Configuration
         }
         public string PropertyDescription { get; set; }
         public string PropertyName { get; set; }
-        public EditorType PropertyEditor { get; set; }
+        
+        public string PropertyEditor { get; set; }
+        
         public BrowseOptions BrowseOption { get; set; }
 
         public string this[string name]
@@ -157,17 +159,17 @@ namespace KEI.UI.Wpf.Controls.Configuration
             }
         }
 
-        protected EditorType GetEditor(Type type)
+        protected string GetEditor(Type type)
         {
             if (typeof(IConvertible).IsAssignableFrom(type))
             {
                 if (type.IsEnum)
-                    return EditorType.Enum;
+                    return "enum";
                 else if (type == typeof(bool))
-                    return EditorType.Bool;
-                return EditorType.String;
+                    return "bool";
+                return "string";
             }
-            return EditorType.Object;
+            return "dc";
         }
 
         public abstract void SetPropertyValue(string value);
@@ -251,7 +253,7 @@ namespace KEI.UI.Wpf.Controls.Configuration
                 PropertyValue = Enum.GetName(value.GetType(), value);
             }
 
-            PropertyEditor = source.Editor;
+            PropertyEditor = source.Type;
             BrowseOption = item.BrowseOption;
 
             PropertyChangedEventManager.AddListener(source, this, "Value");

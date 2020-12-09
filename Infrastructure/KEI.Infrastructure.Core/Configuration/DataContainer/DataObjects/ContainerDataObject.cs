@@ -108,6 +108,8 @@ namespace KEI.Infrastructure
             return DC_START_ELEMENT_NAME;
         }
 
+        protected override bool CanWriteValueAsXmlAttribute() { return false; }
+
         /// <summary>
         /// Implementation for <see cref="DataObject.ReadXmlElement(string, XmlReader)"/>
         /// </summary>
@@ -141,13 +143,12 @@ namespace KEI.Infrastructure
 
                     obj.ReadXml(newReader);
 
-                    Value.Add(obj);
+                    if (obj is not NotSupportedDataObject)
+                    {
+                        Value.Add(obj); 
+                    }
 
                     return true;
-                }
-                else
-                {
-                    //
                 }
             }
 

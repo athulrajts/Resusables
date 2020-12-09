@@ -144,7 +144,7 @@ namespace KEI.Infrastructure.Core.Tests
             const string PROP_NAME = "IntProperty";
 
             IPropertyContainer property = PropertyContainerBuilder.Create()
-                .Property(PROP_NAME, 42)
+                .Object(PROP_NAME, 42)
                 .Build();
 
             int prop = 0;
@@ -166,7 +166,7 @@ namespace KEI.Infrastructure.Core.Tests
             const string PROP_NAME = "IntProperty";
 
             IPropertyContainer property = PropertyContainerBuilder.Create()
-                .Property(PROP_NAME, 42)
+                .Object(PROP_NAME, 42)
                 .Build();
 
             int prop = 0;
@@ -188,7 +188,7 @@ namespace KEI.Infrastructure.Core.Tests
             const int SET_VALUE = 14;
 
             IPropertyContainer property = PropertyContainerBuilder.Create()
-                .Property(PROP_NAME, VALUE)
+                .Object(PROP_NAME, VALUE)
                 .Build();
 
             property.SetValue(PROP_NAME, SET_VALUE);
@@ -232,7 +232,7 @@ namespace KEI.Infrastructure.Core.Tests
             const int SET_VALUE = 14;
 
             IPropertyContainer property = PropertyContainerBuilder.Create()
-                .Property(PROP_NAME, VALUE)
+                .Object(PROP_NAME, VALUE)
                 .Build();
 
             int originalValue = 0;
@@ -263,7 +263,7 @@ namespace KEI.Infrastructure.Core.Tests
             const int NEW_VALUE = 14;
 
             IPropertyContainer pc = PropertyContainerBuilder.Create()
-                .Property(PROP_NAME, VALUE)
+                .Object(PROP_NAME, VALUE)
                 .Build();
 
             var bindingTarget = new BindingTestObject();
@@ -298,7 +298,7 @@ namespace KEI.Infrastructure.Core.Tests
             const int NEW_VALUE = 14;
 
             IPropertyContainer property = PropertyContainerBuilder.Create()
-                .Property(PROP_NAME, VALUE)
+                .Object(PROP_NAME, VALUE)
                 .Build();
 
             var bindingTarget = new BindingTestObject();
@@ -331,7 +331,7 @@ namespace KEI.Infrastructure.Core.Tests
             const int NEW_VALUE = 14;
 
             IPropertyContainer property = PropertyContainerBuilder.Create()
-                .Property(PROP_NAME, VALUE)
+                .Object(PROP_NAME, VALUE)
                 .Build();
 
             var bindingTarget = new BindingTestObject();
@@ -365,7 +365,7 @@ namespace KEI.Infrastructure.Core.Tests
             const int NEW_VALUE = 14;
 
             IPropertyContainer property = PropertyContainerBuilder.Create()
-                .Property(PROP_NAME, VALUE)
+                .Object(PROP_NAME, VALUE)
                 .Build();
 
             var bindingTarget = new BindingTestObject();

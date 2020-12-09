@@ -16,7 +16,6 @@
                 <ResourceDictionary Source="pack://application:,,,/KEI.UI.Wpf;component/Themes/CheckBoxes.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             <local:BooleanToErrorBrushConverter x:Key="BooleanToErrorBrushConverter"/>
-            <config:DataTypeToEditorTypeConverter x:Key="DataTypeToEditorTypeConverter"/>
 
             <ControlTemplate x:Key="ErrorTemplate">
                 <Border BorderBrush="Red" BorderThickness="1" IsHitTestVisible="False">
@@ -166,19 +165,19 @@
                     <Style TargetType="ContentControl">
                         <Setter Property="ContentTemplate" Value="{StaticResource StringAndNumericTemplate}"/>
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding Editor}" Value="Bool">
+                            <DataTrigger Binding="{Binding Type}" Value="bool">
                                 <Setter Property="ContentTemplate" Value="{StaticResource BooleanTemplate}"/>
                             </DataTrigger>
-                            <DataTrigger Binding="{Binding Editor}" Value="Enum">
+                            <DataTrigger Binding="{Binding Type}" Value="enum">
                                 <Setter Property="ContentTemplate" Value="{StaticResource EnumTemplate}"/>
                             </DataTrigger>
-                            <DataTrigger Binding="{Binding Editor}" Value="Folder">
+                            <DataTrigger Binding="{Binding Type}" Value="folder">
                                 <Setter Property="ContentTemplate" Value="{StaticResource FolderTemplate}"/>
                             </DataTrigger>
-                            <DataTrigger Binding="{Binding Editor}" Value="File">
+                            <DataTrigger Binding="{Binding Type}" Value="file">
                                 <Setter Property="ContentTemplate" Value="{StaticResource FileTemplate}"/>
                             </DataTrigger>
-                            <DataTrigger Binding="{Binding Editor}" Value="Object">
+                            <DataTrigger Binding="{Binding Type}" Value="dc">
                                 <Setter Property="ContentTemplate" Value="{StaticResource ObjectTemplate}"/>
                             </DataTrigger>
                             <DataTrigger Binding="{Binding Data.BrowseOption}" Value="NonEditable">

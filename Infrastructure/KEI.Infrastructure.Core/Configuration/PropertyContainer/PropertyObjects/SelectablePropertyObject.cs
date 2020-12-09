@@ -53,11 +53,6 @@ namespace KEI.Infrastructure
         }
 
         /// <summary>
-        /// Implementation for <see cref="PropertyObject.Editor"/>
-        /// </summary>
-        public override EditorType Editor => EditorType.Enum;
-
-        /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="name"></param>

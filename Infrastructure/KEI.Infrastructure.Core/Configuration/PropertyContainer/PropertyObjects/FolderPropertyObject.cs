@@ -10,11 +10,6 @@
     internal class FolderPropertyObject : StringPropertyObject
     {
         /// <summary>
-        /// Implementation for <see cref="PropertyObject.Editor"/>
-        /// </summary>
-        public override EditorType Editor => EditorType.Folder;
-
-        /// <summary>
         /// Implementation for <see cref="DataObject.Type"/>
         /// </summary>
         public override string Type => "folder";

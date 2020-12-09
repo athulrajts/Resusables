@@ -123,6 +123,16 @@ namespace KEI.Infrastructure
             return null;
         }
 
+        public Color(string hex) : this(0,0,0)
+        {
+            if(Parse(hex) is Color c)
+            {
+                R = c.R;
+                G = c.G;
+                B = c.B;
+            }
+        }
+
         public override string ToString()
         {
             return $"#{R:X2}{G:X2}{B:X2}";

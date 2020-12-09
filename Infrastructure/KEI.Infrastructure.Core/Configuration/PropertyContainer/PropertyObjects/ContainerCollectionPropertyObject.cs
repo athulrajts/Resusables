@@ -1,6 +1,7 @@
 ﻿using KEI.Infrastructure.Types;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Xml;
@@ -30,15 +31,16 @@ namespace KEI.Infrastructure
             CollectionType = value.GetType();
         }
 
+        public ContainerCollectionPropertyObject(string name, ObservableCollection<IDataContainer> value)
+        {
+            Name = name;
+            Value = value;
+        }
+
         /// <summary>
         /// Type of <see cref="IList"/>
         /// </summary>
         public Type CollectionType { get; set; }
-
-        /// <summary>
-        /// Implementation for <see cref="PropertyObject.Editor"/>
-        /// </summary>
-        public override EditorType Editor => EditorType.Object;
 
         /// <summary>
         /// Value
@@ -93,6 +95,8 @@ namespace KEI.Infrastructure
         {
             return ContainerDataObject.DC_START_ELEMENT_NAME;
         }
+
+        protected override bool CanWriteValueAsXmlAttribute() { return false; }
 
         /// <summary>
         /// Implementation for <see cref="DataObject.WriteXmlContent(XmlWriter)"/>

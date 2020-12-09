@@ -3,7 +3,7 @@
     /// <summary>
     /// PropertyObject implementation for <see cref="int"/>
     /// </summary>
-    internal class IntPropertyObject : PropertyObject<int>
+    internal class IntPropertyObject : PropertyObject<int>, INumericPropertyObject
     {
         /// <summary>
         /// Constructor
@@ -17,14 +17,14 @@
         }
 
         /// <summary>
-        /// Implementation for <see cref="PropertyObject.Editor"/>
-        /// </summary>
-        public override EditorType Editor => EditorType.String;
-
-        /// <summary>
         /// Implementation for <see cref="DataObject.Type"/>
         /// </summary>
         public override string Type => "int";
+
+        /// <summary>
+        /// Increment for editors
+        /// </summary>
+        public object Increment { get; set; }
 
         /// <summary>
         /// Implementation for <see cref="DataObject.CanConvertFromString(string)"/>
@@ -54,7 +54,7 @@
         /// <param name="value"></param>
         protected override void OnStringValueChanged(string value)
         {
-            if(int.TryParse(value, out _value))
+            if (int.TryParse(value, out _value))
             {
                 RaisePropertyChanged(nameof(Value));
             }

@@ -97,7 +97,7 @@ namespace Application.UI.AdvancedSetup.ViewModels
                     saveSchemaCommand = new DelegateCommand(() =>
                     {
                         _setup.Schema = SelectedResultProperties.Select(x => x.Column).ToList();
-                        _setupConfig.SetValue("Schema", _setup.Schema.ToListPropertyContainer("Schema"));
+                        _setupConfig.SetValue("Schema", DataContainerBuilder.CreateList("Schema", _setup.Schema));
                         _currentRecipe?.Store();
 
                     });

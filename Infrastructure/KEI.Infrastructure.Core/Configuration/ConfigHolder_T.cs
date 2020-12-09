@@ -95,7 +95,7 @@ namespace KEI.Infrastructure.Configuration
                 if(Config is IList listConfig)
                 {
                     var dc = DataContainerBuilder.Create(ConfigName);
-                    foreach (var item in listConfig.ToListDataContainer(ConfigName))
+                    foreach (var item in DataContainerBuilder.CreateList(ConfigName, listConfig))
                     {
                         dc.Data(item.Name, item);
                     }
@@ -110,7 +110,7 @@ namespace KEI.Infrastructure.Configuration
             }
             else
             {
-                if (XmlHelper.SerializeToFile(Config.ToDataContainer(ConfigName), path) == false)
+                if (XmlHelper.SerializeToFile(DataContainerBuilder.CreateObject(ConfigName,Config), path) == false)
                 {
                     Logger.Error($"Unable to Store Config \"{ConfigName}\"");
                     return false;

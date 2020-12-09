@@ -20,11 +20,11 @@ namespace Application.Core.Modules
         public override string ConfigName => "VISION";
         protected override PropertyContainerBuilder DefineConfigShape()
         {
-            return PropertyContainerBuilder.Create(ConfigName, ConfigPath)
-                .Property("MorphologyOperatorSize", 25)
-                .Property("MedinBlurSize", 3)
-                .Property("WindowSizeTolerance", 110)
-                .Property("PermissibleDistanceOfRotation", 100);
+            return PropertyContainerBuilder.Create(ConfigName)
+                .Object("MorphologyOperatorSize", 25)
+                .Object("MedinBlurSize", 3)
+                .Object("WindowSizeTolerance", 110)
+                .Object("PermissibleDistanceOfRotation", 100);
         }
 
         #endregion

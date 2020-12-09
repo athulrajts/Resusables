@@ -13,12 +13,9 @@ namespace Application.Core
 
         protected override PropertyContainerBuilder DefineConfigShape()
         {
-            return PropertyContainerBuilder.Create(ConfigName, ConfigPath)
-                .Property("ShowCommandPanelOnLeftSide", false)
-                    .SetDescription("Indices whether commands of each screen is shown on the left side")
-                .Property("Theme", Theme.Dark)
-                    .SetDescription("Current Application Theme")
-                    .SetBrowsePermission(BrowseOptions.NonBrowsable);
+            return PropertyContainerBuilder.Create(ConfigName)
+                .Object("ShowCommandPanelOnLeftSide", false)
+                .Object("Theme", Theme.Dark);
         }
 
         public GeneralPreferences(IEssentialServices essentialServices) : base(essentialServices)

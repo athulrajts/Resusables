@@ -7,5 +7,5 @@
         <ResourceDictionary Source="pack://application:,,,/KEI.UI.Wpf;component/Themes/TextBoxes.xaml"/>
         <ResourceDictionary Source="pack://application:,,,/KEI.UI.Wpf;component/Themes/Buttons.xaml"/>
     </ResourceDictionary.MergedDictionaries>
-
+    
 </ResourceDictionary>

@@ -4,6 +4,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using KEI.Infrastructure;
 using Microsoft.WindowsAPICodePack.Dialogs;
 
 namespace KEI.UI.Wpf.Controls
@@ -154,7 +155,4 @@ namespace KEI.UI.Wpf.Controls
         File,
         Folder
     }
-
-    public record Filter(string Description, string Extenstion);
-    public class FilterCollection : List<Filter> { }
 }

@@ -4,6 +4,14 @@ using System.Xml;
 
 namespace KEI.Infrastructure
 {
+    public record Filter(string Description, string Extenstion);
+    public class FilterCollection : List<Filter> { }
+
+    public interface IFileProperty
+    {
+        public FilterCollection Filters { get; }
+    }
+
     /// <summary>
     /// PropertyObject implementation for storing file paths
     /// There is no corresponding DataObject implementation, since the only
@@ -11,15 +19,11 @@ namespace KEI.Infrastructure
     /// is the Editor in PropertyGrid. <see cref="StringDataObject"/> should be used for storing filepaths
     /// in <see cref="DataContainer"/>
     /// </summary>
-    internal class FilePropertyObject : StringPropertyObject
+    internal class FilePropertyObject : StringPropertyObject , IFileProperty
     {
         const string FILTER_DESCRIPTION_ATTRIBUTE = "desc";
         const string FILTER_EXTENSTION_ATTRIBUTE = "ext";
-
-        /// <summary>
-        /// Implementation for <see cref="PropertyObject.Editor"/>
-        /// </summary>
-        public override EditorType Editor => EditorType.File;
+        const string FILTER_ELEMENT = "Filter";
 
         /// <summary>
         /// Implementation for <see cref="DataObject.Type"/>
@@ -31,7 +35,7 @@ namespace KEI.Infrastructure
         /// <see cref="Tuple{T1, T2}.Item1"/> is Description of filter
         /// <see cref="Tuple{T1, T2}.Item2"/> is Extension of filter
         /// </summary>
-        public List<Tuple<string, string>> Filters { get; set; }
+        public FilterCollection Filters { get; set; }
 
         /// <summary>
         /// Constructor
@@ -39,9 +43,9 @@ namespace KEI.Infrastructure
         /// <param name="name"></param>
         /// <param name="value"></param>
         /// <param name="filters"></param>
-        public FilePropertyObject(string name, string value, params Tuple<string,string>[] filters): base(name, value)
+        public FilePropertyObject(string name, string value): base(name, value)
         {
-            Filters = new List<Tuple<string, string>>(filters);
+            Filters = new FilterCollection();
         }
 
         /// <summary>
@@ -54,9 +58,9 @@ namespace KEI.Infrastructure
 
             foreach (var filter in Filters)
             {
-                writer.WriteStartElement("Filter");
-                writer.WriteAttributeString(FILTER_DESCRIPTION_ATTRIBUTE, filter.Item1);
-                writer.WriteAttributeString(FILTER_EXTENSTION_ATTRIBUTE, filter.Item2);
+                writer.WriteStartElement(FILTER_ELEMENT);
+                writer.WriteAttributeString(FILTER_DESCRIPTION_ATTRIBUTE, filter.Description);
+                writer.WriteAttributeString(FILTER_EXTENSTION_ATTRIBUTE, filter.Extenstion);
                 writer.WriteEndElement();
             }
         }
@@ -74,7 +78,7 @@ namespace KEI.Infrastructure
                 return true;
             }
 
-            if(elementName == "Filter")
+            if(elementName == FILTER_ELEMENT)
             {
                 string desc = reader.GetAttribute(FILTER_DESCRIPTION_ATTRIBUTE);
                 string ext = reader.GetAttribute(FILTER_EXTENSTION_ATTRIBUTE);

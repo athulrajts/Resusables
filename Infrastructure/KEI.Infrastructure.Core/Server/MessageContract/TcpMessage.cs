@@ -15,8 +15,8 @@ namespace KEI.Infrastructure.Server
         public TcpMessage(IMessageBody body, params object[] headerArgs)
         {
             messageHeader = (IMessageHeader)Activator.CreateInstance(typeof(THeader), headerArgs);
-            
-            messageBody = body.ToDataContainer();
+
+            messageBody = DataContainerBuilder.CreateObject("body", body);
 
             if (messageBody != null)
             {

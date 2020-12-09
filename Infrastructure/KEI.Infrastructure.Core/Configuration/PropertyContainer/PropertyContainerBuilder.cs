@@ -17,14 +17,8 @@ namespace KEI.Infrastructure
         /// <summary>
         /// Object the builder uses
         /// </summary>
-        private IPropertyContainer config;
+        protected IPropertyContainer config;
 
-        /// <summary>
-        /// Filename if the config built need to be saved
-        /// </summary>
-        private string filename = string.Empty;
-
-        PropertyObject lastCreatedObject;
 
         #endregion
 
@@ -35,14 +29,13 @@ namespace KEI.Infrastructure
             config = new PropertyContainer();
         }
 
-        private PropertyContainerBuilder(string configName, string fileName = "")
+        private PropertyContainerBuilder(string configName)
         {
-            config = new PropertyContainer { Name = configName, FilePath = fileName };
-            filename = fileName;
+            config = new PropertyContainer { Name = configName };
         }
 
-        public static PropertyContainerBuilder Create(string name, string filename = "")
-            => new PropertyContainerBuilder(name, filename);
+        public static PropertyContainerBuilder Create(string name)
+            => new PropertyContainerBuilder(name);
 
         public static PropertyContainerBuilder Create()
             => new PropertyContainerBuilder();
@@ -52,7 +45,7 @@ namespace KEI.Infrastructure
         public static IPropertyContainer FromFile(string path) => PropertyContainer.FromFile(path);
 
 
-        public PropertyContainerBuilder Property(string name, object value)
+        public PropertyContainerBuilder Object(string name, object value, Action<PropertyObjectBuilder> propertyBuilder = null)
         {
             if (config.ContainsData(name) || value is null)
             {
@@ -61,31 +54,121 @@ namespace KEI.Infrastructure
 
             if (DataObjectFactory.GetPropertyObjectFor(name, value) is PropertyObject obj)
             {
-                config.Add(obj);
+                propertyBuilder?.Invoke(new PropertyObjectBuilder(obj));
 
-                lastCreatedObject = obj;
+                config.Add(obj);
             }
 
             return this;
         }
 
-        public PropertyContainerBuilder FileProperty(string name, string value, params Tuple<string,string>[] filters)
+        public PropertyContainerBuilder File(string name, string value, Action<FilePropertyObjectBuilder> propertyBuilder = null)
         {
             if (config.ContainsData(name) || value is null)
             {
                 return this;
             }
 
-            var obj = new FilePropertyObject(name, value, filters);
+
+            var obj = new FolderPropertyObject(name, value);
+
+            propertyBuilder?.Invoke(new FilePropertyObjectBuilder(obj));
 
             config.Add(obj);
-
-            lastCreatedObject = obj;
 
             return this;
         }
 
-        public PropertyContainerBuilder FolderProperty(string name, string value)
+        public PropertyContainerBuilder Color(string name, Color c, Action<PropertyObjectBuilder> propertyBuilder = null)
+        {
+            if (config.ContainsData(name))
+            {
+                return this;
+            }
+
+            var obj = new ColorPropertyObject(name, c);
+
+            propertyBuilder?.Invoke(new PropertyObjectBuilder(obj));
+
+            config.Add(obj);
+
+            return this;
+        }
+
+        public PropertyContainerBuilder Array(string name, Array a, Action<PropertyObjectBuilder> propertyBuilder = null)
+        {
+            if (config.ContainsData(name))
+            {
+                return this;
+            }
+
+            if(a.GetType().GetElementType().IsPrimitive == false)
+            {
+                throw new NotSupportedException("Arrays of non primitive types not supported");
+            }
+
+            PropertyObject obj = a.Rank switch
+            {
+                1 => new Array1DPropertyObject(name, a),
+                2 => new Array2DPropertyObject(name, a),
+                _ => throw new NotSupportedException("Arrays of more than 2 dimensions not supported"),
+            };
+
+            propertyBuilder?.Invoke(new PropertyObjectBuilder(obj));
+
+            config.Add(obj);
+
+            return this;
+        }
+
+        public PropertyContainerBuilder Color(string name, string hex , Action<PropertyObjectBuilder> propertyBuilder = null)
+        {
+            if(Infrastructure.Color.Parse(hex) is Color c)
+            {
+                Color(name, c, propertyBuilder);
+            }    
+
+            return this;
+        }
+
+        public PropertyContainerBuilder Color(string name, byte R, byte G, byte B, Action<PropertyObjectBuilder> propertyBuilder = null)
+        {
+            return Color(name, new Color(R, G, B), propertyBuilder);
+        }
+
+        public PropertyContainerBuilder Number(string name, int value, Action<NumericPropertyObjectBuilder> propertyBuilder = null)
+        {
+            return Number(name, (object)value, propertyBuilder);
+        }
+        
+        public PropertyContainerBuilder Number(string name, double value, Action<NumericPropertyObjectBuilder> propertyBuilder = null)
+        {
+            return Number(name, (object)value, propertyBuilder);
+        }
+        
+        public PropertyContainerBuilder Number(string name, float value, Action<NumericPropertyObjectBuilder> propertyBuilder = null)
+        {
+            return Number(name, (object)value, propertyBuilder);
+        }
+
+        private PropertyContainerBuilder Number(string name, object value, Action<NumericPropertyObjectBuilder> propertyBuilder = null)
+        {
+            if (config.ContainsData(name) || value is null)
+            {
+                return this;
+            }
+
+            if (DataObjectFactory.GetPropertyObjectFor(name, value) is PropertyObject obj)
+            {
+                propertyBuilder?.Invoke(new NumericPropertyObjectBuilder(obj));
+
+                config.Add(obj);
+            }
+
+            return this;
+        }
+
+        public PropertyContainerBuilder Folder(string name, string value)
         {
             if (config.ContainsData(name) || value is null)
             {
@@ -96,53 +179,11 @@ namespace KEI.Infrastructure
 
             config.Add(obj);
 
-            lastCreatedObject = obj;
-
             return this;
         }
 
 
-        public PropertyContainerBuilder SetDescription(string description)
-        {
-            if (lastCreatedObject is not null)
-            {
-                lastCreatedObject.SetDescription(description);
-            }
-
-            return this;
-        }
-
-        public PropertyContainerBuilder SetBrowsePermission(BrowseOptions option)
-        {
-            if (lastCreatedObject is not null)
-            {
-                lastCreatedObject.SetBrowsePermission(option);
-            }
-
-            return this;
-        }
-
-        public PropertyContainerBuilder SetDisplayName(string name)
-        {
-            if (lastCreatedObject is not null)
-            {
-                lastCreatedObject.SetDisplayName(name);
-            }
-
-            return this;
-        }
-
-        public PropertyContainerBuilder SetCategory(string category)
-        {
-            if (lastCreatedObject is not null)
-            {
-                lastCreatedObject.SetCategory(category);
-            }
-
-            return this;
-        }
-
-        public PropertyContainerBuilder Property(PropertyInfo pi, object obj)
+        internal PropertyContainerBuilder Property(PropertyInfo pi, object obj)
         {
 
             if (pi.GetValue(obj) is not null)

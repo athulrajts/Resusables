@@ -49,11 +49,6 @@ namespace KEI.Infrastructure
         public override string Type => "dc";
 
         /// <summary>
-        /// Implementation for <see cref="PropertyObject.Editor"/>
-        /// </summary>
-        public override EditorType Editor => EditorType.Object;
-
-        /// <summary>
         /// Implementation for <see cref="DataObject.GetStartElementName"/>
         /// </summary>
         /// <returns></returns>
@@ -61,6 +56,8 @@ namespace KEI.Infrastructure
         {
             return ContainerDataObject.DC_START_ELEMENT_NAME;
         }
+
+        protected override bool CanWriteValueAsXmlAttribute() { return false; }
 
         /// <summary>
         /// Implementation for <see cref="DataObject.InitializeObject"/>
@@ -103,13 +100,12 @@ namespace KEI.Infrastructure
 
                     obj.ReadXml(newReader);
 
-                    Value.Add(obj);
+                    if (obj is not NotSupportedDataObject)
+                    {
+                        Value.Add(obj); 
+                    }
 
                     return true;
-                }
-                else
-                {
-                    // Skip
                 }
             }
 

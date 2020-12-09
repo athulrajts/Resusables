@@ -22,11 +22,6 @@ namespace KEI.Infrastructure
         public Type EnumType { get; set; }
 
         /// <summary>
-        /// Implementation for <see cref="PropertyObject.Editor"/>
-        /// </summary>
-        public override EditorType Editor => EditorType.Enum;
-
-        /// <summary>
         /// Implementation for <see cref="DataObject.Type"/>
         /// </summary>
         public override string Type => "enum";

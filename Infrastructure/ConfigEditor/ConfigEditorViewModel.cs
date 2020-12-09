@@ -40,7 +40,7 @@ namespace ConfigEditor
 
         public void OpenFile(string path)
         {
-            var dc = PropertyContainerBuilder.FromFile(path) ?? DataContainer.FromFile(path).ToPropertyContainer();
+            var dc = PropertyContainerBuilder.FromFile(path);
 
             if (dc == null)
             {

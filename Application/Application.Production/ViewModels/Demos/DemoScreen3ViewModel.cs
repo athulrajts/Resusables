@@ -28,8 +28,8 @@ namespace Application.Production.ViewModels
             var list = new List<Point> { new(), new(), new() };
 
             IPropertyContainer inner = PropertyContainerBuilder.Create("Inner Container")
-                .Property("InnerInt", 23)
-                .Property("inner Enum", UriHostNameType.Dns)
+                .Object("InnerInt", 23)
+                .Object("inner Enum", UriHostNameType.Dns)
                 .Build();
 
             //IPropertyContainer inner2 = PropertyContainerBuilder.CreateList("InnerList", list);
@@ -47,32 +47,34 @@ namespace Application.Production.ViewModels
             //    .Property("PropertyContainerProperty", inner).SetCategory("Complex")
             //    .Property("ListProperty", list).SetCategory("Complex")
             //    .Build();
+            Array a = new int[,] { { 11, 21 ,31 ,41 ,51}, { 61, 71, 81, 91, 10 }, { 11, 12, 13, 14, 15 }, { 16, 17, 18, 19, 20 } };
 
             SamplePropertyContainer = PropertyContainerBuilder.Create("Sample Confing")
-                .Property("Fill", new Color(255,255,255))
-                    .SetDescription("fill color of shape")
+                .Color("Fill", "#FFFFFF", p => p
                     .SetCategory("Visualization")
-                .Property("Stroke", new Color(0,0,0))
-                    .SetDescription("border color of shape")
+                    .SetDescription("Color of shape"))
+                .Color("Stroke", "#000000", p => p
                     .SetCategory("Visualization")
-                .Property("StrokeThickness", 1.0)
-                    .SetDescription("border thickness of shape")
+                    .SetDescription("Border color of shape"))
+                .Number("StrokeThickness", 1.0, p => p
                     .SetCategory("Visualization")
-                .Property("Shape", Shape.Rectangle)
-                    .SetDescription("shape type")
+                    .SetDescription("Border thickness of shape"))
+                .Object("Shape", Shape.Rectangle, p => p
                     .SetCategory("Definition")
-                .Property("Height", 200.0)
-                    .SetDescription("height of shape")
+                    .SetDescription("Ellipse/Rectangle"))
+                .Number("Height", 200.0, p => p
                     .SetCategory("Definition")
-                .Property("Width", 200.0)
-                    .SetDescription("width of shape")
+                    .SetDescription("Height of shape"))
+                .Number("Width", 200.0, p => p
                     .SetCategory("Definition")
-                .Property("X", 50.0)
-                    .SetDescription("x-coordinate of top left point")
+                    .SetDescription("Widht of shape"))
+                .Number("X", 50.0, p => p
                     .SetCategory("Definition")
-                .Property("Y", 50.0)
-                    .SetDescription("y-coordinate of top left point")
+                    .SetDescription("X-Coordinate of top left point"))
+                .Number("Y", 50.0, p => p
                     .SetCategory("Definition")
+                    .SetDescription("Y-Coordinate of top left point"))
+                .Array("Array", a)
                 .Build();
 
             var xmlString = XmlHelper.SerializeToString(SamplePropertyContainer);

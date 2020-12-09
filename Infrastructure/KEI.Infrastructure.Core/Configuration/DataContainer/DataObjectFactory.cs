@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.Serialization;
 
@@ -61,9 +62,11 @@ namespace KEI.Infrastructure
             { "dc" , typeof(ContainerPropertyObject) },
             { "char", typeof(CharPropertyObject)},
             { "color", typeof(ColorPropertyObject)},
+            { "dcl", typeof(ContainerCollectionPropertyObject)},
             { "file", typeof(FilePropertyObject)},
             { "folder", typeof(FolderPropertyObject)},
-            { "dcl", typeof(ContainerCollectionPropertyObject) }
+            { "array-1", typeof(Array1DPropertyObject) },
+            { "array-2", typeof(Array2DPropertyObject) }
         };
 
 
@@ -79,7 +82,7 @@ namespace KEI.Infrastructure
             { typeof(double) , typeof(DoublePropertyObject) },
             { typeof(string), typeof(StringPropertyObject) },
             { typeof(char), typeof(CharPropertyObject)},
-            { typeof(Color), typeof(ColorPropertyObject)}
+            { typeof(Color), typeof(ColorPropertyObject)},
         };
 
         /// <summary>
@@ -117,7 +120,7 @@ namespace KEI.Infrastructure
         {
             return typeIdDataObjMapping.ContainsKey(typeid)
                 ? (DataObject)FormatterServices.GetUninitializedObject(typeIdDataObjMapping[typeid])
-                : null;
+                : new NotSupportedDataObject();
         }
 
         /// <summary>
@@ -129,7 +132,7 @@ namespace KEI.Infrastructure
         {
             return typeIdPropObjMapping.ContainsKey(typeid)
                 ? (DataObject)FormatterServices.GetUninitializedObject(typeIdPropObjMapping[typeid])
-                : null;
+                : new NotSupportedDataObject();
         }
 
         /// <summary>
@@ -142,10 +145,10 @@ namespace KEI.Infrastructure
         {
             Type valueType = value.GetType();
 
-            if(typeDataObjMapping.ContainsKey(valueType))
+            if (typeDataObjMapping.ContainsKey(valueType))
             {
                 object[] constructorArgs;
-                
+
                 if (args is not null && args.Length > 0)
                 {
                     constructorArgs = new object[args.Length + 2];
@@ -154,7 +157,7 @@ namespace KEI.Infrastructure
 
                     for (int i = 0; i < args.Length; i++)
                     {
-                        constructorArgs[i + 2] = args[i]; 
+                        constructorArgs[i + 2] = args[i];
                     }
                 }
                 else
@@ -166,13 +169,31 @@ namespace KEI.Infrastructure
             }
             else
             {
+                /// special objects which can be used for multiple types
                 return value switch
                 {
+                    DataObject data => data,
                     Enum e => new EnumDataObject(name, e),
                     IDataContainer d => new ContainerDataObject(name, d),
+                    ObservableCollection<IDataContainer> ie => new ContainerCollectionDataObject(name, ie),
+                    Array a => GetArrayDataObject(name, a),
                     IList l => new ContainerCollectionDataObject(name, l),
-                    DataObject data => data,
                     _ => new ContainerDataObject(name, value),
+                };
+            }
+
+            static DataObject GetArrayDataObject(string name, Array a)
+            {
+                if(a.GetType().GetElementType().IsPrimitive == false)
+                {
+                    throw new NotSupportedException("Array of non primitive types not supported");
+                }
+
+                return a.Rank switch
+                {
+                    1 => new Array1DDataObject(name, a),
+                    2 => new Array2DDataObject(name, a),
+                    _ => throw new NotSupportedException("Array of more than 2 dimensions not allowed")
                 };
             }
         }
@@ -216,13 +237,31 @@ namespace KEI.Infrastructure
             }
             else
             {
+                /// special objects which can be used for multiple types
                 return value switch
                 {
-                    Enum e => new EnumPropertyObject(name, e),
-                    IDataContainer d => new ContainerPropertyObject(name, d),
-                    IList l => new ContainerCollectionPropertyObject(name, l),
                     PropertyObject data => data,
+                    Enum e => new EnumPropertyObject(name, e),
+                    ObservableCollection<IDataContainer> ie => new ContainerCollectionPropertyObject(name, ie),
+                    IDataContainer d => new ContainerPropertyObject(name, d),
+                    Array a => GetArrayPropertyObject(name, a),
+                    IList l => new ContainerCollectionPropertyObject(name, l),
                     _ => new ContainerPropertyObject(name, value),
+                };
+            }
+
+            static PropertyObject GetArrayPropertyObject(string name, Array a)
+            {
+                if (a.GetType().GetElementType().IsPrimitive == false)
+                {
+                    throw new NotSupportedException("Array of non primitive types not supported");
+                }
+
+                return a.Rank switch
+                {
+                    1 => new Array1DPropertyObject(name, a),
+                    2 => new Array2DPropertyObject(name, a),
+                    _ => throw new NotSupportedException("Array of more than 2 dimensions not allowed")
                 };
             }
         }
@@ -238,14 +277,14 @@ namespace KEI.Infrastructure
         {
             var dataobj = DataObjectFactory.GetPropertyObject(typeid);
 
-            if(dataobj is null)
+            if (dataobj is null)
             {
                 return;
             }
 
             var type = dataobj.GetType();
 
-            if(editorMapping.ContainsKey(type))
+            if (editorMapping.ContainsKey(type))
             {
                 editorMapping[type] = typeof(TEditor);
             }
@@ -279,7 +318,7 @@ namespace KEI.Infrastructure
 
         public static Type GetEditorType(Type propertyObjectType)
         {
-            if(editorMapping.ContainsKey(propertyObjectType) == false)
+            if (editorMapping.ContainsKey(propertyObjectType) == false)
             {
                 return null;
             }

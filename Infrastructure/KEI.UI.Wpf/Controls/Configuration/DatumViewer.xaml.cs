@@ -33,8 +33,6 @@ namespace KEI.UI.Wpf.Configuration
             {
                 template.StringValue = data.StringValue;
 
-                template.RaisePropertyChanged(nameof(Editor));
-
                 if (data.Type == "enum")
                 {
                     template.EnumSource = new List<string>(Enum.GetNames(data.GetValue().GetType()));
@@ -122,7 +120,6 @@ namespace KEI.UI.Wpf.Configuration
         {
             Data.StringValue = value;
         }
-        public EditorType Editor => Data.Editor;
 
         private void SubscribePropertyChanged(PropertyObject source, bool subscribe)
         {
@@ -161,26 +158,6 @@ namespace KEI.UI.Wpf.Configuration
             {
                 return ValidationResult?.ErrorMessage;
             }
-        }
-    }
-
-
-
-    public class DataTypeToEditorTypeConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if (value is EditorType type && parameter != null)
-            {
-                if (type.ToString() == parameter.ToString())
-                    return Visibility.Visible;
-            }
-            return Visibility.Collapsed;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
         }
     }
 }

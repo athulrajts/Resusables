@@ -221,7 +221,7 @@ namespace KEI.Infrastructure
                     }
                     else if(data.Type == "dcl" && data.GetValue() is ObservableCollection<IDataContainer> oc)
                     {
-                        var listType = data.GetType().GetProperty("CollectionType").GetValue(data) as Type;
+                        var listType = prop.PropertyType;
                         
                         if (listType is not null)
                         {
@@ -605,15 +605,10 @@ namespace KEI.Infrastructure
 
                         obj.ReadXml(newReader);
 
-                        Add(obj);
-                    }
-                    else
-                    {
-                        /// Unsupoprted DataObject implementation
-                        /// 3rd Party Implementation should Register themselves to <see cref="DataObjectFactory"/>
-                        /// using <see cref="DataObjectFactory.RegisterDataObject{T}"/> or <see cref="DataObjectFactory.RegisterPropertyObject{T}"/>
-                        /// If no implementation is found in Factory, skip 
-
+                        if (obj is not NotSupportedDataObject)
+                        {
+                            Add(obj);
+                        }
                     }
                 }    
 

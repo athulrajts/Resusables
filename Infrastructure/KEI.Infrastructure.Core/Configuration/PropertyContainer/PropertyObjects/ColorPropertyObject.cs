@@ -21,7 +21,6 @@ namespace KEI.Infrastructure
 
         public override string Type => "color";
 
-        public override EditorType Editor => EditorType.Color;
 
         private Color _value;
         public Color Value

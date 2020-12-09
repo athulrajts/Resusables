@@ -58,6 +58,12 @@ namespace KEI.Infrastructure
         public abstract string Type { get; }
 
         /// <summary>
+        /// Writes <see cref="StringValue"/> as <see cref="VALUE_ATTRIBUTE"/> in xml if returns true
+        /// </summary>
+        /// <returns></returns>
+        protected virtual bool CanWriteValueAsXmlAttribute() { return true; }
+
+        /// <summary>
         /// Checks whether we can convert the given string this objects value
         /// </summary>
         /// <param name="value">value to check</param>
@@ -215,7 +221,7 @@ namespace KEI.Infrastructure
             writer.WriteAttributeString(TYPE_ID_ATTRIBUTE, Type);
             writer.WriteAttributeString(KEY_ATTRIBUTE, Name);
 
-            if (string.IsNullOrEmpty(StringValue) == false)
+            if (CanWriteValueAsXmlAttribute())
             {
                 writer.WriteAttributeString(VALUE_ATTRIBUTE, StringValue);
             }
@@ -258,6 +264,10 @@ namespace KEI.Infrastructure
             {
                 if (EqualityComparer<T>.Default.Equals(_value, value) == true)
                 {
+                    if (stringValue != _value?.ToString())
+                    {
+                        stringValue = _value?.ToString();
+                    }
                     return;
                 }
 

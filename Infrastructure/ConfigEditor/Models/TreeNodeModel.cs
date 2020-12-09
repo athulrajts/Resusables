@@ -27,26 +27,29 @@ namespace ConfigEditor.Models
             set { SetProperty(ref isExpanded, value); }
         }
 
-        private ObservableCollection<PropertyObject> dataItems = new ObservableCollection<PropertyObject>();
-        public ObservableCollection<PropertyObject> DataItems
-        {
-            get { return dataItems; }
-            set { SetProperty(ref dataItems, value); }
-        }
+        public IDataContainer Container { get; set; }
 
         public TreeNodeModel(IPropertyContainer dc)
         {
             Name = string.IsNullOrEmpty(dc.Name) ? "Untitled" : dc.Name;
 
+            Container = dc;
+
             foreach (var item in dc)
             {
                 if(item.GetValue() is IPropertyContainer dcValue)
                 {
+                    if(item is PropertyObject p)
+                    {
+                        p.SetBrowsePermission(BrowseOptions.NonBrowsable);
+                    }
+
                     Children.Add(new TreeNodeModel(dcValue));
                 }
                 else
                 {
-                    DataItems.Add((PropertyObject)item);
+                    var data = (PropertyObject)item;
+                    data.SetBrowsePermission(BrowseOptions.Browsable);
                 }
             }
         }

@@ -21,10 +21,10 @@ namespace Application.Core.Modules
         protected override PropertyContainerBuilder DefineConfigShape()
         {
             return PropertyContainerBuilder.Create(ConfigName)
-                .Object("MorphologyOperatorSize", 25)
-                .Object("MedinBlurSize", 3)
-                .Object("WindowSizeTolerance", 110)
-                .Object("PermissibleDistanceOfRotation", 100);
+                .Property("MorphologyOperatorSize", 25)
+                .Property("MedinBlurSize", 3)
+                .Property("WindowSizeTolerance", 110)
+                .Property("PermissibleDistanceOfRotation", 100);
         }
 
         #endregion

@@ -45,7 +45,7 @@ namespace KEI.Infrastructure
         public static IPropertyContainer FromFile(string path) => PropertyContainer.FromFile(path);
 
 
-        public PropertyContainerBuilder Object(string name, object value, Action<PropertyObjectBuilder> propertyBuilder = null)
+        public PropertyContainerBuilder Property(string name, object value, Action<PropertyObjectBuilder> propertyBuilder = null)
         {
             if (config.ContainsData(name) || value is null)
             {
@@ -62,13 +62,44 @@ namespace KEI.Infrastructure
             return this;
         }
 
+        public PropertyContainerBuilder Time(string name, TimeSpan value, Action<PropertyObjectBuilder> propertyBuilder = null)
+        {
+            if (config.ContainsData(name))
+            {
+                return this;
+            }
+
+            var obj = new TimeSpanPropertyObject(name, value);
+
+            propertyBuilder?.Invoke(new PropertyObjectBuilder(obj));
+
+            config.Add(obj);
+
+            return this;
+        }
+
+        public PropertyContainerBuilder DateTime(string name, DateTime value, Action<PropertyObjectBuilder> propertyBuilder = null)
+        {
+            if (config.ContainsData(name))
+            {
+                return this;
+            }
+
+            var obj = new DateTimePropertyObject(name, value);
+
+            propertyBuilder?.Invoke(new PropertyObjectBuilder(obj));
+
+            config.Add(obj);
+
+            return this;
+        }
+
         public PropertyContainerBuilder File(string name, string value, Action<FilePropertyObjectBuilder> propertyBuilder = null)
         {
             if (config.ContainsData(name) || value is null)
             {
                 return this;
             }
-
 
             var obj = new FolderPropertyObject(name, value);
 

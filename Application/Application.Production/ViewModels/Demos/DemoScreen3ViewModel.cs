@@ -28,8 +28,8 @@ namespace Application.Production.ViewModels
             var list = new List<Point> { new(), new(), new() };
 
             IPropertyContainer inner = PropertyContainerBuilder.Create("Inner Container")
-                .Object("InnerInt", 23)
-                .Object("inner Enum", UriHostNameType.Dns)
+                .Property("InnerInt", 23)
+                .Property("inner Enum", UriHostNameType.Dns)
                 .Build();
 
             //IPropertyContainer inner2 = PropertyContainerBuilder.CreateList("InnerList", list);
@@ -59,7 +59,7 @@ namespace Application.Production.ViewModels
                 .Number("StrokeThickness", 1.0, p => p
                     .SetCategory("Visualization")
                     .SetDescription("Border thickness of shape"))
-                .Object("Shape", Shape.Rectangle, p => p
+                .Property("Shape", Shape.Rectangle, p => p
                     .SetCategory("Definition")
                     .SetDescription("Ellipse/Rectangle"))
                 .Number("Height", 200.0, p => p
@@ -75,6 +75,9 @@ namespace Application.Production.ViewModels
                     .SetCategory("Definition")
                     .SetDescription("Y-Coordinate of top left point"))
                 .Array("Array", a)
+                .Time("Time", TimeSpan.FromSeconds(69))
+                .DateTime("DateTime", DateTime.Now)
+                .Property("TrueFalse", false)
                 .Build();
 
             var xmlString = XmlHelper.SerializeToString(SamplePropertyContainer);

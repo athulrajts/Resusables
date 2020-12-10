@@ -27,7 +27,11 @@ namespace KEI.Infrastructure
             { "dc" , typeof(ContainerDataObject) },
             { "char", typeof(CharDataObject)},
             { "color", typeof(ColorDataObject)},
-            { "dcl", typeof(ContainerCollectionDataObject) }
+            { "dcl", typeof(ContainerCollectionDataObject) },
+            { "array-1", typeof(Array1DDataObject)},
+            { "array-2", typeof(Array2DDataObject)},
+            { "dt", typeof(DateTimeDataObject)},
+            { "ts", typeof(TimeSpanDataObject)}
         };
 
         /// <summary>
@@ -42,7 +46,9 @@ namespace KEI.Infrastructure
             { typeof(double) , typeof(DoubleDataObject) },
             { typeof(string) , typeof(StringDataObject) },
             { typeof(char), typeof(CharDataObject)},
-            { typeof(Color), typeof(ColorDataObject) }
+            { typeof(Color), typeof(ColorDataObject) },
+            { typeof(DateTime), typeof(DateTimeDataObject)},
+            { typeof(TimeSpan), typeof(TimeSpanDataObject)}
         };
 
         /// <summary>
@@ -66,7 +72,9 @@ namespace KEI.Infrastructure
             { "file", typeof(FilePropertyObject)},
             { "folder", typeof(FolderPropertyObject)},
             { "array-1", typeof(Array1DPropertyObject) },
-            { "array-2", typeof(Array2DPropertyObject) }
+            { "array-2", typeof(Array2DPropertyObject) },
+            { "dt", typeof(DateTimePropertyObject)},
+            { "ts", typeof(TimeSpanPropertyObject)}
         };
 
 
@@ -83,6 +91,8 @@ namespace KEI.Infrastructure
             { typeof(string), typeof(StringPropertyObject) },
             { typeof(char), typeof(CharPropertyObject)},
             { typeof(Color), typeof(ColorPropertyObject)},
+            { typeof(DateTime), typeof(DateTimeDataObject) },
+            { typeof(TimeSpan), typeof(TimeSpanDataObject)}
         };
 
         /// <summary>
@@ -105,7 +115,7 @@ namespace KEI.Infrastructure
         public static void RegisterPropertyObject<T>()
             where T : PropertyObject
         {
-            var instance = (PropertyObject)FormatterServices.GetUninitializedObject(typeof(T));
+            var instance = (DataObject)FormatterServices.GetUninitializedObject(typeof(T));
 
             typeIdPropObjMapping.Add(instance.Type, typeof(T));
             typePropObjMapping.Add(instance.GetDataType(), typeof(T));

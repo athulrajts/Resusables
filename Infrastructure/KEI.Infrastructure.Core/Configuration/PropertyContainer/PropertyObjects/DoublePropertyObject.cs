@@ -7,8 +7,6 @@ namespace KEI.Infrastructure
     /// </summary>
     internal class DoublePropertyObject : PropertyObject<double> , INumericPropertyObject
     {
-        const double DEFAULT_INCREMENT = 0.1;
-
         /// <summary>
         /// Constructor
         /// </summary>
@@ -31,26 +29,15 @@ namespace KEI.Infrastructure
         public object Increment { get; set; }
 
         /// <summary>
-        /// Implementation for <see cref="DataObject.CanConvertFromString(string)"/>
+        /// Max value of <see cref="DataObject{T}.Value"/>
         /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public override bool CanConvertFromString(string value)
-        {
-            return double.TryParse(value, out _);
-        }
+        public object Max { get; set; }
 
         /// <summary>
-        /// Implementation for <see cref="DataObject.ConvertFromString(string)"/>
+        /// Min value of <see cref="DataObject{T}.Value"/>
         /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public override object ConvertFromString(string value)
-        {
-            return double.TryParse(value, out double tmp)
-                ? tmp
-                : null;
-        }
+        public object Min { get; set; }
+
 
         /// <summary>
         /// Implementation for <see cref="DataObject.WriteXmlContent(XmlWriter)"/>
@@ -60,13 +47,29 @@ namespace KEI.Infrastructure
         {
             base.WriteXmlContent(writer);
 
-            if(Increment is double d && d != DEFAULT_INCREMENT)
+            if(Increment is double inc)
             {
-                writer.WriteElementString(nameof(Increment), d.ToString());
+                writer.WriteElementString(nameof(Increment), inc.ToString());
+            }
+
+            if(Max is double max)
+            {
+                writer.WriteElementString(nameof(Max), max.ToString());
+            }
+
+            if(Min is double min)
+            {
+                writer.WriteElementString(nameof(Min), min.ToString());
             }
 
         }
 
+        /// <summary>
+        /// Implementation for <see cref="DataObject.ReadXmlElement(string, XmlReader)"/>
+        /// </summary>
+        /// <param name="elementName"></param>
+        /// <param name="reader"></param>
+        /// <returns></returns>
         protected override bool ReadXmlElement(string elementName, XmlReader reader)
         {
             if(base.ReadXmlElement(elementName, reader))
@@ -77,21 +80,19 @@ namespace KEI.Infrastructure
             if(elementName == nameof(Increment))
             {
                 Increment = reader.ReadElementContentAsDouble();
+                return true;
+            }
+            else if(elementName == nameof(Max))
+            {
+                Max = reader.ReadElementContentAsDouble();
+                return true;
+            }
+            else if(elementName == nameof(Min))
+            {
+                Min = reader.ReadElementContentAsDouble();
             }
 
             return false;
-        }
-
-        /// <summary>
-        /// Implementation for <see cref="DataObject.OnStringValueChanged(string)"/>
-        /// </summary>
-        /// <param name="value"></param>
-        protected override void OnStringValueChanged(string value)
-        {
-            if(double.TryParse(value, out _value))
-            {
-                RaisePropertyChanged(nameof(Value));
-            }
         }
     }
 }

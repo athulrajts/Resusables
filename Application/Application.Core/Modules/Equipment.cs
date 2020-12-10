@@ -41,10 +41,10 @@ namespace Application.Core.Modules
             _cameraConfig = _configManager.GetConfig(ConfigKeys.Camera);
 
             _defaultRecipe = PropertyContainerBuilder.Create("Recipe")
-                .Object("MaximumTransmittance", 100.0)
-                .Object("MinimumTransmittance", 90.0)
-                .Object("Production DB", new DatabaseSetup { Schema = new List<DatabaseColumn>(DatabaseSchema.SchemaFor<TestResult>()), Name = PathUtils.GetPath("Database/Production/Production.csv"), CreationMode = DatabaseCreationMode.Daily })
-                .Object("Engineering DB", new DatabaseSetup { Schema = new List<DatabaseColumn>(DatabaseSchema.SchemaFor<TestResult>()), Name = PathUtils.GetPath("Database/Engineering/Engineering.csv"), CreationMode = DatabaseCreationMode.Daily });
+                .Property("MaximumTransmittance", 100.0)
+                .Property("MinimumTransmittance", 90.0)
+                .Property("Production DB", new DatabaseSetup { Schema = new List<DatabaseColumn>(DatabaseSchema.SchemaFor<TestResult>()), Name = PathUtils.GetPath("Database/Production/Production.csv"), CreationMode = DatabaseCreationMode.Daily })
+                .Property("Engineering DB", new DatabaseSetup { Schema = new List<DatabaseColumn>(DatabaseSchema.SchemaFor<TestResult>()), Name = PathUtils.GetPath("Database/Engineering/Engineering.csv"), CreationMode = DatabaseCreationMode.Daily });
 
             //        _defaultRecipe = PropertyContainerBuilder.Create("Recipe", PathUtils.GetPath("Configs/DefaultRecipe.rcp"))
             //.Property("MaximumTransmittance", 100.0, "Maximum Value of Transmittance allowed that considered pass")

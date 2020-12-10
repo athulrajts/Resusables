@@ -75,6 +75,19 @@ namespace KEI.Infrastructure
             prop.Increment = increment;
             return this;
         }
+
+        public NumericPropertyObjectBuilder SetMax(object max)
+        {
+            prop.Max = max;
+            return this;
+        }
+
+        public NumericPropertyObjectBuilder SetMin(object min)
+        {
+            prop.Min = min;
+            return this;
+        }
+
     }
 
     public class FilePropertyObjectBuilder : PropertyObjectBuilder
@@ -117,5 +130,7 @@ namespace KEI.Infrastructure
     public interface INumericPropertyObject
     {
         public object Increment { get; set; }
+        public object Max { get; set; }
+        public object Min { get; set; }
     }
 }

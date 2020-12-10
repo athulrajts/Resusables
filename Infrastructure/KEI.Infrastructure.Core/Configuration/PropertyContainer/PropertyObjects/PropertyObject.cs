@@ -94,7 +94,7 @@ namespace KEI.Infrastructure
             base.WriteXmlContent(writer);
 
             // Write DisplayName if have we have one
-            if(string.IsNullOrEmpty(DisplayName) == false)
+            if (string.IsNullOrEmpty(DisplayName) == false)
             {
                 writer.WriteElementString(nameof(DisplayName), DisplayName);
             }
@@ -106,7 +106,7 @@ namespace KEI.Infrastructure
             }
 
             // Write validation if we have one
-            if(Validation is not null)
+            if (Validation is not null)
             {
                 writer.WriteObjectXml(Validation);
             }
@@ -133,7 +133,7 @@ namespace KEI.Infrastructure
             }
 
             // read category
-            if(reader.GetAttribute(CATEGORY_ATTRIBUTE) is string category)
+            if (reader.GetAttribute(CATEGORY_ATTRIBUTE) is string category)
             {
                 Category = category;
             }
@@ -239,25 +239,66 @@ namespace KEI.Infrastructure
             get { return _value; }
             set
             {
+                // update string value whenever our value changes
+                stringValue = ConvertToString(value);
+
                 if (EqualityComparer<T>.Default.Equals(_value, value) == true)
                 {
-                    if(stringValue != _value?.ToString())
-                    {
-                        stringValue = _value?.ToString();
-                    }
-
                     return;
                 }
 
                 _value = value;
 
-                // update string value whenever our value changes
-                stringValue = _value?.ToString();
-
                 RaisePropertyChanged(nameof(Value));
                 RaisePropertyChanged(nameof(StringValue));
             }
         }
+
+        /// <summary>
+        /// Convert value held to string
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public virtual string ConvertToString(T value)
+        {
+            return value?.ToString();
+        }
+
+        /// <summary>
+        /// Implementation for <see cref="DataObject.CanConvertFromString(string)"/>
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public override bool CanConvertFromString(string value)
+        {
+            var converter = TypeDescriptor.GetConverter(typeof(T));
+
+            if (converter is null)
+            {
+                return false;
+            }
+
+            return converter.IsValid(value);
+        }
+
+        /// <summary>
+        /// Implementation for <see cref="DataObject.ConvertFromString(string)"/>
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public override object ConvertFromString(string value)
+        {
+            var converter = TypeDescriptor.GetConverter(typeof(T));
+
+            if (converter is null)
+            {
+                return null;
+            }
+
+            return converter.ConvertFromInvariantString(value);
+        }
+
 
         /// <summary>
         /// Implemenatiton for <see cref="DataObject.GetValue"/>
@@ -277,7 +318,10 @@ namespace KEI.Infrastructure
                 return false;
             }
 
-            Value = (T)value;
+            if (Validate((T)value))
+            {
+                Value = (T)value;
+            }
 
             return true;
         }
@@ -290,5 +334,35 @@ namespace KEI.Infrastructure
         {
             return typeof(T);
         }
+
+        /// <summary>
+        /// Called just before setting <see cref="Value"/> in <see cref="SetValue(object)"/>
+        /// If this returns false, value will not be updated.
+        /// Implementors can used to perform extra validation other than type safety, which already handled implicitely.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        protected virtual bool Validate(T value)
+        {
+            return true;
+        }
+
+        /// <summary>
+        /// Implementation for <see cref="DataObject.OnStringValueChanged(string)"/>
+        /// </summary>
+        /// <param name="value"></param>
+        protected override void OnStringValueChanged(string value)
+        {
+            if (CanConvertFromString(value))
+            {
+                if (ConvertFromString(value) is T newValue
+                    && Validate(newValue))
+                {
+                    _value = newValue;
+                    RaisePropertyChanged(nameof(Value));
+                }
+            }
+        }
+
     }
 }

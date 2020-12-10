@@ -6,6 +6,7 @@ using System.Xml.Serialization;
 using System.Collections.Generic;
 using Prism.Mvvm;
 using System.Collections;
+using System.ComponentModel;
 
 namespace KEI.Infrastructure
 {
@@ -35,12 +36,7 @@ namespace KEI.Infrastructure
         /// <summary>
         /// Unique name/key
         /// </summary>
-        private string name;
-        public string Name
-        {
-            get { return name; }
-            set { SetProperty(ref name, value); }
-        }
+        public string Name { get; set; }
 
         /// <summary>
         /// Value as string if possible
@@ -216,6 +212,12 @@ namespace KEI.Infrastructure
             writer.WriteEndElement();
         }
 
+        /// <summary>
+        /// Write all attributes of DataObject, called just after writing the Start element return by <see cref="GetStartElementName"/>
+        /// By default it writes, <see cref="Type"/> and <see cref="Name"/>
+        /// and if <see cref="CanWriteValueAsXmlAttribute"/> returns true it also write <see cref="StringValue"/>
+        /// </summary>
+        /// <param name="writer"></param>
         protected virtual void WriteXmlAttributes(XmlWriter writer)
         {
             writer.WriteAttributeString(TYPE_ID_ATTRIBUTE, Type);
@@ -234,6 +236,13 @@ namespace KEI.Infrastructure
         /// <param name="writer"></param>
         protected virtual void WriteXmlContent(XmlWriter writer) { }
 
+        /// <summary>
+        /// Initialize object, called when Xml Reading begins.
+        /// This is required because <see cref="DataObjectFactory.GetDataObject(string)"/> and <see cref="DataObjectFactory.GetPropertyObject(string)"/>
+        /// return an unintialized object without calling the constructor.
+        /// </summary>
+        protected virtual void InitializeObject() { }
+
         #endregion
 
         /// <summary>
@@ -243,8 +252,6 @@ namespace KEI.Infrastructure
         /// </summary>
         /// <param name="value"></param>
         protected virtual void OnStringValueChanged(string value) { }
-
-        protected virtual void InitializeObject() { }
     }
 
     /// <summary>
@@ -254,6 +261,14 @@ namespace KEI.Infrastructure
     public abstract class DataObject<T> : DataObject
     {
         /// <summary>
+        /// Default contructor
+        /// </summary>
+        public DataObject()
+        {
+
+        }
+
+        /// <summary>
         /// Value held by this object
         /// </summary>
         protected T _value;
@@ -262,19 +277,15 @@ namespace KEI.Infrastructure
             get { return _value; }
             set
             {
+                // update string value whenever our value changes
+                stringValue = ConvertToString(_value);
+
                 if (EqualityComparer<T>.Default.Equals(_value, value) == true)
                 {
-                    if (stringValue != _value?.ToString())
-                    {
-                        stringValue = _value?.ToString();
-                    }
                     return;
                 }
 
                 _value = value;
-
-                // update string value whenever our value changes
-                stringValue = ConvertToString(_value);
 
                 RaisePropertyChanged(nameof(Value));
                 RaisePropertyChanged(nameof(StringValue));
@@ -290,6 +301,40 @@ namespace KEI.Infrastructure
         public virtual string ConvertToString(T value)
         {
             return value?.ToString();
+        }
+
+        /// <summary>
+        /// Implementation for <see cref="DataObject.CanConvertFromString(string)"/>
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public override bool CanConvertFromString(string value)
+        {
+            var converter = TypeDescriptor.GetConverter(typeof(T));
+
+            if (converter is null)
+            {
+                return false;
+            }
+
+            return converter.IsValid(value);
+        }
+
+        /// <summary>
+        /// Implementation for <see cref="DataObject.ConvertFromString(string)"/>
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public override object ConvertFromString(string value)
+        {
+            var converter = TypeDescriptor.GetConverter(typeof(T));
+
+            if (converter is null)
+            {
+                return null;
+            }
+
+            return converter.ConvertFromInvariantString(value);
         }
 
 
@@ -311,7 +356,10 @@ namespace KEI.Infrastructure
                 return false;
             }
 
-            Value = (T)value;
+            if (Validate((T)value))
+            {
+                Value = (T)value;
+            }
 
             return true;
         }
@@ -323,11 +371,32 @@ namespace KEI.Infrastructure
         public override Type GetDataType() => typeof(T);
 
         /// <summary>
-        /// Default contructor
+        /// Called just before setting <see cref="Value"/> in <see cref="SetValue(object)"/>
+        /// If this returns false, value will not be updated.
+        /// Implementors can used to perform extra validation other than type safety, which already handled implicitely.
         /// </summary>
-        public DataObject()
+        /// <param name="value"></param>
+        /// <returns></returns>
+        protected virtual bool Validate(T value)
         {
+            return true;
+        }
 
+        /// <summary>
+        /// Implementation for <see cref="DataObject.OnStringValueChanged(string)"/>
+        /// </summary>
+        /// <param name="value"></param>
+        protected override void OnStringValueChanged(string value)
+        {
+            if (CanConvertFromString(value))
+            {
+                if (ConvertFromString(value) is T newValue
+                    && Validate(newValue))
+                {
+                    _value = newValue;
+                    RaisePropertyChanged(nameof(Value));
+                }
+            }
         }
     }
 }

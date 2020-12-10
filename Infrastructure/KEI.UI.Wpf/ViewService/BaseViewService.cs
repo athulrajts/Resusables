@@ -1,19 +1,15 @@
 ﻿using System;
 using System.Windows;
-using System.Reflection;
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Prism.Ioc;
 using Prism.Services.Dialogs;
 using KEI.Infrastructure;
 using KEI.Infrastructure.Logging;
-using KEI.Infrastructure.Localizer;
-using KEI.UI.Wpf.Hotkey;
 using KEI.UI.Wpf.ViewService.Dialogs;
 using KEI.UI.Wpf.Controls.ObjectEditors;
 using KEI.UI.Wpf.ViewService.Views;
 using KEI.UI.Wpf.ViewService.ViewModels;
-using System.Drawing.Design;
 
 namespace KEI.UI.Wpf.ViewService
 {
@@ -23,8 +19,16 @@ namespace KEI.UI.Wpf.ViewService
 
         private Window loading;
 
+        /// <summary>
+        /// Implementation for <see cref="IViewService.IsBusy"/>
+        /// </summary>
         public bool IsBusy => isBusy;
 
+        /// <summary>
+        /// Implementation for <see cref="IViewService.Error(string, bool)"/>
+        /// </summary>
+        /// <param name="error"></param>
+        /// <param name="isModal"></param>
         public void Error(string error, bool isModal = true)
         {
             Logger.Error(error);
@@ -44,6 +48,11 @@ namespace KEI.UI.Wpf.ViewService
             });
         }
 
+        /// <summary>
+        /// Implementation for <see cref="IViewService.Inform(string, bool)"/>
+        /// </summary>
+        /// <param name="info"></param>
+        /// <param name="isModal"></param>
         public void Inform(string info, bool isModal = true)
         {
             Logger.Info(info);
@@ -63,6 +72,11 @@ namespace KEI.UI.Wpf.ViewService
             });
         }
 
+        /// <summary>
+        /// Implementation for <see cref="IViewService.Warn(string, bool)"/>
+        /// </summary>
+        /// <param name="warning"></param>
+        /// <param name="isModal"></param>
         public void Warn(string warning, bool isModal = true)
         {
             Logger.Warn(warning);
@@ -83,7 +97,12 @@ namespace KEI.UI.Wpf.ViewService
 
         }
 
-
+        /// <summary>
+        /// Implementation for <see cref="IViewService.Prompt(string, PromptOptions)"/>
+        /// </summary>
+        /// <param name="confirmMsg"></param>
+        /// <param name="buttons"></param>
+        /// <returns></returns>
         public PromptResult Prompt(string confirmMsg, PromptOptions buttons)
         {
             Logger.Info(confirmMsg);
@@ -102,6 +121,14 @@ namespace KEI.UI.Wpf.ViewService
             return host.Result;
         }
 
+        /// <summary>
+        /// Implementation for <see cref="IViewService.PromptWithDefault(string, PromptOptions, PromptResult, TimeSpan)"/>
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="buttons"></param>
+        /// <param name="defaultResult"></param>
+        /// <param name="timeout"></param>
+        /// <returns></returns>
         public PromptResult PromptWithDefault(string message, PromptOptions buttons, PromptResult defaultResult, TimeSpan timeout)
         {
             Logger.Info(message);
@@ -122,6 +149,9 @@ namespace KEI.UI.Wpf.ViewService
             return host.Result;
         }
 
+        /// <summary>
+        /// Implementation for <see cref="IViewService.SetAvailable"/>
+        /// </summary>
         public void SetAvailable()
         {
             if (IsBusy == false)
@@ -133,6 +163,10 @@ namespace KEI.UI.Wpf.ViewService
             isBusy = false;
         }
 
+        /// <summary>
+        /// Implementation for <see cref="IViewService.SetBusy(string[])"/>
+        /// </summary>
+        /// <param name="msg"></param>
         public void SetBusy(params string[] msg)
         {
             if (IsBusy)
@@ -152,6 +186,10 @@ namespace KEI.UI.Wpf.ViewService
             isBusy = true;
         }
 
+        /// <summary>
+        /// Implementation for <see cref="IViewService.UpdateBusyText(string[])"/>
+        /// </summary>
+        /// <param name="msg"></param>
         public void UpdateBusyText(params string[] msg)
         {
             if (msg == null || IsBusy == false)
@@ -165,13 +203,26 @@ namespace KEI.UI.Wpf.ViewService
             }
         }
 
+        /// <summary>
+        /// Implementation for <see cref="IViewService.SwitchUser"/>
+        /// </summary>
         public virtual void SwitchUser() => ContainerLocator.Container.Resolve<LoginWindow>().ShowDialog();
 
+        /// <summary>
+        /// Implementation for <see cref="IViewService.EditObject(object)"/>
+        /// </summary>
+        /// <param name="o"></param>
         public void EditObject(object o)
         {
             new ObjectEditorWindow(o).ShowDialog();
         }
 
+        /// <summary>
+        /// Implementation for <see cref="IViewService.BrowseFile(string, string)"/>
+        /// </summary>
+        /// <param name="description"></param>
+        /// <param name="filters"></param>
+        /// <returns></returns>
         public string BrowseFile(string description = "", string filters = "")
         {
             var dlg = new CommonOpenFileDialog
@@ -205,6 +256,10 @@ namespace KEI.UI.Wpf.ViewService
             return string.Empty;
         }
 
+        /// <summary>
+        /// Implementation for <see cref="IViewService.BrowseFolder"/>
+        /// </summary>
+        /// <returns></returns>
         public string BrowseFolder()
         {
             var dlg = new CommonOpenFileDialog
@@ -230,6 +285,11 @@ namespace KEI.UI.Wpf.ViewService
             return string.Empty;
         }
 
+        /// <summary>
+        /// Implementation for <see cref="IViewService.SaveFile(Action{string}, string)"/>
+        /// </summary>
+        /// <param name="saveAction"></param>
+        /// <param name="filters"></param>
         public void SaveFile(Action<string> saveAction, string filters = "")
         {
             var sfd = new SaveFileDialog();
@@ -244,24 +304,5 @@ namespace KEI.UI.Wpf.ViewService
             }
         }
 
-    }
-
-    public static class ContainerRegisteryExtensions
-    {
-        public static void RegisterUIServices(this IContainerRegistry registry)
-        {
-            registry.RegisterSingleton<IViewService, BaseViewService>();
-            registry.RegisterSingleton<IHotkeyService, HotkeyService>();
-            registry.RegisterDialog<ConfigsChangedDialog>();
-            registry.RegisterInstance<IStringLocalizer>(new ResourceManagerStringLocalizer(Assembly.GetExecutingAssembly()), Assembly.GetExecutingAssembly().GetName().Name);
-
-
-            CustomUITypeEditorMapping.RegisterEditor<Controls.PropertyGridEditors.FileNameEditor>("file");
-            CustomUITypeEditorMapping.RegisterEditor<Controls.PropertyGridEditors.FolderNameEditor>("folder");
-            CustomUITypeEditorMapping.RegisterEditor<Controls.PropertyGridEditors.ColorEditor>("color");
-            CustomUITypeEditorMapping.RegisterEditor<Controls.PropertyGridEditors.PropertyGridEditor>("dc");
-
-            Infrastructure.ViewService.Service = ContainerLocator.Container.Resolve<IViewService>();
-        }
     }
 }

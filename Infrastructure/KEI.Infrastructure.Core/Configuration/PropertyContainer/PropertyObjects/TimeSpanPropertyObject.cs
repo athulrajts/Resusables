@@ -1,25 +1,26 @@
-﻿namespace KEI.Infrastructure
+﻿using System;
+
+namespace KEI.Infrastructure
 {
     /// <summary>
-    /// PropertyObject Implementation for <see cref="byte"/>
+    /// PropertyObject implementation for storing <see cref="TimeSpan"/>
     /// </summary>
-    internal class BytePropertyObject : PropertyObject<byte>
+    internal class TimeSpanPropertyObject : PropertyObject<TimeSpan>
     {
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="name"></param>
         /// <param name="value"></param>
-        public BytePropertyObject(string name, byte value)
+        public TimeSpanPropertyObject(string name, TimeSpan value)
         {
             Name = name;
             Value = value;
         }
-
+        
         /// <summary>
         /// Implementation for <see cref="DataObject.Type"/>
         /// </summary>
-        public override string Type => "byte";
-
+        public override string Type => "ts";
     }
 }

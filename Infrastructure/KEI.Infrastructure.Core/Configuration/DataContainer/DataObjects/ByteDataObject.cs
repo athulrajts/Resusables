@@ -31,39 +31,5 @@ namespace KEI.Infrastructure
         {
             writer.Write(Value);
         }
-
-        /// <summary>
-        /// Implementation for <see cref="DataObject.CanConvertFromString(string)"/>
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public override bool CanConvertFromString(string value)
-        {
-            return byte.TryParse(value, out _);
-        }
-
-        /// <summary>
-        /// Implementation for <see cref="DataObject.ConvertFromString(string)"/>
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public override object ConvertFromString(string value)
-        {
-            return byte.TryParse(value, out byte tmp)
-                ? tmp
-                : null;
-        }
-
-        /// <summary>
-        /// Implementation for <see cref="OnStringValueChanged(string)"/>
-        /// </summary>
-        /// <param name="value"></param>
-        protected override void OnStringValueChanged(string value)
-        {
-            if (byte.TryParse(value, out _value))
-            {
-                RaisePropertyChanged(nameof(Value));
-            }
-        }
     }
 }

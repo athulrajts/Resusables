@@ -12,7 +12,7 @@ namespace KEI.UI.Wpf.Controls.PropertyGridEditors
     /// <summary>
     /// Default type edit for <see cref="Infrastructure.DataObject"/> of type color
     /// </summary>
-    public class ColorEditor : TypeEditor<ColorPicker>
+    public class ColorEditor : TypeEditor<PropertyGridEditorColorPicker>
     {
         protected override void SetValueDependencyProperty()
         {

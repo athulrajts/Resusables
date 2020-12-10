@@ -14,8 +14,8 @@ namespace Application.Core
         protected override PropertyContainerBuilder DefineConfigShape()
         {
             return PropertyContainerBuilder.Create(ConfigName)
-                .Object("ShowCommandPanelOnLeftSide", false)
-                .Object("Theme", Theme.Dark);
+                .Property("ShowCommandPanelOnLeftSide", false)
+                .Property("Theme", Theme.Dark);
         }
 
         public GeneralPreferences(IEssentialServices essentialServices) : base(essentialServices)

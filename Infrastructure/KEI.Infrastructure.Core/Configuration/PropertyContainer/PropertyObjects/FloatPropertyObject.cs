@@ -1,10 +1,13 @@
-﻿namespace KEI.Infrastructure
+﻿using System.Xml;
+
+namespace KEI.Infrastructure
 {
     /// <summary>
     /// PropertyObject implementation for <see cref="float"/>
     /// </summary>
     internal class FloatPropertyObject : PropertyObject<float>, INumericPropertyObject
     {
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -24,40 +27,72 @@
         /// <summary>
         /// Increment for editors
         /// </summary>
-        public object Increment { get; set; }
+        public object Increment { get; set; } = 1.0f;
 
         /// <summary>
-        /// Implementation for <see cref="DataObject.CanConvertFromString(string)"/>
+        /// Max value of <see cref="DataObject{T}.Value"/>
         /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public override bool CanConvertFromString(string value)
-        {
-            return float.TryParse(value, out _);
-        }
+        public object Max { get; set; }
 
         /// <summary>
-        /// Implementation for <see cref="DataObject.ConvertFromString(string)"/>
+        /// Min value of <see cref="DataObject{T}.Value"/>
         /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public override object ConvertFromString(string value)
-        {
-            return float.TryParse(value, out float tmp)
-                ? tmp
-                : null;
-        }
+        public object Min { get; set; }
 
         /// <summary>
-        /// Implementation for <see cref="DataObject.OnStringValueChanged(string)"/>
+        /// Implementation for <see cref="DataObject.WriteXmlContent(XmlWriter)"/>
         /// </summary>
-        /// <param name="value"></param>
-        protected override void OnStringValueChanged(string value)
+        /// <param name="writer"></param>
+        protected override void WriteXmlContent(XmlWriter writer)
         {
-            if (float.TryParse(value, out _value))
+            base.WriteXmlContent(writer);
+
+            if (Increment is float inc)
             {
-                RaisePropertyChanged(nameof(Value));
+                writer.WriteElementString(nameof(Increment), inc.ToString());
             }
+
+            if (Max is float max)
+            {
+                writer.WriteElementString(nameof(Max), max.ToString());
+            }
+
+            if (Min is float min)
+            {
+                writer.WriteElementString(nameof(Min), min.ToString());
+            }
+
+        }
+
+        /// <summary>
+        /// Implementation for <see cref="DataObject.ReadXmlElement(string, XmlReader)"/>
+        /// </summary>
+        /// <param name="elementName"></param>
+        /// <param name="reader"></param>
+        /// <returns></returns>
+        protected override bool ReadXmlElement(string elementName, XmlReader reader)
+        {
+            if (base.ReadXmlElement(elementName, reader))
+            {
+                return true;
+            }
+
+            if (elementName == nameof(Increment))
+            {
+                Increment = reader.ReadElementContentAsFloat();
+                return true;
+            }
+            else if (elementName == nameof(Max))
+            {
+                Max = reader.ReadElementContentAsFloat();
+                return true;
+            }
+            else if (elementName == nameof(Min))
+            {
+                Min = reader.ReadElementContentAsFloat();
+            }
+
+            return false;
         }
     }
 }

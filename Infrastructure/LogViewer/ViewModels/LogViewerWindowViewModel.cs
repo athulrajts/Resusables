@@ -300,7 +300,7 @@ namespace LogViewer.ViewModels
 
         void ExecuteBrowseFileCommand()
         {
-            var filePath = _viewService.BrowseFile("Log files", "slog");
+            var filePath = _viewService.BrowseFile(new FilterCollection { new Filter("Log files", "slog") });
 
             if (string.IsNullOrEmpty(filePath) || 
                 File.Exists(filePath) == false)

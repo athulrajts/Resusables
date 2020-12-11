@@ -204,7 +204,7 @@ namespace Application.Engineering
         {
             _statusManager.CurrentLanguage = Language.English;
 
-            var file = _viewService.BrowseFile("Recipe Files", ".rcp");
+            var file = _viewService.BrowseFile(new FilterCollection { new Filter("Recipe Files", ".rcp") });
 
             if (string.IsNullOrEmpty(file))
                 return;
@@ -222,7 +222,7 @@ namespace Application.Engineering
 
         void ExecuteOpenLayoutCommand()
         {
-            var file = _viewService.BrowseFile("Layout Files", ".view");
+            var file = _viewService.BrowseFile(new FilterCollection { new Filter("Layout Files", ".view") });
 
             if (string.IsNullOrEmpty(file))
                 return;
@@ -320,7 +320,7 @@ namespace Application.Engineering
 
         void ExecuteOpenDatabaseCommand()
         {
-            var file = _viewService.BrowseFile("Database Files", ".csv");
+            var file = _viewService.BrowseFile(new FilterCollection { new Filter("Database Files", ".csv") });
 
             if (string.IsNullOrEmpty(file))
                 return;

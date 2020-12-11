@@ -8,7 +8,7 @@ namespace KEI.Infrastructure
 {
 
     /// <summary>
-    /// Class use to build <see cref="PropertyContainer"/> Objects
+    /// Class use to build <see cref="IPropertyContainer"/> Objects
     /// </summary>
     public class PropertyContainerBuilder
     {
@@ -22,7 +22,7 @@ namespace KEI.Infrastructure
 
         #endregion
 
-        #region Constructor
+        #region Creation
 
         private PropertyContainerBuilder()
         {
@@ -40,11 +40,46 @@ namespace KEI.Infrastructure
         public static PropertyContainerBuilder Create()
             => new PropertyContainerBuilder();
 
+        public static IPropertyContainer FromFile(string path) => Infrastructure.PropertyContainer.FromFile(path);
+
         #endregion
 
-        public static IPropertyContainer FromFile(string path) => PropertyContainer.FromFile(path);
+        /// <summary>
+        /// Sets the underlying type of the PropertyContainer being built
+        /// </summary>
+        /// <param name="t">Type object</param>
+        public void SetUnderlyingType(Type t) => config.UnderlyingType = t;
 
+        /// <summary>
+        /// Create a nested property container.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="containerBuilder"></param>
+        /// <returns></returns>
+        public PropertyContainerBuilder PropertyContainer(string name, Action<PropertyContainerBuilder> containerBuilder)
+        {
+            if (config.ContainsData(name))
+            {
+                return this;
+            }
 
+            var builder = Create(name);
+            containerBuilder?.Invoke(builder);
+
+            config.Add(new ContainerPropertyObject(name, builder.Build()));
+
+            return this;
+        }
+
+        /// <summary>
+        /// Generic method to create all types of objects
+        /// Addes a different implementation of <see cref="PropertyObject"/> based on <see cref="Type"/>
+        /// of <paramref name="value"/>
+        /// </summary>
+        /// <param name="name">name of property to be added</param>
+        /// <param name="value">value of property</param>
+        /// <param name="propertyBuilder">builder to set additional properties of <see cref="PropertyObject"/></param>
+        /// <returns></returns>
         public PropertyContainerBuilder Property(string name, object value, Action<PropertyObjectBuilder> propertyBuilder = null)
         {
             if (config.ContainsData(name) || value is null)
@@ -62,6 +97,73 @@ namespace KEI.Infrastructure
             return this;
         }
 
+        /// <summary>
+        /// Adds <see cref="BoolPropertyObject"/>
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        /// <param name="propertyBuilder"></param>
+        /// <returns></returns>
+        public PropertyContainerBuilder Bool(string name, bool value, Action<PropertyObjectBuilder> propertyBuilder = null)
+        {
+            if (config.ContainsData(name))
+            {
+                return this;
+            }
+
+            var obj = new BoolPropertyObject(name, value);
+
+            propertyBuilder?.Invoke(new PropertyObjectBuilder(obj));
+
+            config.Add(obj);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Adds <see cref="PointPropertyObject"/> passing <paramref name="x"/> and <paramref name="y"/> to <see cref="Infrastructure.Point"/> constructor
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="propertyBuilder"></param>
+        /// <returns></returns>
+        public PropertyContainerBuilder Point(string name, double x, double y, Action<PropertyObjectBuilder> propertyBuilder = null)
+        {
+            return Point(name, new Point(x, y), propertyBuilder);
+        }
+
+
+        /// <summary>
+        /// Adds <see cref="PointPropertyObject"/>
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        /// <param name="propertyBuilder"></param>
+        /// <returns></returns>
+        public PropertyContainerBuilder Point(string name, Point value, Action<PropertyObjectBuilder> propertyBuilder = null)
+        {
+            if (config.ContainsData(name))
+            {
+                return this;
+            }
+
+            var obj = new PointPropertyObject(name, value);
+
+            propertyBuilder?.Invoke(new PropertyObjectBuilder(obj));
+
+            config.Add(obj);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Adds <see cref="TimeSpanPropertyObject"/>
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        /// <param name="propertyBuilder"></param>
+        /// <returns></returns>
         public PropertyContainerBuilder Time(string name, TimeSpan value, Action<PropertyObjectBuilder> propertyBuilder = null)
         {
             if (config.ContainsData(name))
@@ -78,6 +180,13 @@ namespace KEI.Infrastructure
             return this;
         }
 
+        /// <summary>
+        /// Adds <see cref="DateTimePropertyObject"/>
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        /// <param name="propertyBuilder"></param>
+        /// <returns></returns>
         public PropertyContainerBuilder DateTime(string name, DateTime value, Action<PropertyObjectBuilder> propertyBuilder = null)
         {
             if (config.ContainsData(name))
@@ -94,6 +203,13 @@ namespace KEI.Infrastructure
             return this;
         }
 
+        /// <summary>
+        /// Adds <see cref="FilePropertyObject"/>
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        /// <param name="propertyBuilder"></param>
+        /// <returns></returns>
         public PropertyContainerBuilder File(string name, string value, Action<FilePropertyObjectBuilder> propertyBuilder = null)
         {
             if (config.ContainsData(name) || value is null)
@@ -110,6 +226,13 @@ namespace KEI.Infrastructure
             return this;
         }
 
+        /// <summary>
+        /// Adds <see cref="ColorPropertyObject"/>
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="c"></param>
+        /// <param name="propertyBuilder"></param>
+        /// <returns></returns>
         public PropertyContainerBuilder Color(string name, Color c, Action<PropertyObjectBuilder> propertyBuilder = null)
         {
             if (config.ContainsData(name))
@@ -126,6 +249,45 @@ namespace KEI.Infrastructure
             return this;
         }
 
+        /// <summary>
+        /// Creates <see cref="Infrastructure.Color"/> from hex value and adds <see cref="ColorPropertyObject"/>
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="hex"></param>
+        /// <param name="propertyBuilder"></param>
+        /// <returns></returns>
+        public PropertyContainerBuilder Color(string name, string hex, Action<PropertyObjectBuilder> propertyBuilder = null)
+        {
+            if (Infrastructure.Color.Parse(hex) is Color c)
+            {
+                Color(name, c, propertyBuilder);
+            }
+
+            return this;
+        }
+
+        /// <summary>
+        /// Creates <see cref="Infrastructure.Color"/> from R,G,B values and adds <see cref="ColorPropertyObject"/>
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="R"></param>
+        /// <param name="G"></param>
+        /// <param name="B"></param>
+        /// <param name="propertyBuilder"></param>
+        /// <returns></returns>
+        public PropertyContainerBuilder Color(string name, byte R, byte G, byte B, Action<PropertyObjectBuilder> propertyBuilder = null)
+        {
+            return Color(name, new Color(R, G, B), propertyBuilder);
+        }
+
+        /// <summary>
+        /// Adds <see cref="Array1DPropertyObject"/> or <see cref="Array2DPropertyObject"/>
+        /// Throws <see cref="NotSupportedException"/> if <see cref="System.Array"/> of <see cref="System.Array.Rank"/> greater than 2 is given
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="a"></param>
+        /// <param name="propertyBuilder"></param>
+        /// <returns></returns>
         public PropertyContainerBuilder Array(string name, Array a, Action<PropertyObjectBuilder> propertyBuilder = null)
         {
             if (config.ContainsData(name))
@@ -152,53 +314,48 @@ namespace KEI.Infrastructure
             return this;
         }
 
-        public PropertyContainerBuilder Color(string name, string hex , Action<PropertyObjectBuilder> propertyBuilder = null)
-        {
-            if(Infrastructure.Color.Parse(hex) is Color c)
-            {
-                Color(name, c, propertyBuilder);
-            }    
-
-            return this;
-        }
-
-        public PropertyContainerBuilder Color(string name, byte R, byte G, byte B, Action<PropertyObjectBuilder> propertyBuilder = null)
-        {
-            return Color(name, new Color(R, G, B), propertyBuilder);
-        }
-
+        /// <summary>
+        /// Adds <see cref="IntPropertyObject"/>
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        /// <param name="propertyBuilder"></param>
+        /// <returns></returns>
         public PropertyContainerBuilder Number(string name, int value, Action<NumericPropertyObjectBuilder> propertyBuilder = null)
         {
             return Number(name, (object)value, propertyBuilder);
         }
         
+        /// <summary>
+        /// Adds <see cref="DoublePropertyObject"/>
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        /// <param name="propertyBuilder"></param>
+        /// <returns></returns>
         public PropertyContainerBuilder Number(string name, double value, Action<NumericPropertyObjectBuilder> propertyBuilder = null)
         {
             return Number(name, (object)value, propertyBuilder);
         }
         
+        /// <summary>
+        /// Adds <see cref="FloatPropertyObject"/>
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        /// <param name="propertyBuilder"></param>
+        /// <returns></returns>
         public PropertyContainerBuilder Number(string name, float value, Action<NumericPropertyObjectBuilder> propertyBuilder = null)
         {
             return Number(name, (object)value, propertyBuilder);
         }
 
-        private PropertyContainerBuilder Number(string name, object value, Action<NumericPropertyObjectBuilder> propertyBuilder = null)
-        {
-            if (config.ContainsData(name) || value is null)
-            {
-                return this;
-            }
-
-            if (DataObjectFactory.GetPropertyObjectFor(name, value) is PropertyObject obj)
-            {
-                propertyBuilder?.Invoke(new NumericPropertyObjectBuilder(obj));
-
-                config.Add(obj);
-            }
-
-            return this;
-        }
-
+        /// <summary>
+        /// Adds <see cref="FolderPropertyObject"/>
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public PropertyContainerBuilder Folder(string name, string value)
         {
             if (config.ContainsData(name) || value is null)
@@ -213,22 +370,12 @@ namespace KEI.Infrastructure
             return this;
         }
 
-
-        internal PropertyContainerBuilder Property(PropertyInfo pi, object obj)
-        {
-
-            if (pi.GetValue(obj) is not null)
-            {
-                var option = pi.GetBrowseOption();
-                var description = pi.GetDescription();
-                config.Add(DataObjectFactory.GetPropertyObjectFor(pi.Name, pi.GetValue(obj))
-                    .SetBrowsePermission(option)
-                    .SetDescription(description));
-            }
-
-            return this;
-        }
-
+        /// <summary>
+        /// Creates a <see cref="IPropertyContainer"/> which was the same properties and hierarchy as <paramref name="value"/>
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static IPropertyContainer CreateObject(string name, object value)
         {
             if (value is null)
@@ -255,6 +402,12 @@ namespace KEI.Infrastructure
             return objContainer.Build();
         }
 
+        /// <summary>
+        /// Creates a <see cref="IEnumerable{IPropertyContainer}"/> from an <see cref="IList"/>
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="list"></param>
+        /// <returns></returns>
         public static IEnumerable<IPropertyContainer> CreateList(string name, IList list)
         {
             if (list is null)
@@ -277,10 +430,57 @@ namespace KEI.Infrastructure
         #region Private/Internal Methods
 
         /// <summary>
-        /// Sets the underlying type of the PropertyContainer being built
+        /// Method used internally to create <see cref="IPropertyContainer"/> from CLR objects
         /// </summary>
-        /// <param name="t">Type object</param>
-        internal void SetUnderlyingType(Type t) => config.UnderlyingType = t;
+        /// <param name="pi"></param>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        private PropertyContainerBuilder Property(PropertyInfo pi, object obj)
+        {
+
+            if (pi.GetValue(obj) is not null)
+            {
+                var option = pi.GetBrowseOption();
+                var description = pi.GetDescription();
+                var category = pi.GetCategory();
+                var displayName = pi.GetDisplayName();
+
+                config.Add(DataObjectFactory.GetPropertyObjectFor(pi.Name, pi.GetValue(obj))?
+                    .SetBrowsePermission(option)
+                    .SetDescription(description)
+                    .SetCategory(category)
+                    .SetDisplayName(displayName));
+            }
+
+            return this;
+        }
+
+
+        /// <summary>
+        /// Adds <see cref="IntPropertyObject"/> , <see cref="FloatPropertyObject"/> or <see cref="DoublePropertyObject"/>
+        /// based on <see cref="Type"/> of <paramref name="value"/>
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        /// <param name="propertyBuilder"></param>
+        /// <returns></returns>
+        private PropertyContainerBuilder Number(string name, object value, Action<NumericPropertyObjectBuilder> propertyBuilder = null)
+        {
+            if (config.ContainsData(name) || value is null)
+            {
+                return this;
+            }
+
+            if (DataObjectFactory.GetPropertyObjectFor(name, value) is PropertyObject obj)
+            {
+                propertyBuilder?.Invoke(new NumericPropertyObjectBuilder(obj));
+
+                config.Add(obj);
+            }
+
+            return this;
+        }
+
 
         #endregion
     }

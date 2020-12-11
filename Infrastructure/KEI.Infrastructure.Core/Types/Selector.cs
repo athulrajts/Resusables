@@ -65,10 +65,12 @@ namespace KEI.Infrastructure
 
         public Selector Clone(string newValue)
         {
-            var ret = new Selector();
-            ret.Option = Option;
-            ret.Type = Type;
-            ret.SelectedItem = newValue;
+            var ret = new Selector
+            {
+                Option = Option,
+                Type = Type,
+                SelectedItem = newValue
+            };
 
             return ret;
         }

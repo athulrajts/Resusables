@@ -4,8 +4,6 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:prism="http://prismlibrary.com/"
-             xmlns:local="clr-namespace:Application.Production.Views"
-             xmlns:w="clr-namespace:KEI.UI.Wpf.Controls.Configuration;assembly=KEI.UI.Wpf"
              xmlns:wpf="http://gesinfotek.com/wpf"
              xmlns:xc="http://schemas.xceed.com/wpf/xaml/toolkit"
              prism:ViewModelLocator.AutoWireViewModel="True"

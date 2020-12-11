@@ -74,23 +74,17 @@ namespace KEI.Infrastructure
         void EditObject(object o);
 
         /// <summary>
-        /// Opens a file dialog to choose a file
+        /// Opens a filedialog to choose a file with given filters
         /// </summary>
-        /// <param name="filterName">The name of this filter</param>
-        /// <param name="filterExtensions">The list of extensions in this filter. See remarks</param>
-        /// <remarks>
-        /// The extensionList can use a semicolon(";") or comma (",") to separate extensions.
-        /// Extensions can be prefaced with a period (".") or with the file wild card specifier
-        /// "*.".
-        /// </remarks>
-        /// <returns>filename</returns>
-        string BrowseFile(string filterName = "", string filterExtensions = "");
+        /// <param name="filters"></param>
+        /// <returns></returns>
+        string BrowseFile(FilterCollection filters = null, string initialDirectory = null);
 
         /// <summary>
         /// Opens a file dialog to chose a folder.
         /// </summary>
         /// <returns></returns>
-        string BrowseFolder();
+        string BrowseFolder(string initialDirectory = null);
 
         /// <summary>
         /// Opens a file dialog to browse and save a file

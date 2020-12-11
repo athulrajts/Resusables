@@ -223,8 +223,10 @@ namespace KEI.UI.Wpf.ViewService
         /// <param name="description"></param>
         /// <param name="filters"></param>
         /// <returns></returns>
-        public string BrowseFile(string description = "", string filters = "")
+        public string BrowseFile(FilterCollection filters = null, string initialDirectory = null)
         {
+            initialDirectory ??= AppDomain.CurrentDomain.BaseDirectory;
+
             var dlg = new CommonOpenFileDialog
             {
                 AddToMostRecentlyUsedList = false,
@@ -236,17 +238,14 @@ namespace KEI.UI.Wpf.ViewService
                 Multiselect = false,
                 ShowPlacesList = true,
                 IsFolderPicker = false,
-                DefaultDirectory = AppDomain.CurrentDomain.BaseDirectory,
-                InitialDirectory = AppDomain.CurrentDomain.BaseDirectory
+                DefaultDirectory = initialDirectory,
+                InitialDirectory = initialDirectory
             };
 
-            if (!string.IsNullOrEmpty(description) && !string.IsNullOrEmpty(filters))
+            foreach (var filter in filters)
             {
-                dlg.Filters.Add(new CommonFileDialogFilter(description, filters));
+                dlg.Filters.Add(new CommonFileDialogFilter(filter.Description, filter.Extenstion));
             }
-
-            dlg.DefaultDirectory = AppDomain.CurrentDomain.BaseDirectory;
-            dlg.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory;
 
             if (dlg.ShowDialog() == CommonFileDialogResult.Ok)
             {
@@ -260,8 +259,10 @@ namespace KEI.UI.Wpf.ViewService
         /// Implementation for <see cref="IViewService.BrowseFolder"/>
         /// </summary>
         /// <returns></returns>
-        public string BrowseFolder()
+        public string BrowseFolder(string initialDirectory = null)
         {
+            initialDirectory ??= AppDomain.CurrentDomain.BaseDirectory;
+
             var dlg = new CommonOpenFileDialog
             {
                 AddToMostRecentlyUsedList = false,
@@ -273,8 +274,8 @@ namespace KEI.UI.Wpf.ViewService
                 Multiselect = false,
                 ShowPlacesList = true,
                 IsFolderPicker = true,
-                DefaultDirectory = AppDomain.CurrentDomain.BaseDirectory,
-                InitialDirectory = AppDomain.CurrentDomain.BaseDirectory
+                DefaultDirectory = initialDirectory,
+                InitialDirectory = initialDirectory
             };
 
             if (dlg.ShowDialog() == CommonFileDialogResult.Ok)
@@ -294,13 +295,17 @@ namespace KEI.UI.Wpf.ViewService
         {
             var sfd = new SaveFileDialog();
 
-            if (!string.IsNullOrEmpty(filters))
+            if (string.IsNullOrEmpty(filters) == false)
+            {
                 sfd.Filter = filters;
+            }
 
             if (sfd.ShowDialog() == true)
             {
-                if (!string.IsNullOrEmpty(sfd.FileName))
-                    saveAction(sfd.FileName);
+                if (string.IsNullOrEmpty(sfd.FileName) == false)
+                {
+                    saveAction?.Invoke(sfd.FileName);
+                }
             }
         }
 

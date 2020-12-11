@@ -35,7 +35,7 @@ namespace KEI.Infrastructure
 
         #region DataContainer Get/Put Extensions
 
-        public static T Get<T>(this IDataContainer dc, string key)
+        public static T GetValue<T>(this IDataContainer dc, string key)
         {
             if(dc is null)
             {
@@ -49,7 +49,7 @@ namespace KEI.Infrastructure
             return retValue;
         }
 
-        public static void Put(this IDataContainer dc, string key, object value)
+        public static void PutValue(this IDataContainer dc, string key, object value)
         {
             if(dc is null)
             {

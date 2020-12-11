@@ -126,7 +126,7 @@ namespace ServiceEditor.ViewModels
 
         void ExecuteLoadServiceConfigCommand()
         {
-            var fileName = _viewService.BrowseFile("Config File", "cfg");
+            var fileName = _viewService.BrowseFile(new FilterCollection { new Filter("Config File", "cfg") });
 
             if(string.IsNullOrEmpty(fileName))
             {

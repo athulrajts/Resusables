@@ -200,8 +200,8 @@ namespace KEI.Infrastructure.Server
                 config = DataContainerBuilder.FromFile(ConfigPath);
             }
 
-            Port = config.Get<ushort>(nameof(Port));
-            RecieveBufferSize = config.Get<int>(nameof(RecieveBufferSize));
+            Port = config.GetValue<ushort>(nameof(Port));
+            RecieveBufferSize = config.GetValue<int>(nameof(RecieveBufferSize));
 
             return true;
         }

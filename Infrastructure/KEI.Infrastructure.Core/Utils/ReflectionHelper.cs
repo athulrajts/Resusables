@@ -86,6 +86,10 @@ namespace KEI.Infrastructure.Helpers
 
         public static string GetDescription(this PropertyInfo info) => info.GetCustomAttribute<DescriptionAttribute>()?.Description;
 
+        public static string GetCategory(this PropertyInfo info) => info.GetCustomAttribute<CategoryAttribute>()?.Category;
+
+        public static string GetDisplayName(this PropertyInfo info) => info.GetCustomAttribute<DisplayNameAttribute>()?.DisplayName;
+
         public static BrowseOptions GetBrowseOption(this PropertyInfo info)
         {
             BrowseOptions browseOption = BrowseOptions.Browsable;

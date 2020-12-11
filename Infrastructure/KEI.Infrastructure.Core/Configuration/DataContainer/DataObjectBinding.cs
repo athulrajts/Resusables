@@ -21,7 +21,9 @@ namespace KEI.Infrastructure
             UpdateTarget();
 
             if (Mode == BindingMode.OneTime)
+            {
                 return;
+            }
 
             if (BindingTarget.Target is INotifyPropertyChanged inpc &&
                 (Mode == BindingMode.TwoWay || Mode == BindingMode.OneWayToSource))
@@ -35,6 +37,11 @@ namespace KEI.Infrastructure
             }
         }
 
+        /// <summary>
+        /// Update Target / Source on property change events
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnPropertyChangeRaised(object sender, PropertyChangedEventArgs e)
         {
             if (sender == BindingTarget.Target)
@@ -96,6 +103,9 @@ namespace KEI.Infrastructure
 
         #region IDisposible Members
 
+        /// <summary>
+        /// Implementation for <see cref="IDisposable.Dispose"/>
+        /// </summary>
         public void Dispose()
         {
             if (Mode == BindingMode.OneTime)

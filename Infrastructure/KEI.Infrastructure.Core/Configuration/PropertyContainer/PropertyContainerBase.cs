@@ -1,6 +1,4 @@
-﻿using System.IO;
-using System.Xml;
-using KEI.Infrastructure.Validation;
+﻿using KEI.Infrastructure.Validation;
 
 namespace KEI.Infrastructure
 {
@@ -40,6 +38,11 @@ namespace KEI.Infrastructure
             return false;
         }
 
+        /// <summary>
+        /// Implementation for <see cref="DataContainerBase.GetUnitializedDataObject(string)"/>
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
         protected override DataObject GetUnitializedDataObject(string type)
         {
             return DataObjectFactory.GetPropertyObject(type);

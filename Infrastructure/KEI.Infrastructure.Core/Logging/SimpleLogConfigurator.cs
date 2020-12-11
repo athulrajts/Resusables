@@ -1,80 +1,33 @@
-﻿using Prism;
+﻿using System;
 
 namespace KEI.Infrastructure.Logging
 {
-    public class SimpleLogConfigurator : ISimpleLogConfigurator, IFileAppenderConfigurator
+    public class SimpleLogConfigurator
     {
-        private SimpleLogger logger = new SimpleLogger("System");
-        private ILogAppender logAppender;
+        private readonly SimpleLogger logger = new SimpleLogger("System");
 
         public static ILogManager ConfigureConsoleLogger() => Configure().WriteToConsole().Finish();
-        
+
         public static ILogManager ConfigureFileLogger(string file, string pattern)
-            => Configure().WriteToFile(file, pattern).Create().Finish();
+        {
+            return Configure().WriteToFile(file, a => a.Pattern(pattern)).Finish();
+        }
 
-        public static ILogManager ConfigureFileLogger(string file)
-            => Configure().WriteToFile(file).Create().Finish();
+        public static ILogManager ConfigureXmlLogger(string file)
+        {
+            return Configure().WriteToXml(file).Finish();
+        }
 
-        public static ILogManager ConfigureXMLLogger(string file)
-            => Configure().WriteToXml(file).Create().Finish();
-
-        public static ISimpleLogConfigurator Configure()
+        public static SimpleLogConfigurator Configure()
         { 
             return new SimpleLogConfigurator();
         }
 
-        public ISimpleLogConfigurator Create()
+        public SimpleLogConfigurator WriteToFile(string fileName, Action<PatternFileAppenderBuilder> appenderBuilder = null)
         {
-            logger.Appenders.Add(logAppender);
-            return this;
-        }
-
-        public IFileAppenderConfigurator Pattern(string pattern)
-        {
-            if (logAppender is PatternAppender appender)
-            {
-                appender.LayoutPattern = pattern;
-            }
-
-            return this;
-        }
-
-        public IFileAppenderConfigurator RollingInterval(int interval)
-        {
-            if (logAppender is RollingFileAppender appender)
-            {
-                appender.RollingInterval = interval; 
-            }
-            return this;
-        }
-
-        public IFileAppenderConfigurator RollingMode(RollingMode mode)
-        {
-            if (logAppender is RollingFileAppender appender)
-            {
-                appender.Mode = mode; 
-            }
-            return this;
-        }
-
-        public IFileAppenderConfigurator RollingSize(int size)
-        {
-            if (logAppender is RollingFileAppender appender)
-            {
-                appender.RollingSize = size; 
-            }
-            return this;
-        }
-
-        public IFileAppenderConfigurator WriteToFile(string fileName, string pattern)
-        {
-            logAppender = new PatternAppender { FilePath = fileName, LayoutPattern = pattern };
-            return this;
-        }
-
-        public IFileAppenderConfigurator WriteToFile(string fileName)
-        {
-            logAppender = new PatternAppender { FilePath = fileName };
+            var appender = new PatternAppender { FilePath = fileName };
+            logger.Appenders.Add(appender);
+            appenderBuilder?.Invoke(new PatternFileAppenderBuilder(appender));
             return this;
         }
 
@@ -83,36 +36,79 @@ namespace KEI.Infrastructure.Logging
             return new SimpleLogManager(logger);
         }
 
-        public ISimpleLogConfigurator WriteToConsole()
+        public SimpleLogConfigurator WriteToConsole()
         {
-            logAppender = new ConsoleAppender();
-            logger.Appenders.Add(logAppender);
+            logger.Appenders.Add(new ConsoleAppender());
             return this;
         }
 
-        public IFileAppenderConfigurator WriteToXml(string fileName)
+        public SimpleLogConfigurator WriteToXml(string fileName, Action<FileAppenderBuilder> appenderBuilder = null)
         {
-            logAppender = new XmlFileAppender { FilePath = fileName };
+            var appender = new XmlFileAppender { FilePath = fileName };
+            logger.Appenders.Add(appender);
+            appenderBuilder?.Invoke(new FileAppenderBuilder(appender));
             return this;
         }
 
     }
 
-    public interface ISimpleLogConfigurator
+    public class FileAppenderBuilder
     {
-        public IFileAppenderConfigurator WriteToFile(string fileName, string pattern);
-        public IFileAppenderConfigurator WriteToFile(string fileName);
-        public ISimpleLogConfigurator WriteToConsole();
-        public IFileAppenderConfigurator WriteToXml(string fileName);
-        public ILogManager Finish();
+        private RollingFileAppender _appender;
+
+        public FileAppenderBuilder(RollingFileAppender appender)
+        {
+            _appender = appender;
+        }
+
+        public virtual FileAppenderBuilder RollingMode(RollingMode mode)
+        {
+            _appender.Mode = mode;
+            return this;
+        }
+
+        public virtual FileAppenderBuilder RollingInterval(int interval)
+        {
+            _appender.RollingInterval = interval;
+            return this;
+        }
+
+        public virtual FileAppenderBuilder RollingSize(int size)
+        {
+            _appender.RollingSize = size;
+            return this;
+        }
     }
 
-    public interface IFileAppenderConfigurator
+    public class PatternFileAppenderBuilder : FileAppenderBuilder
     {
-        public IFileAppenderConfigurator RollingMode(RollingMode mode);
-        public IFileAppenderConfigurator RollingInterval(int interval);
-        public IFileAppenderConfigurator RollingSize(int size);
-        public ISimpleLogConfigurator Create();
+        private PatternAppender _appender;
+
+        public PatternFileAppenderBuilder(PatternAppender appender) : base(appender)
+        {
+            _appender = appender;
+        }
+
+        public override PatternFileAppenderBuilder RollingMode(RollingMode mode)
+        {
+            return (PatternFileAppenderBuilder)base.RollingMode(mode);
+        }
+
+        public override PatternFileAppenderBuilder RollingInterval(int interval)
+        {
+            return (PatternFileAppenderBuilder)base.RollingInterval(interval);
+        }
+
+        public override PatternFileAppenderBuilder RollingSize(int size)
+        {
+            return (PatternFileAppenderBuilder)base.RollingSize(size);
+        }
+
+        public PatternFileAppenderBuilder Pattern(string pattern)
+        {
+            _appender.LayoutPattern = pattern;
+            return this;
+        }
     }
 
 }

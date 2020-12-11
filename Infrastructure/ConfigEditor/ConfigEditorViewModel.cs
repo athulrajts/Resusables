@@ -30,7 +30,7 @@ namespace ConfigEditor
 
         void ExecuteOpenFileCommand()
         {
-            var fileName = _viewService.BrowseFile("DataContainer Files", "rcp,xcfg");
+            var fileName = _viewService.BrowseFile(new FilterCollection { new Filter("DataContainer Files", "rcp,xcfg") });
 
             if (string.IsNullOrEmpty(fileName))
                 return;

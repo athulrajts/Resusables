@@ -1,8 +1,8 @@
-﻿using Prism.Ioc;
-using Prism.Services.Dialogs;
-using System;
+﻿using System;
 using System.Windows;
 using System.Windows.Media;
+using Prism.Ioc;
+using Prism.Services.Dialogs;
 
 namespace KEI.UI.Wpf.ViewService.Dialogs
 {
@@ -19,7 +19,7 @@ namespace KEI.UI.Wpf.ViewService.Dialogs
 
             DataContext = vm;
 
-            Content = Activator.CreateInstance<TContent>();
+            Content = ContainerLocator.Container.Resolve<TContent>();
 
             SizeToContent = SizeToContent.Manual;
             WindowStyle = WindowStyle.None;

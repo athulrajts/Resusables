@@ -1,7 +1,4 @@
 ﻿using KEI.UI.Wpf.Converters;
-using System;
-using System.Globalization;
-using System.Windows;
 using System.Windows.Data;
 using Xceed.Wpf.Toolkit;
 using Xceed.Wpf.Toolkit.PropertyGrid;

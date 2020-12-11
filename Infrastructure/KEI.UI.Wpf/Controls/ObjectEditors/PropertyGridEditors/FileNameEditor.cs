@@ -25,14 +25,12 @@ namespace KEI.UI.Wpf.Controls.PropertyGridEditors
             Editor.Type = BrowseType.File;
             Editor.VerticalContentAlignment = VerticalAlignment.Center;
 
-            if (propertyItem.PropertyDescriptor is DataObjectPropertyDescriptor desc)
+            if (propertyItem.PropertyDescriptor is DataObjectPropertyDescriptor desc
+                && desc.DataObject is IFileProperty ifp)
             {
-                List<Tuple<string, string>> filters = desc.DataObject.GetType()
-                    .GetProperty("Filters").GetValue(desc.DataObject) as List<Tuple<string, string>>;
-
-                foreach (var filter in filters)
+                foreach (var filter in ifp.Filters)
                 {
-                    Editor.Filters.Add(new Filter(filter.Item1, filter.Item2));
+                    Editor.Filters.Add(filter);
                 }
             }
 

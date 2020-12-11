@@ -71,7 +71,7 @@ namespace ApplicationShell
 
             // Register Logger
             containerRegistry.RegisterLogger(SimpleLogConfigurator.Configure()
-                .WriteToFile(PathUtils.GetPath("Logs/Log.slog")).Create()
+                .WriteToFile(PathUtils.GetPath("Logs/Log.slog"))
                 .Finish());
 
             // Register Infrastructure Services

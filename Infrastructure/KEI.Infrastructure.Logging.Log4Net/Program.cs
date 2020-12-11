@@ -1,5 +1,4 @@
-﻿using KEI.Infrastructure;
-using KEI.Infrastructure.Logging;
+﻿using KEI.Infrastructure.Logging;
 using System;
 
 namespace ConsoleApp1
@@ -9,9 +8,9 @@ namespace ConsoleApp1
         static void Main(string[] args)
         {
             _ = SimpleLogConfigurator.Configure()
-                .WriteToFile(@"Logs\Testlog.txt").Create()
+                .WriteToFile(@"Logs\Testlog.txt")
                 .WriteToConsole()
-                .WriteToXml(@"Logs\TestLogXml.txt").Create()
+                .WriteToXml(@"Logs\TestLogXml.txt")
                 .Finish();
 
             Logger.Debug("Debug");

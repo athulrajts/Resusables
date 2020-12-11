@@ -25,8 +25,6 @@ namespace Application.Production.ViewModels
 
         public DemoScreen3ViewModel(IHotkeyService hotkeyService) : base(hotkeyService)
         {
-            var list = new List<Point> { new(), new(), new() };
-
             IPropertyContainer inner = PropertyContainerBuilder.Create("Inner Container")
                 .Property("InnerInt", 23)
                 .Property("inner Enum", UriHostNameType.Dns)
@@ -78,6 +76,7 @@ namespace Application.Production.ViewModels
                 .Time("Time", TimeSpan.FromSeconds(69))
                 .DateTime("DateTime", DateTime.Now)
                 .Property("TrueFalse", false)
+                .Property("Point", new KEI.Infrastructure.Point(23, 45))
                 .Build();
 
             var xmlString = XmlHelper.SerializeToString(SamplePropertyContainer);

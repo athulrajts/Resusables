@@ -154,7 +154,7 @@ namespace KEI.Infrastructure.Core.Tests
             Assert.NotEqual(0, prop);
             Assert.Equal(42, prop);
 
-            int prop2 = property.Get<int>(PROP_NAME);
+            int prop2 = property.GetValue<int>(PROP_NAME);
 
             Assert.NotEqual(0, prop2);
             Assert.Equal(42, prop2);
@@ -175,7 +175,7 @@ namespace KEI.Infrastructure.Core.Tests
             Assert.False(containsProperty);
             Assert.Equal(default, prop);
 
-            int prop2 = property.Get<int>("blah");
+            int prop2 = property.GetValue<int>("blah");
 
             Assert.Equal(default, prop2);
         }
@@ -195,7 +195,7 @@ namespace KEI.Infrastructure.Core.Tests
 
             int value = 0;
             property.GetValue(PROP_NAME, ref value);
-            int value2 = property.Get<int>(PROP_NAME);
+            int value2 = property.GetValue<int>(PROP_NAME);
 
             Assert.NotEqual(VALUE, value);
             Assert.NotEqual(VALUE, value2);
@@ -214,7 +214,7 @@ namespace KEI.Infrastructure.Core.Tests
 
             Assert.False(property.ContainsData(PROP_NAME));
 
-            property.Put(PROP_NAME, SET_VALUE);
+            property.PutValue(PROP_NAME, SET_VALUE);
 
             Assert.True(property.ContainsData(PROP_NAME));
 
@@ -240,7 +240,7 @@ namespace KEI.Infrastructure.Core.Tests
 
             Assert.True(property.ContainsData(PROP_NAME));
 
-            property.Put(PROP_NAME, SET_VALUE);
+            property.PutValue(PROP_NAME, SET_VALUE);
 
             Assert.True(property.ContainsData(PROP_NAME));
 

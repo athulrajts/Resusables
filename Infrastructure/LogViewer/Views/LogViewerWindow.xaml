@@ -395,7 +395,7 @@
                                         Header="Level"
                                         Binding="{Binding Level}" 
                                         IsReadOnly="True"
-                                        Width="50"
+                                        Width="Auto"
                                         CanUserResize="False"
                                         CellStyle="{StaticResource CenteredContent}"
                                         Visibility="{Binding Data, Converter={wpf:BooleanToVisibilityConverter}, Source={StaticResource LogLevelChecked}}"/>

@@ -25,10 +25,10 @@ namespace LogViewer.ViewModels
             _viewService = viewService;
 
             LogCount.Add(LogLevel.Debug, 0);
-            LogCount.Add(LogLevel.Info, 0);
-            LogCount.Add(LogLevel.Warn, 0);
+            LogCount.Add(LogLevel.Information, 0);
+            LogCount.Add(LogLevel.Warning, 0);
             LogCount.Add(LogLevel.Error, 0);
-            LogCount.Add(LogLevel.Fatal, 0);
+            LogCount.Add(LogLevel.Critical, 0);
 
             Directory = new ObservableCollection<DirectoryNode>();
 
@@ -132,14 +132,14 @@ namespace LogViewer.ViewModels
         public bool ViewInfo
         {
             get { return viewInfo; }
-            set { SetLevelFilter(ref viewInfo, value, LogLevel.Info); }
+            set { SetLevelFilter(ref viewInfo, value, LogLevel.Information); }
         }
 
         private bool viewWarn;
         public bool ViewWarn
         {
             get { return viewWarn; }
-            set { SetLevelFilter(ref viewWarn, value, LogLevel.Warn); }
+            set { SetLevelFilter(ref viewWarn, value, LogLevel.Warning); }
         }
 
         private bool viewError;
@@ -153,7 +153,7 @@ namespace LogViewer.ViewModels
         public bool ViewFatal
         {
             get { return viewFatal; }
-            set { SetLevelFilter(ref viewFatal, value, LogLevel.Fatal); }
+            set { SetLevelFilter(ref viewFatal, value, LogLevel.Critical); }
         }
 
         public LogLevel Filter { get; set; }

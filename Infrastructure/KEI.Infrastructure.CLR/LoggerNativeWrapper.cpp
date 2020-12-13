@@ -19,7 +19,7 @@ LoggerNativeWrapper::LoggerNativeWrapper(ILogger^ logger)
 
 void LoggerNativeWrapper::Debug(std::string message, const char* filename, const char* function_name, int line_number)
 {
-	instance->Debug(gcnew String(message.c_str()),
+	instance->Log(KEI::Infrastructure::Logging::LogLevel::Debug, gcnew String(message.c_str()),
 		gcnew String(filename),
 		gcnew String(function_name),
 		line_number);
@@ -27,7 +27,7 @@ void LoggerNativeWrapper::Debug(std::string message, const char* filename, const
 
 void LoggerNativeWrapper::Information(std::string message, const char* filename, const char* function_name, int line_number)
 {
-	instance->Info(gcnew String(message.c_str()),
+	instance->Log(KEI::Infrastructure::Logging::LogLevel::Information, gcnew String(message.c_str()),
 		gcnew String(filename),
 		gcnew String(function_name),
 		line_number);
@@ -35,7 +35,7 @@ void LoggerNativeWrapper::Information(std::string message, const char* filename,
 
 void LoggerNativeWrapper::Warning(std::string message, const char* filename, const char* function_name, int line_number)
 {
-	instance->Warn(gcnew String(message.c_str()),
+	instance->Log(KEI::Infrastructure::Logging::LogLevel::Warning, gcnew String(message.c_str()),
 		gcnew String(filename),
 		gcnew String(function_name),
 		line_number);
@@ -43,7 +43,7 @@ void LoggerNativeWrapper::Warning(std::string message, const char* filename, con
 
 void LoggerNativeWrapper::Error(std::string message, const char* filename, const char* function_name, int line_number)
 {
-	instance->Error(gcnew String(message.c_str()),
+	instance->Log(KEI::Infrastructure::Logging::LogLevel::Error, gcnew String(message.c_str()),
 		gcnew String(filename),
 		gcnew String(function_name),
 		line_number);

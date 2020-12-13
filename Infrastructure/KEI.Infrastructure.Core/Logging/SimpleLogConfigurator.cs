@@ -2,6 +2,9 @@
 
 namespace KEI.Infrastructure.Logging
 {
+    /// <summary>
+    /// Class to create <see cref="ILogManager"/>
+    /// </summary>
     public class SimpleLogConfigurator
     {
         private readonly SimpleLogger logger = new SimpleLogger("System");
@@ -12,17 +15,19 @@ namespace KEI.Infrastructure.Logging
         {
             return Configure().WriteToFile(file, a => a.Pattern(pattern)).Finish();
         }
-
-        public static ILogManager ConfigureXmlLogger(string file)
-        {
-            return Configure().WriteToXml(file).Finish();
-        }
-
+        
         public static SimpleLogConfigurator Configure()
-        { 
+        {
             return new SimpleLogConfigurator();
         }
 
+        /// <summary>
+        /// Create logger to write to File
+        /// Creates <see cref="PatternAppender"/>
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="appenderBuilder"></param>
+        /// <returns></returns>
         public SimpleLogConfigurator WriteToFile(string fileName, Action<PatternFileAppenderBuilder> appenderBuilder = null)
         {
             var appender = new PatternAppender { FilePath = fileName };
@@ -31,82 +36,38 @@ namespace KEI.Infrastructure.Logging
             return this;
         }
 
+        /// <summary>
+        /// Get instance of <see cref="ILogManager"/> with the appenders built
+        /// </summary>
+        /// <returns></returns>
         public ILogManager Finish()
         {
             return new SimpleLogManager(logger);
         }
 
-        public SimpleLogConfigurator WriteToConsole()
+        /// <summary>
+        /// Creates logger to write to console
+        /// </summary>
+        /// <param name="appenderBuilder"></param>
+        /// <returns></returns>
+        public SimpleLogConfigurator WriteToConsole(Action<BaseAppenderBuilder> appenderBuilder = null)
         {
-            logger.Appenders.Add(new ConsoleAppender());
-            return this;
-        }
-
-        public SimpleLogConfigurator WriteToXml(string fileName, Action<FileAppenderBuilder> appenderBuilder = null)
-        {
-            var appender = new XmlFileAppender { FilePath = fileName };
+            var appender = new ColorConsoleAppender();
             logger.Appenders.Add(appender);
-            appenderBuilder?.Invoke(new FileAppenderBuilder(appender));
+            appenderBuilder?.Invoke(new BaseAppenderBuilder(appender));
             return this;
         }
 
-    }
-
-    public class FileAppenderBuilder
-    {
-        private RollingFileAppender _appender;
-
-        public FileAppenderBuilder(RollingFileAppender appender)
+        /// <summary>
+        /// Creates a logger to write to <see cref="System.Diagnostics.Trace"/>
+        /// </summary>
+        /// <param name="appenderBuilder"></param>
+        /// <returns></returns>
+        public SimpleLogConfigurator WriteToTrace(Action<BaseAppenderBuilder> appenderBuilder = null)
         {
-            _appender = appender;
-        }
-
-        public virtual FileAppenderBuilder RollingMode(RollingMode mode)
-        {
-            _appender.Mode = mode;
-            return this;
-        }
-
-        public virtual FileAppenderBuilder RollingInterval(int interval)
-        {
-            _appender.RollingInterval = interval;
-            return this;
-        }
-
-        public virtual FileAppenderBuilder RollingSize(int size)
-        {
-            _appender.RollingSize = size;
-            return this;
-        }
-    }
-
-    public class PatternFileAppenderBuilder : FileAppenderBuilder
-    {
-        private PatternAppender _appender;
-
-        public PatternFileAppenderBuilder(PatternAppender appender) : base(appender)
-        {
-            _appender = appender;
-        }
-
-        public override PatternFileAppenderBuilder RollingMode(RollingMode mode)
-        {
-            return (PatternFileAppenderBuilder)base.RollingMode(mode);
-        }
-
-        public override PatternFileAppenderBuilder RollingInterval(int interval)
-        {
-            return (PatternFileAppenderBuilder)base.RollingInterval(interval);
-        }
-
-        public override PatternFileAppenderBuilder RollingSize(int size)
-        {
-            return (PatternFileAppenderBuilder)base.RollingSize(size);
-        }
-
-        public PatternFileAppenderBuilder Pattern(string pattern)
-        {
-            _appender.LayoutPattern = pattern;
+            var appender = new TraceAppender();
+            logger.Appenders.Add(appender);
+            appenderBuilder?.Invoke(new BaseAppenderBuilder(appender));
             return this;
         }
     }

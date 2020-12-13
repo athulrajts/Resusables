@@ -6,7 +6,7 @@ class DataContainerNativeWrapper
 {
 public:
 	DataContainerNativeWrapper();
-	DataContainerNativeWrapper(KEI::Infrastructure::Configuration::IDataContainer^ instance);
+	DataContainerNativeWrapper(KEI::Infrastructure::IDataContainer^ instance);
 
 	std::vector<std::string> GetKeys();
 
@@ -30,5 +30,5 @@ public:
 
 
 private:
-	msclr::gcroot<KEI::Infrastructure::Configuration::IDataContainer^> instance;
+	msclr::gcroot<KEI::Infrastructure::IDataContainer^> instance;
 };

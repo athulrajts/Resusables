@@ -1,20 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace KEI.Infrastructure.Logging
 {
+    /// <summary>
+    /// <see cref="ILogger"/> Implementation
+    /// </summary>
     public class SimpleLogger : ILogger
     {
-        internal string Name { get; set; }
+        public string Name { get; private set; }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="name"></param>
         public SimpleLogger(string name)
         {
             Name = name;
         }
 
+        /// <summary>
+        /// Called by <see cref="ILogManager.GetLogger(string)"/> <see cref="ILogManager.GetLogger(Type)"/>
+        /// and <see cref="ILogManager.GetLoggerT{T}"/>
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public SimpleLogger Clone(string name)
         {
             var clone = (SimpleLogger)MemberwiseClone();
@@ -22,264 +36,77 @@ namespace KEI.Infrastructure.Logging
             return clone;
         }
 
-
+        /// <summary>
+        /// List of appenders
+        /// </summary>
         public List<ILogAppender> Appenders { get; set; } = new List<ILogAppender>();
 
-        public bool IsDebugEnabled { get; set; } = true;
-
-        public bool IsErrorEnabled { get; set; } = true;
-
-        public bool IsFatalEnabled { get; set; } = true;
-
-        public bool IsInfoEnabled { get; set; } = true;
-
-        public bool IsWarnEnabled { get; set; } = true;
-
-        public void Debug(object message, [CallerFilePath] string callerFile = "", [CallerMemberName] string callerMember = "", [CallerLineNumber] int lineNumber = 0)
+        /// <summary>
+        /// Implementation for <see cref="ILogger.Log(LogLevel, string, string, string, int)"/>
+        /// </summary>
+        /// <param name="level"></param>
+        /// <param name="message"></param>
+        /// <param name="fileName"></param>
+        /// <param name="callerName"></param>
+        /// <param name="lineNumber"></param>
+        public void Log(LogLevel level, string message, [CallerFilePath] string fileName = "", [CallerMemberName] string callerName = "", [CallerLineNumber] int lineNumber = 0)
         {
-            if (IsDebugEnabled == false)
+            if (Appenders is null || Appenders.Any() == false)
+            {
                 return;
-
-            if (Appenders == null)
-                return;
+            }
 
             var logEvent = new LogEvent
             {
                 Name = Name,
-                Level = LogLevel.Debug,
-                FileName = Path.GetFileName(callerFile),
-                MethodName = callerMember,
+                Level = level,
+                FileName = Path.GetFileName(fileName),
+                MethodName = callerName,
                 LineNumber = lineNumber,
                 Time = DateTime.Now,
                 Message = message?.ToString(),
-                MachineName = Environment.MachineName
+                MachineName = Environment.MachineName,
             };
 
             Log(logEvent);
+        }
 
+        /// <summary>
+        /// Implementation for <see cref="ILogger.Log(LogLevel, string, Exception, string, string, int)"/>
+        /// </summary>
+        /// <param name="level"></param>
+        /// <param name="message"></param>
+        /// <param name="ex"></param>
+        /// <param name="fileName"></param>
+        /// <param name="callerName"></param>
+        /// <param name="lineNumber"></param>
+        public void Log(LogLevel level, string message, Exception ex, [CallerFilePath] string fileName = "", [CallerMemberName] string callerName = "", [CallerLineNumber] int lineNumber = 0)
+        {
+            if (Appenders is null || Appenders.Any() == false)
+            {
+                return;
+            }
+
+            var logEvent = new LogEvent
+            {
+                Name = Name,
+                Level = level,
+                FileName = Path.GetFileName(fileName),
+                MethodName = callerName,
+                LineNumber = lineNumber,
+                Time = DateTime.Now,
+                Message = message?.ToString(),
+                MachineName = Environment.MachineName,
+                Exception = ex.Message,
+                StackTrace = ex.StackTrace
+            };
+
+            Log(logEvent);
         }
 
         private void Log(LogEvent logEvent)
         {
             Parallel.ForEach(Appenders, a => a.Append(logEvent));
-        }
-
-
-        public void Debug(object message, Exception exception, [CallerFilePath] string callerFile = "", [CallerMemberName] string callerMember = "", [CallerLineNumber] int lineNumber = 0)
-        {
-            if (IsDebugEnabled == false)
-                return;
-
-            if (Appenders == null)
-                return;
-
-            var logEvent = new LogEvent
-            {
-                Name = Name,
-                Level = LogLevel.Debug,
-                FileName = Path.GetFileName(callerFile),
-                MethodName = callerMember,
-                LineNumber = lineNumber,
-                Time = DateTime.Now,
-                Message = message?.ToString(),
-                MachineName = Environment.MachineName,
-                Exception = exception.Message,
-                StackTrace = exception.StackTrace
-            };
-
-            Log(logEvent);
-        }
-
-        public void Error(object message, [CallerFilePath] string callerFile = "", [CallerMemberName] string callerMember = "", [CallerLineNumber] int lineNumber = 0)
-        {
-            if (IsErrorEnabled == false)
-                return;
-
-            if (Appenders == null)
-                return;
-
-            var logEvent = new LogEvent
-            {
-                Name = Name,
-                Level = LogLevel.Error,
-                FileName = Path.GetFileName(callerFile),
-                MethodName = callerMember,
-                LineNumber = lineNumber,
-                Time = DateTime.Now,
-                Message = message?.ToString(),
-                MachineName = Environment.MachineName
-            };
-
-            Log(logEvent);
-        }
-
-        public void Error(object message, Exception exception, [CallerFilePath] string callerFile = "", [CallerMemberName] string callerMember = "", [CallerLineNumber] int lineNumber = 0)
-        {
-            if (IsErrorEnabled == false)
-                return;
-
-            if (Appenders == null)
-                return;
-
-            var logEvent = new LogEvent
-            {
-                Name = Name,
-                Level = LogLevel.Error,
-                FileName = Path.GetFileName(callerFile),
-                MethodName = callerMember,
-                LineNumber = lineNumber,
-                Time = DateTime.Now,
-                Message = message?.ToString(),
-                MachineName = Environment.MachineName,
-                Exception = exception.Message,
-                StackTrace = exception.StackTrace
-            };
-
-            Log(logEvent);
-        }
-
-        public void Fatal(object message, [CallerFilePath] string callerFile = "", [CallerMemberName] string callerMember = "", [CallerLineNumber] int lineNumber = 0)
-        {
-            if (IsFatalEnabled == false)
-                return;
-
-            if (Appenders == null)
-                return;
-
-            var logEvent = new LogEvent
-            {
-                Name = Name,
-                Level = LogLevel.Fatal,
-                FileName = Path.GetFileName(callerFile),
-                MethodName = callerMember,
-                LineNumber = lineNumber,
-                Time = DateTime.Now,
-                Message = message?.ToString(),
-                MachineName = Environment.MachineName,
-            };
-
-            Log(logEvent);
-        }
-
-        public void Fatal(object message, Exception exception, [CallerFilePath] string callerFile = "", [CallerMemberName] string callerMember = "", [CallerLineNumber] int lineNumber = 0)
-        {
-            if (IsFatalEnabled == false)
-                return;
-
-            if (Appenders == null)
-                return;
-
-            var logEvent = new LogEvent
-            {
-                Name = Name,
-                Level = LogLevel.Fatal,
-                FileName = Path.GetFileName(callerFile),
-                MethodName = callerMember,
-                LineNumber = lineNumber,
-                Time = DateTime.Now,
-                Message = message?.ToString(),
-                MachineName = Environment.MachineName,
-                Exception = exception.Message,
-                StackTrace = exception.StackTrace
-            };
-
-            Log(logEvent);
-        }
-
-        public void Info(object message, [CallerFilePath] string callerFile = "", [CallerMemberName] string callerMember = "", [CallerLineNumber] int lineNumber = 0)
-        {
-            if (IsInfoEnabled == false)
-                return;
-
-            if (Appenders == null)
-                return;
-
-            var logEvent = new LogEvent
-            {
-                Name = Name,
-                Level = LogLevel.Info,
-                FileName = Path.GetFileName(callerFile),
-                MethodName = callerMember,
-                LineNumber = lineNumber,
-                Time = DateTime.Now,
-                Message = message?.ToString(),
-                MachineName = Environment.MachineName
-            };
-
-            Log(logEvent);
-        }
-
-        public void Info(object message, Exception exception, [CallerFilePath] string callerFile = "", [CallerMemberName] string callerMember = "", [CallerLineNumber] int lineNumber = 0)
-        {
-            if (IsInfoEnabled == false)
-                return;
-
-            if (Appenders == null)
-                return;
-
-            var logEvent = new LogEvent
-            {
-                Name = Name,
-                Level = LogLevel.Info,
-                FileName = Path.GetFileName(callerFile),
-                MethodName = callerMember,
-                LineNumber = lineNumber,
-                Time = DateTime.Now,
-                Message = message?.ToString(),
-                MachineName = Environment.MachineName,
-                Exception = exception.Message,
-                StackTrace = exception.StackTrace
-            };
-
-            Log(logEvent);
-        }
-
-        public void Warn(object message, [CallerFilePath] string callerFile = "", [CallerMemberName] string callerMember = "", [CallerLineNumber] int lineNumber = 0)
-        {
-            if (IsWarnEnabled == false)
-                return;
-
-            if (Appenders == null)
-                return;
-
-            var logEvent = new LogEvent
-            {
-                Name = Name,
-                Level = LogLevel.Warn,
-                FileName = Path.GetFileName(callerFile),
-                MethodName = callerMember,
-                LineNumber = lineNumber,
-                Time = DateTime.Now,
-                Message = message?.ToString(),
-                MachineName = Environment.MachineName
-            };
-
-            Log(logEvent);
-        }
-
-        public void Warn(object message, Exception exception, [CallerFilePath] string callerFile = "", [CallerMemberName] string callerMember = "", [CallerLineNumber] int lineNumber = 0)
-        {
-            if (IsWarnEnabled == false)
-                return;
-
-            if (Appenders == null)
-                return;
-
-            var logEvent = new LogEvent
-            {
-                Name = Name,
-                Level = LogLevel.Warn,
-                FileName = Path.GetFileName(callerFile),
-                MethodName = callerMember,
-                LineNumber = lineNumber,
-                Time = DateTime.Now,
-                Message = message?.ToString(),
-                MachineName = Environment.MachineName,
-                Exception = exception.Message,
-                StackTrace = exception.StackTrace
-            };
-
-            Log(logEvent);
         }
     }
 }

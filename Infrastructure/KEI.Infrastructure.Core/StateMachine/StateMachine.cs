@@ -50,7 +50,7 @@ namespace KEI.Infrastructure.StateMachine
 
             if (transition is null)
             {
-                _logger.Warn($"No trasitions exists for the trigger : {trigger} from state : {CurrentState}");
+                _logger.LogError($"No trasitions exists for the trigger : {trigger} from state : {CurrentState}");
             }
 
             _states[CurrentState].ExitActions.ForEach(action => action());

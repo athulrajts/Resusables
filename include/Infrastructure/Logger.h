@@ -18,8 +18,3 @@ public:
 private:
 	LoggerNativeWrapper* ManagedLogger;
 };
-
-#define Debug(msg) Debug(msg, __FILE__ , __func__, __LINE__)
-#define Information(msg) Information(msg, __FILE__ , __func__, __LINE__)
-#define Warning(msg) Warning(msg, __FILE__ , __func__, __LINE__)
-#define Error(msg) Error(msg, __FILE__ , __func__, __LINE__)

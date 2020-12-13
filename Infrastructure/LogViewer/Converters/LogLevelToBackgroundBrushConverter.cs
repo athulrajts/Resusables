@@ -15,10 +15,10 @@ namespace LogViewer.Converters
                 return e switch
                 {
                     LogLevel.Debug => new SolidColorBrush(Colors.White),
-                    LogLevel.Info => new SolidColorBrush(Colors.LightGreen),
-                    LogLevel.Warn => new SolidColorBrush(Colors.Yellow),
+                    LogLevel.Information => new SolidColorBrush(Colors.LightGreen),
+                    LogLevel.Warning => new SolidColorBrush(Colors.Yellow),
                     LogLevel.Error => new SolidColorBrush(Colors.OrangeRed),
-                    LogLevel.Fatal => new SolidColorBrush(Colors.Red),
+                    LogLevel.Critical => new SolidColorBrush(Colors.Red),
                     _ => new SolidColorBrush(Colors.White)
                 };
             }

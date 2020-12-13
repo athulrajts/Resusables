@@ -65,7 +65,7 @@ namespace KEI.Infrastructure
 
             if (data is null)
             {
-                Logger.Warn($"Unable to find \"{key}\" from {Name}");
+                Logger.Warning($"Unable to find \"{key}\" from {Name}");
             }
             else if (data.GetValue() is T val)
             {
@@ -87,7 +87,7 @@ namespace KEI.Infrastructure
 
             if (data is null)
             {
-                Logger.Warn($"Unable to find \"{key}\" from {Name}");
+                Logger.Warning($"Unable to find \"{key}\" from {Name}");
             }
             else
             {
@@ -894,7 +894,7 @@ namespace KEI.Infrastructure
                 {
                     addActions.Add(() => workingCopy.Add(item));
 
-                    Logger.Info($"Added new property {item.Name} = {item.StringValue}");
+                    Logger.Information($"Added new property {item.Name} = {item.StringValue}");
                 }
                 else if (item is ContainerDataObject baseChild)
                 {
@@ -919,7 +919,7 @@ namespace KEI.Infrastructure
                 {
                     removeActions.Add(() => workingCopy.Remove(item));
 
-                    Logger.Info($"Removed property {item.Name} = {item.StringValue}");
+                    Logger.Information($"Removed property {item.Name} = {item.StringValue}");
                 }
                 else if (item is ContainerDataObject baseChild)
                 {

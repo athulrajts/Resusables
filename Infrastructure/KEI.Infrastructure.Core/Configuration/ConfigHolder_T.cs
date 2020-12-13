@@ -52,7 +52,7 @@ namespace KEI.Infrastructure.Configuration
 
             if (intermediateConfig == null || string.IsNullOrEmpty(ConfigPath))
             {
-                Logger.Warn($"Unable to Load Config \"{ConfigName}\", Creating Default Config.");
+                Logger.Warning($"Unable to Load Config \"{ConfigName}\", Creating Default Config.");
                 return false;
             }
 

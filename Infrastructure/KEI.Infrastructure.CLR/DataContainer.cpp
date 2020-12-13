@@ -119,10 +119,10 @@ bool DataContainer::Store()
 
 DataContainerNativeWrapper::DataContainerNativeWrapper()
 {
-	instance = gcnew KEI::Infrastructure::Configuration::DataDictionary();
+	instance = gcnew KEI::Infrastructure::DataContainer();
 }
 
-DataContainerNativeWrapper::DataContainerNativeWrapper(KEI::Infrastructure::Configuration::IDataContainer^ managed)
+DataContainerNativeWrapper::DataContainerNativeWrapper(KEI::Infrastructure::IDataContainer^ managed)
 {
 	instance = managed;
 }
@@ -130,67 +130,67 @@ DataContainerNativeWrapper::DataContainerNativeWrapper(KEI::Infrastructure::Conf
 bool DataContainerNativeWrapper::Get(std::string key, std::string& value)
 {
 	String^ val = gcnew String(value.c_str());
-	bool retValue = instance->Get(gcnew String(key.c_str()), val);
+	bool retValue = instance->GetValue(gcnew String(key.c_str()), val);
 	value = MarshalString(val);
 	return retValue;
 }
 
 bool DataContainerNativeWrapper::Get(std::string key, int& value)
 {
-	return instance->Get(gcnew String(key.c_str()), value);
+	return instance->GetValue(gcnew String(key.c_str()), value);
 }
 
 bool DataContainerNativeWrapper::Get(std::string key, bool& value)
 {
-	return instance->Get(gcnew String(key.c_str()), value);
+	return instance->GetValue(gcnew String(key.c_str()), value);
 }
 
 bool DataContainerNativeWrapper::Get(std::string key, float& value)
 {
-	return instance->Get(gcnew String(key.c_str()), value);
+	return instance->GetValue(gcnew String(key.c_str()), value);
 }
 
 bool DataContainerNativeWrapper::Get(std::string key, double& value)
 {
-	return instance->Get(gcnew String(key.c_str()), value);
+	return instance->GetValue(gcnew String(key.c_str()), value);
 }
 
 bool DataContainerNativeWrapper::Get(std::string key, DataContainerNativeWrapper& value)
 {
-	KEI::Infrastructure::Configuration::IDataContainer^ val = gcnew KEI::Infrastructure::Configuration::DataDictionary();
-	bool retValue = instance->Get(gcnew String(key.c_str()), val);
+	KEI::Infrastructure::IDataContainer^ val = gcnew KEI::Infrastructure::DataContainer();
+	bool retValue = instance->GetValue(gcnew String(key.c_str()), val);
 	value = DataContainerNativeWrapper(val);
 	return retValue;
 }
 
 void DataContainerNativeWrapper::Put(std::string key, std::string value)
 {
-	KEI::Infrastructure::Configuration::DataContainerExtensions::Put(instance, gcnew String(key.c_str()), gcnew String(value.c_str()));
+	KEI::Infrastructure::DataContainerExtensions::PutValue(instance, gcnew String(key.c_str()), gcnew String(value.c_str()));
 }
 
 void DataContainerNativeWrapper::Put(std::string key, bool value)
 {
-	KEI::Infrastructure::Configuration::DataContainerExtensions::Put(instance, gcnew String(key.c_str()), value);
+	KEI::Infrastructure::DataContainerExtensions::PutValue(instance, gcnew String(key.c_str()), value);
 }
 
 void DataContainerNativeWrapper::Put(std::string key, int value)
 {
-	KEI::Infrastructure::Configuration::DataContainerExtensions::Put(instance, gcnew String(key.c_str()), value);
+	KEI::Infrastructure::DataContainerExtensions::PutValue(instance, gcnew String(key.c_str()), value);
 }
 
 void DataContainerNativeWrapper::Put(std::string key, float value)
 {
-	KEI::Infrastructure::Configuration::DataContainerExtensions::Put(instance, gcnew String(key.c_str()), value);
+	KEI::Infrastructure::DataContainerExtensions::PutValue(instance, gcnew String(key.c_str()), value);
 }
 
 void DataContainerNativeWrapper::Put(std::string key, double value)
 {
-	KEI::Infrastructure::Configuration::DataContainerExtensions::Put(instance, gcnew String(key.c_str()), value);
+	KEI::Infrastructure::DataContainerExtensions::PutValue(instance, gcnew String(key.c_str()), value);
 }
 
 void DataContainerNativeWrapper::Put(std::string key, DataContainerNativeWrapper* value)
 {
-	KEI::Infrastructure::Configuration::DataContainerExtensions::Put(instance, gcnew String(key.c_str()), value->instance);
+	KEI::Infrastructure::DataContainerExtensions::PutValue(instance, gcnew String(key.c_str()), value->instance);
 }
 
 std::vector<std::string> DataContainerNativeWrapper::GetKeys()
@@ -207,7 +207,7 @@ std::vector<std::string> DataContainerNativeWrapper::GetKeys()
 
 DataContainerNativeWrapper* DataContainerNativeWrapper::Load(std::string path)
 {
-	KEI::Infrastructure::Configuration::IDataContainer^ dc = KEI::Infrastructure::Configuration::DataContainer::FromFile(gcnew String(path.c_str()));
+	KEI::Infrastructure::IDataContainer^ dc = KEI::Infrastructure::DataContainer::FromFile(gcnew String(path.c_str()));
 	return new DataContainerNativeWrapper(dc);
 }
 

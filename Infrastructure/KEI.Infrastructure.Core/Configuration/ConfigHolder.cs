@@ -64,7 +64,7 @@ namespace KEI.Infrastructure.Configuration
 
             if (Config == null)
             {
-                _logger.Warn($"Unable to load config \"{ConfigPath}\", Creating new config with default values");
+                _logger.LogError($"Unable to load config \"{ConfigPath}\", Creating new config with default values");
                 return false;
             }
 
@@ -86,7 +86,7 @@ namespace KEI.Infrastructure.Configuration
 
             if (Config.Store(path) == false)
             {
-                _logger.Error($"Unable to store confing \"{ConfigPath}\"");
+                _logger.LogError($"Unable to store confing \"{ConfigPath}\"");
                 return false;
             }
 

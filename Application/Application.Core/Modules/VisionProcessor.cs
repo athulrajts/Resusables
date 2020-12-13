@@ -42,7 +42,7 @@ namespace Application.Core.Modules
         #region IVisionProcessor Members
         public List<TestResult> ReferenceTest(string imagePath)
         {
-            _logger.Debug($"Entering {nameof(ReferenceTest)}");
+            _logger.LogDebug($"Entering {nameof(ReferenceTest)}");
 
             int morphSize = 25;
             GetValue(VisionConfigKeys.MorphologyOperatorSize, ref morphSize);
@@ -75,14 +75,14 @@ namespace Application.Core.Modules
             }
 
 
-            _logger.Debug($"Leaving {nameof(ReferenceTest)}");
+            _logger.LogDebug($"Leaving {nameof(ReferenceTest)}");
 
             return results;
         }
 
         public List<TestResult> Test(string imagePath)
         {
-            _logger.Debug($"Entering {nameof(Test)}");
+            _logger.LogDebug($"Entering {nameof(Test)}");
 
             double maxTransmittance = 100;
             double minTransmittance = 90;
@@ -123,7 +123,7 @@ namespace Application.Core.Modules
             }
 
 
-            _logger.Debug($"Leaving {nameof(Test)}");
+            _logger.LogDebug($"Leaving {nameof(Test)}");
 
             return results;
         }

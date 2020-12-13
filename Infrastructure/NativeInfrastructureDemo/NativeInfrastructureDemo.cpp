@@ -8,7 +8,12 @@
 int main()
 {
 
-    //LogManager::InitializeConsole();
+    LogManager::InitializeConsole();
+
+    LOG_DEBUG("Hello");
+    LOG_INFORMATION("World");
+    LOG_WARNING("Good");
+    LOG_ERROR("Bye");
 
     //auto logger = LogManager::GetLogger("Test");
 
@@ -16,9 +21,9 @@ int main()
 
     std::cout << "Hello World!\n";
 
-    ViewService::InitializeBaseViewService();
+    //ViewService::InitializeBaseViewService();
 
-    ViewService::BrowseFile("DLL files", "dll");
+    //ViewService::BrowseFile("DLL files", "dll");
 
     //MessageBoxService::ErrorDialog("404");
     //MessageBoxService::WarningDialog("Not Found");
@@ -28,7 +33,7 @@ int main()
 
     //std::cout << (int)result;
 
-    getchar();
+    int value = getchar();
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

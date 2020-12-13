@@ -6,6 +6,7 @@
 
 using namespace Prism::Ioc;
 using namespace System;
+using namespace System::Collections::Generic;
 
 #pragma warning(push)
 #pragma warning(disable : 4691)
@@ -45,7 +46,11 @@ PromptResult ViewServiceNativeWrapper::PromptDialog(std::string message, PromptO
 
 std::string ViewServiceNativeWrapper::BrowseFile(std::string description, std::string filter)
 {
-	return MarshalString(instance->BrowseFile(gcnew String(description.c_str()), gcnew String(filter.c_str())));
+
+	KEI::Infrastructure::FilterCollection^ filters = gcnew KEI::Infrastructure::FilterCollection();
+	filters->Add(gcnew KEI::Infrastructure::Filter(gcnew String(description.c_str()), gcnew String(filter.c_str())));
+
+	return MarshalString(instance->BrowseFile(filters, gcnew String("")));
 }
 
 

@@ -1,10 +1,11 @@
-﻿using Prism.Ioc;
-using System.Collections.Generic;
+﻿using System;
 using System.IO;
+using System.Collections.Generic;
+using Prism.Ioc;
 
 namespace KEI.Infrastructure.Logging
 {
-    public static class Extensions
+    public static class ContainerExtensions
     {
         public static IContainerRegistry RegisterLogger(this IContainerRegistry registry, ILogManager manager)
         {
@@ -27,14 +28,11 @@ namespace KEI.Infrastructure.Logging
             return registry;
         }
 
-        public static IContainerRegistry RegisterLogger(this IContainerRegistry registry,string file, string pattern)
+        public static IContainerRegistry RegisterLogger(this IContainerRegistry registry, Action<SimpleLogConfigurator> builder)
         {
-            return registry.RegisterInstance(SimpleLogConfigurator.ConfigureFileLogger(file, pattern));
-        }
-
-        public static IContainerRegistry RegisterLogger(this IContainerRegistry registry, string file)
-        {
-            return registry.RegisterInstance(SimpleLogConfigurator.Configure().WriteToFile(file).Finish());
+            var configurator = new SimpleLogConfigurator();
+            builder.Invoke(configurator);
+            return registry.RegisterInstance(configurator.Finish());
         }
 
         public static IContainerRegistry RegisterConsoleLogger(this IContainerRegistry registry)

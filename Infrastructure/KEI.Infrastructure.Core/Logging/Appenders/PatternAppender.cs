@@ -1,8 +1,8 @@
-﻿using KEI.Infrastructure.Helpers;
-using System;
+﻿using System.IO;
+using System.Threading;
 using System.Collections.Generic;
-using System.IO;
 using System.Text.RegularExpressions;
+using KEI.Infrastructure.Helpers;
 
 namespace KEI.Infrastructure.Logging
 {
@@ -63,26 +63,19 @@ namespace KEI.Infrastructure.Logging
         }
 
         /// <summary>
-        /// Append to file as plain text
+        /// Write log to file
         /// </summary>
         /// <param name="msg"></param>
         protected override void WriteToFile(LogEvent msg)
         {
-            try
-            {
-                using (var writer = fileInfo.AppendText())
-                {
-                    /// We're adding an Invisible characters <see cref="LINE_BREAK"/>
-                    /// so that a parser can know end of a single log.
-                    writer.WriteLine($"{GetLogString(msg)}{LINE_BREAK}");
-                }
-            }
-            catch (Exception) { }
+            /// <see cref="LoggingHelper.WriteLog(FileInfo, string)"/>
+            /// using an extension method that uses a <see cref="ReaderWriterLock"/>
+            /// to avoid collision between multiple threads.
+            fileInfo.WriteLog(GetLogString(msg));
         }
 
-
         /// <summary>
-        /// Write data to start of each file to identify ourself.
+        /// Write data to start of each file to <see cref="LayoutPattern"/> that was used.
         /// </summary>
         /// <param name="writer"></param>
         protected override void WriteMetaDataInternal(StreamWriter writer)
@@ -133,7 +126,7 @@ namespace KEI.Infrastructure.Logging
             /// We're also adding an invisible character <see cref="DELIMITER"/>
             /// to separate each component in log so that a parser can correctly
             /// recreate <see cref="LogEvent"/> object given <see cref="LayoutPattern"/>
-            return string.Join($"\t{DELIMITER}", logString);
+            return string.Join($"\t{DELIMITER}", logString) + LINE_BREAK;
         }
 
         /// <summary>
@@ -166,6 +159,26 @@ namespace KEI.Infrastructure.Logging
                 {
                     _logStructure.Add(GetLogToken(m[i].Groups[1].Value));
                 }
+            }
+        }
+    }
+
+
+    internal static class LoggingHelper
+    {
+        static ReaderWriterLock _syncLock = new ReaderWriterLock();
+
+        internal static void WriteLog(this FileInfo fi, string message)
+        {
+            try
+            {
+                _syncLock.AcquireWriterLock(int.MaxValue);
+                using var writer = fi.AppendText();
+                writer.WriteLine(message);
+            }
+            finally
+            {
+                _syncLock.ReleaseWriterLock();
             }
         }
     }

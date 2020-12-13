@@ -48,7 +48,7 @@ namespace Application.Core.Camera
             if (!File.Exists(@".\Images\DummyImages\Ref.bmp") ||
                 !File.Exists(@".\Images\DummyImages\DUT3_WithGlassWindows_afterPolish.bmp"))
             {
-                _logger.Error("Simulated Image files does not exisit");
+                _logger.LogError("Simulated Image files does not exisit");
             }
 
             IsConnected = true;

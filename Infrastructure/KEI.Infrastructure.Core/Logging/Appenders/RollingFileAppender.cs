@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text.RegularExpressions;
 
 namespace KEI.Infrastructure.Logging
 {
     public abstract class RollingFileAppender : BaseAppender
     {
-        private readonly object writeLock = new object();
         private const long BYTE_TO_MB_FACTOR = 1000000;
-        private Regex fileNameRegex;
         private string fileNameWithoutExt;
         private string ext;
         private string directory;
@@ -40,7 +36,6 @@ namespace KEI.Infrastructure.Logging
 
                 filePath = value;
                 fileNameWithoutExt = Path.GetFileNameWithoutExtension(filePath);
-                fileNameRegex = new Regex($@"{fileNameWithoutExt}(\d+)");
                 directory = fileInfo.DirectoryName;
                 ext = fileInfo.Extension;
             }
@@ -96,15 +91,12 @@ namespace KEI.Infrastructure.Logging
         /// <param name="msg"></param>
         protected override void ProcessLogInternal(LogEvent msg)
         {
-            if (CanRoll())
+            if (CanRollFile())
             {
-                Roll();
+                RollFile();
             }
 
-            lock (writeLock)
-            {
-                WriteToFile(msg); 
-            }
+            WriteToFile(msg); 
         }
 
         protected abstract void WriteToFile(LogEvent msg);
@@ -114,11 +106,11 @@ namespace KEI.Infrastructure.Logging
         /// Determines whether we need to create a new log file
         /// </summary>
         /// <returns></returns>
-        private bool CanRoll()
+        private bool CanRollFile()
         {
             return Mode switch
             {
-                RollingMode.Time => DateTime.Now.DayOfYear > fileInfo.CreationTime.DayOfYear,
+                RollingMode.Time => DateTime.Now.DayOfYear - fileInfo.CreationTime.DayOfYear > RollingInterval,
                 RollingMode.Size => HasOverflowed(),
                 _ => false
             };
@@ -129,7 +121,7 @@ namespace KEI.Infrastructure.Logging
         /// Current log file has reached the limit.
         /// Rename it and start a new one.
         /// </summary>
-        private void Roll()
+        private void RollFile()
         {
             string newFileName = string.Empty;
 

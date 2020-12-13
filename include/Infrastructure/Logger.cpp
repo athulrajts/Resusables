@@ -1,5 +1,4 @@
 #include "pch.h"
-
 #include "Logger.h"
 #include "LoggerNativeWrapper.h"
 
@@ -8,14 +7,6 @@ using namespace KEI::Infrastructure;
 
 #pragma warning(push)
 #pragma warning(disable : 4691)
-#pragma push_macro("Debug")
-#pragma push_macro("Information")
-#pragma push_macro("Warning")
-#pragma push_macro("Error")
-#undef Debug
-#undef Information
-#undef Warning
-#undef Error
 
 #pragma region Logger 
 
@@ -55,8 +46,4 @@ void Logger::Error(std::string message, const char* filename, const char* functi
 
 #pragma endregion
 
-#pragma pop_macro("Debug")
-#pragma pop_macro("Information")
-#pragma pop_macro("Warning")
-#pragma pop_macro("Error")
 #pragma warning(pop)

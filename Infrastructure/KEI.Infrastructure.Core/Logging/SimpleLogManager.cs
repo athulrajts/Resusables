@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.IO;
 using System.Runtime.CompilerServices;
 
@@ -6,6 +7,8 @@ namespace KEI.Infrastructure.Logging
 {
     public class SimpleLogManager : BaseLogManager
     {
+        ConcurrentDictionary<string, ILogger> _loggers = new();
+
         private readonly SimpleLogger seedLogger;
 
         public SimpleLogManager(SimpleLogger seed)
@@ -14,9 +17,13 @@ namespace KEI.Infrastructure.Logging
         }
 
         public override ILogger GetLogger([CallerFilePath] string name = "")
-            => seedLogger.Clone(Path.GetFileName(name));
+        {
+            string fileName = Path.GetFileNameWithoutExtension(name);
+
+            return _loggers.GetOrAdd(name, s => seedLogger.Clone(s));
+        }
 
         public override ILogger GetLogger(Type type)
-            => seedLogger.Clone(type.Name);
+            => _loggers.GetOrAdd(type.Name, s => seedLogger.Clone(s));
     }
 }

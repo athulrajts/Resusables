@@ -55,7 +55,7 @@ namespace KEI.UI.Wpf.ViewService
         /// <param name="isModal"></param>
         public void Inform(string info, bool isModal = true)
         {
-            Logger.Info(info);
+            Logger.Information(info);
 
             var parameters = new DialogParameters
             {
@@ -79,7 +79,7 @@ namespace KEI.UI.Wpf.ViewService
         /// <param name="isModal"></param>
         public void Warn(string warning, bool isModal = true)
         {
-            Logger.Warn(warning);
+            Logger.Warning(warning);
 
             var parameters = new DialogParameters
             {
@@ -105,7 +105,7 @@ namespace KEI.UI.Wpf.ViewService
         /// <returns></returns>
         public PromptResult Prompt(string confirmMsg, PromptOptions buttons)
         {
-            Logger.Info(confirmMsg);
+            Logger.Information(confirmMsg);
 
             var parameters = new DialogParameters
             {
@@ -131,7 +131,7 @@ namespace KEI.UI.Wpf.ViewService
         /// <returns></returns>
         public PromptResult PromptWithDefault(string message, PromptOptions buttons, PromptResult defaultResult, TimeSpan timeout)
         {
-            Logger.Info(message);
+            Logger.Information(message);
 
             var parameters = new DialogParameters
             {

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
-using KEI.Infrastructure.Service;
 
 namespace KEI.Infrastructure
 {
@@ -9,5 +8,6 @@ namespace KEI.Infrastructure
         ILogger DefaultLogger { get; }
         ILogger GetLogger([CallerFilePath]string p_strName = "");
         ILogger GetLogger(Type p_Type);
+        ILogger<T> GetLoggerT<T>();
     }
 }

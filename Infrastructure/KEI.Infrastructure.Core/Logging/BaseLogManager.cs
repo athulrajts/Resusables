@@ -23,5 +23,10 @@ namespace KEI.Infrastructure.Logging
         public abstract ILogger GetLogger([CallerFilePath] string p_strName = "");
 
         public abstract ILogger GetLogger(Type p_Type);
+
+        public ILogger<T> GetLoggerT<T>()
+        {
+            return new Logger<T>(GetLogger(typeof(T)));
+        }
     }
 }

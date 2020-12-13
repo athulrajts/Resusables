@@ -59,7 +59,7 @@ void LogManagerNativeWrapper::InitializeConsole()
 
 void LogManagerNativeWrapper::InitializeFile(std::string baseName)
 {
-	ManagedLogManager = Logging::SimpleLogConfigurator().ConfigureFileLogger(gcnew String(baseName.c_str()));
+	ManagedLogManager = Logging::SimpleLogConfigurator().ConfigureFileLogger(gcnew String(baseName.c_str()), Logging::PatternAppender::DEFAULT_PATTERN);
 }
 
 Logger* LogManagerNativeWrapper::GetLogger(std::string name)

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Windows;
 using System.Threading;
 using System.Globalization;
@@ -11,11 +10,9 @@ using Prism.Modularity;
 using KEI.Infrastructure;
 using KEI.Infrastructure.Prism;
 using KEI.Infrastructure.Utils;
-using KEI.Infrastructure.Types;
 using KEI.Infrastructure.Logging;
 using KEI.Infrastructure.Service;
 using KEI.Infrastructure.Database;
-using KEI.Infrastructure.Configuration;
 using KEI.UI.Wpf.ViewService;
 using Application.Core;
 using Application.Core.Camera;
@@ -26,6 +23,7 @@ using Application.UI.ViewService;
 using Application.UI.AdvancedSetup;
 using ApplicationShell.Commands;
 using KEI.Infrastructure.Server;
+using Unity;
 
 #if DEBUG
 using KEI.Infrastructure.Localizer;
@@ -70,9 +68,28 @@ namespace ApplicationShell
             SplashScreenLogger.Instance.Log("Initializing Application Services");
 
             // Register Logger
-            containerRegistry.RegisterLogger(SimpleLogConfigurator.Configure()
-                .WriteToFile(PathUtils.GetPath("Logs/Log.slog"))
-                .Finish());
+            containerRegistry.RegisterLogger(b => b
+                .WriteToFile(PathUtils.GetPath("Logs/Log.slog"), b => b
+                    .MinimumLogLevel(LogLevel.Debug))
+                .WriteToTrace(b => b
+                    .MinimumLogLevel(LogLevel.Trace)
+                    .Filter( e => e.Level < LogLevel.Information)));
+
+            /// Some magic to resolve <see cref="ILogger{T}"/> by dependency injection directly
+            /// rather than getting <see cref="ILogManager"/> then calling
+            /// <see cref="ILogManager.GetLogger(string)"/>, <see cref="ILogManager.GetLogger(Type)"/>
+            /// or <see cref="ILogManager.GetLoggerT{T}"/>
+            containerRegistry.GetContainer().RegisterFactory(typeof(ILogger<>), (ctr, type, name) =>
+            {
+                var loggerType = type.GetGenericArguments()[0];
+
+                var logManager = ctr.Resolve<ILogManager>();
+
+                var method = logManager.GetType().GetMethod("GetLoggerT");
+                var genericMethod = method.MakeGenericMethod(loggerType);
+
+                return genericMethod.Invoke(logManager, null);
+            });
 
             // Register Infrastructure Services
             containerRegistry.RegisterInfrastructureServices();
@@ -82,8 +99,8 @@ namespace ApplicationShell
             containerRegistry.RegisterServices(GetServices());
 
             // Initialize Native
-            //NativeInitializer.SetLogger(Container.Resolve<ILogManager>());
-            //NativeInitializer.SetViewService(Container.Resolve<IViewService>());
+            NativeInitializer.SetLogger(Container.Resolve<ILogManager>());
+            NativeInitializer.SetViewService(Container.Resolve<IViewService>());
 
             // Regster Application Related Services
             containerRegistry.RegisterSingleton<IDatabaseManager, DatabaseManager>();

@@ -19,19 +19,25 @@ namespace KEI.Infrastructure.Logging
     [Flags]
     public enum LogLevel
     {
+        [Description("NON")]
+        None = 0,
+
+        [Description("TRC")]
+        Trace = 1,
+
         [Description("DBG")]
-        Debug = 1,
+        Debug = 2,
 
         [Description("INF")]
-        Info = 2,
+        Information = 4,
 
         [Description("WRN")]
-        Warn = 4,
+        Warning = 8,
 
         [Description("ERR")]
-        Error = 8,
+        Error = 16,
 
-        [Description("FTL")]
-        Fatal = 16
+        [Description("CTL")]
+        Critical = 32
     }
 }

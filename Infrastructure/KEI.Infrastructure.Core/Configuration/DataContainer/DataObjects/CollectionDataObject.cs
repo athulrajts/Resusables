@@ -2,53 +2,46 @@
 using System.IO;
 using System.Xml;
 using System.Collections;
-using System.Collections.ObjectModel;
 using KEI.Infrastructure.Types;
-using System.Collections.Generic;
 
 namespace KEI.Infrastructure
 {
     /// <summary>
     /// <see cref="DataObject"/> implementation to store <see cref="IList"/> of non primitive types
     /// </summary>
-    internal class ContainerCollectionDataObject : DataObject
+    internal class CollectionDataObject : DataObject
     {
+        private IDataContainer readingHelper;
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="name"></param>
         /// <param name="value"></param>
-        public ContainerCollectionDataObject(string name, IList value)
-        {
-            Name = name;
-
-            int count = 0;
-            foreach (var item in value)
-            {
-                Value.Add(DataContainerBuilder.CreateObject($"{name}[{count++}]", item));
-            }
-
-            CollectionType = value.GetType();
-        }
-
-        public ContainerCollectionDataObject(string name, ObservableCollection<IDataContainer> value)
+        public CollectionDataObject(string name, IList value)
         {
             Name = name;
             Value = value;
+            CollectionType = value.GetType();
         }
 
         /// <summary>
-        /// Holds type of <see cref="IList"/>
+        /// Type of <see cref="IList"/>
         /// </summary>
         public Type CollectionType { get; set; }
 
         /// <summary>
         /// Value
         /// </summary>
-        public ObservableCollection<IDataContainer> Value { get; set; } = new ObservableCollection<IDataContainer>();
+        private IList _value;
+        public IList Value
+        {
+            get { return _value; }
+            set { SetProperty(ref _value, value); }
+        }
+
 
         /// <summary>
-        /// Implementation for <see cref="DataObject.Type"/>
+        /// Imlementation for <see cref="DataObject.Type"/>
         /// </summary>
         public override string Type => "dcl";
 
@@ -58,11 +51,11 @@ namespace KEI.Infrastructure
         /// <returns></returns>
         public override Type GetDataType()
         {
-            return CollectionType;
+            return Value.GetType();
         }
 
         /// <summary>
-        /// Implementation for <see cref="DataObject.GetValue"/>
+        /// Implementation for <see cref="DataObject.GetValue()"/>
         /// </summary>
         /// <returns></returns>
         public override object GetValue()
@@ -77,12 +70,12 @@ namespace KEI.Infrastructure
         /// <returns></returns>
         public override bool SetValue(object value)
         {
-            if (Value is not ObservableCollection<IDataContainer>)
+            if (Value.GetType() != value.GetType())
             {
                 return false;
             }
 
-            Value = value as ObservableCollection<IDataContainer>;
+            Value = (IList)value;
 
             return true;
         }
@@ -96,7 +89,11 @@ namespace KEI.Infrastructure
             return ContainerDataObject.DC_START_ELEMENT_NAME;
         }
 
-        protected override bool CanWriteValueAsXmlAttribute() { return false; }
+        /// <summary>
+        /// Implementation for <see cref="DataObject.CanWriteValueAsXmlAttribute"/>
+        /// </summary>
+        /// <returns></returns>
+        protected override bool CanWriteValueAsXmlAttribute() => false;
 
         /// <summary>
         /// Implementation for <see cref="DataObject.WriteXmlContent(XmlWriter)"/>
@@ -107,16 +104,13 @@ namespace KEI.Infrastructure
             // Write base impl
             base.WriteXmlContent(writer);
 
-            // Write collection type
-            if (CollectionType is not null)
-            {
-                writer.WriteObjectXml(new TypeInfo(CollectionType));
-            }
+            writer.WriteObjectXml(new TypeInfo(Value.GetType()));
 
             // Write values
-            foreach (IDataContainer dc in Value)
+            int count = 0;
+            foreach (var item in Value)
             {
-                new ContainerDataObject(dc.Name, dc).WriteXml(writer);
+                new ContainerPropertyObject($"{Name}[{count++}]", item).WriteXml(writer);
             }
         }
 
@@ -129,35 +123,35 @@ namespace KEI.Infrastructure
         protected override bool ReadXmlElement(string elementName, XmlReader reader)
         {
             // call base
-            if (base.ReadXmlElement(elementName, reader))
+            if(base.ReadXmlElement(elementName, reader))
             {
                 return true;
             }
 
-            // Read DataObject Implementation
+            /// Read DataObject implementation
             if (elementName == ContainerDataObject.DC_START_ELEMENT_NAME)
             {
                 var obj = DataObjectFactory.GetDataObject("dc");
 
-                if (obj is ContainerDataObject cdo)
+                if (obj is not null)
                 {
                     using var newReader = XmlReader.Create(new StringReader(reader.ReadOuterXml()));
 
                     newReader.Read();
 
-                    cdo.ReadXml(newReader);
+                    obj.ReadXml(newReader);
 
-                    Value.Add(cdo.Value);
-
-                    return true;
+                    readingHelper.Add(obj);
                 }
+
+                return true;
             }
 
-            // Read type info
-            else if (elementName == nameof(TypeInfo))
+            /// Read type info
+            else if(elementName == nameof(TypeInfo))
             {
                 CollectionType = reader.ReadObjectXml<TypeInfo>();
-
+                
                 return true;
             }
 
@@ -165,11 +159,24 @@ namespace KEI.Infrastructure
         }
 
         /// <summary>
+        /// Implementation for <see cref="DataObject.OnXmlReadingCompleted"/>
+        /// </summary>
+        protected override void OnXmlReadingCompleted()
+        {
+            Value = (IList)Activator.CreateInstance(CollectionType);
+
+            foreach (var item in readingHelper)
+            {
+                Value.Add(item.GetValue());
+            }
+        }
+
+        /// <summary>
         /// Implementation for <see cref="DataObject.InitializeObject"/>
         /// </summary>
         protected override void InitializeObject()
         {
-            Value = new ObservableCollection<IDataContainer>();
+            readingHelper = new DataContainer();
         }
     }
 }

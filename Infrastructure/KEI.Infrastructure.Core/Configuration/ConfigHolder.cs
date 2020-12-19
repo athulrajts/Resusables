@@ -32,7 +32,7 @@ namespace KEI.Infrastructure.Configuration
 
                 // Create and store default
                 Config = DefineConfigShape().Build();
-                Config.Store();
+                Config.Store(ConfigPath);
             }
             else
             {

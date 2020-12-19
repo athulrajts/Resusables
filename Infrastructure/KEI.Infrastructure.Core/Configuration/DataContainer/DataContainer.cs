@@ -60,9 +60,9 @@ namespace KEI.Infrastructure
             }
             else
             {
-                if (internalDictionary[split.First()] is ContainerDataObject cdo)
+                if (internalDictionary[split.First()].GetValue() is IDataContainer dc)
                 {
-                    return cdo.Value.ContainsData(key);
+                    return dc.ContainsData(key);
                 }
                 else
                 {

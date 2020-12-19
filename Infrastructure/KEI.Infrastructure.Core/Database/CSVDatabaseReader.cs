@@ -8,7 +8,7 @@ using KEI.Infrastructure.Database.Models;
 
 namespace KEI.Infrastructure.Database
 {
-    public class CSVDatabaseReader : IDatabaseReader
+    public class CSVDatabaseReader : IFileDatabaseReader
     {
         private static readonly Regex criteriaRegex = new Regex(@"(<|>|>=|<=)(-?\d+(\.)?(\d+)?)");
         private DataTable _table;

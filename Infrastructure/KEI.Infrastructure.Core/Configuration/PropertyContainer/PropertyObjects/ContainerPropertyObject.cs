@@ -11,12 +11,16 @@ namespace KEI.Infrastructure
     /// </summary>
     internal class ContainerPropertyObject : PropertyObject
     {
-        private IDataContainer _value;
-        public IDataContainer Value
+        private IDataContainer _container;
+
+        private object _value;
+        public object Value
         {
             get { return _value; }
             set { SetProperty(ref _value, value); }
         }
+
+        public Type ObjectType { get; set; }
 
         /// <summary>
         /// Constructor to initialize with <see cref="IDataContainer"/>
@@ -25,9 +29,15 @@ namespace KEI.Infrastructure
         /// <param name="value"></param>
         public ContainerPropertyObject(string name, IDataContainer value)
         {
-            Value = value;
-            Value.Name = name;
             Name = name;
+            
+            if (value.UnderlyingType is TypeInfo t)
+            {
+                Value = value.Morph();
+                ObjectType = t;
+            }
+            
+            _container = value;
         }
 
         /// <summary>
@@ -39,8 +49,8 @@ namespace KEI.Infrastructure
         public ContainerPropertyObject(string name, object value)
         {
             Name = name;
-
-            Value = PropertyContainerBuilder.CreateObject(name, value);
+            Value = value;
+            ObjectType = value.GetType();
         }
 
         /// <summary>
@@ -60,14 +70,6 @@ namespace KEI.Infrastructure
         protected override bool CanWriteValueAsXmlAttribute() { return false; }
 
         /// <summary>
-        /// Implementation for <see cref="DataObject.InitializeObject"/>
-        /// </summary>
-        protected override void InitializeObject()
-        {
-            Value = new PropertyContainer();
-        }
-
-        /// <summary>
         /// Implementation for <see cref="DataObject.ReadXmlElement(string, XmlReader)"/>
         /// </summary>
         /// <param name="elementName"></param>
@@ -84,7 +86,7 @@ namespace KEI.Infrastructure
             /// Read underlying type for <see cref="ContainerDataObject"/> created from CLR objects
             if (elementName == nameof(TypeInfo))
             {
-                Value.UnderlyingType = reader.ReadObjectXml<TypeInfo>();
+                ObjectType = reader.ReadObjectXml<TypeInfo>();
 
                 return true;
             }
@@ -102,7 +104,7 @@ namespace KEI.Infrastructure
 
                     if (obj is not NotSupportedDataObject)
                     {
-                        Value.Add(obj); 
+                        _container.Add(obj); 
                     }
 
                     return true;
@@ -119,13 +121,12 @@ namespace KEI.Infrastructure
         protected override void WriteXmlContent(XmlWriter writer)
         {
             // Write type if this based on an object
-            if (Value.UnderlyingType is not null)
+            if (ObjectType is not null)
             {
-                writer.WriteObjectXml(Value.UnderlyingType);
+                writer.WriteObjectXml(new TypeInfo(ObjectType));
             }
 
-            // Write inner properties
-            foreach (var obj in Value)
+            foreach (var obj in _container ?? PropertyContainerBuilder.CreateObject(Name, Value))
             {
                 obj.WriteXml(writer);
             }
@@ -136,7 +137,14 @@ namespace KEI.Infrastructure
         /// </summary>
         protected override void OnXmlReadingCompleted()
         {
-            Value.Name = Name;
+            if(ObjectType is not null)
+            {
+                _container.UnderlyingType = ObjectType;
+
+                Value = _container.Morph();
+                // free memory, we don't need it anymore
+                _container = null;
+            }
         }
 
         /// <summary>
@@ -152,7 +160,7 @@ namespace KEI.Infrastructure
         /// <returns></returns>
         public override object GetValue()
         {
-            return Value;
+            return _container ?? Value;
         }
 
         /// <summary>
@@ -162,12 +170,12 @@ namespace KEI.Infrastructure
         /// <returns></returns>
         public override bool SetValue(object value)
         {
-            if(value is not IDataContainer)
+            if(Value.GetType() != value.GetType())
             {
                 return false;
             }
 
-            Value = (IDataContainer)value;
+            Value = value;
 
             return true;
         }
@@ -178,8 +186,13 @@ namespace KEI.Infrastructure
         /// <returns></returns>
         public override Type GetDataType()
         {
-            return typeof(PropertyContainer);
+            return ObjectType ?? typeof(PropertyContainer);
         }
 
+
+        protected override void InitializeObject()
+        {
+            _container = new PropertyContainer();
+        }
     }
 }

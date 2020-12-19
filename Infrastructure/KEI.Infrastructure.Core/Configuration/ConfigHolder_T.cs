@@ -64,9 +64,10 @@ namespace KEI.Infrastructure.Configuration
                 {
                     foreach (var item in intermediateConfig)
                     {
-                        if(item.GetValue() is IDataContainer dc)
+                        if (item.GetValue() is object obj &&
+                            typeof(T).GenericTypeArguments[0].IsAssignableFrom(obj.GetType()))
                         {
-                            l.Add(dc.Morph());
+                            l.Add(obj); 
                         }
                     }
                 }
@@ -95,9 +96,12 @@ namespace KEI.Infrastructure.Configuration
                 if(Config is IList listConfig)
                 {
                     var dc = DataContainerBuilder.Create(ConfigName);
-                    foreach (var item in DataContainerBuilder.CreateList(ConfigName, listConfig))
+                    dc.SetUnderlyingType(typeof(T));
+
+                    int count = 0;
+                    foreach (var item in listConfig)
                     {
-                        dc.Data(item.Name, item);
+                        dc.Data($"{ConfigName}[{count++}]", item);
                     }
 
                     if (XmlHelper.SerializeToFile(dc.Build(), path) == false)

@@ -48,7 +48,7 @@ namespace KEI.Infrastructure
         /// <typeparam name="T">Type of of object</typeparam>
         /// <param name="data">Data to serialize</param>
         /// <returns>XML string</returns>
-        public static string SerializeToString<T>(T data)
+        public static string SerializeToString<T>(T data, bool indent = false)
         {
             try
             {
@@ -56,7 +56,7 @@ namespace KEI.Infrastructure
                 
                 var settings = new XmlWriterSettings
                 {
-                    Indent = false,
+                    Indent = indent,
                     OmitXmlDeclaration = true,
                 };
 

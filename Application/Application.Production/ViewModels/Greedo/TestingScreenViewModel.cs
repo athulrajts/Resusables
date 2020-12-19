@@ -22,7 +22,7 @@ namespace Application.Production.ViewModels
     {
 
         private IPropertyContainer _currentRecipe;
-        private IDatabase _mainDatabase;
+        private IFileDatabase _mainDatabase;
         private IEquipment _equipment;
 
         #region Constructor

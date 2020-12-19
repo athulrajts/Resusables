@@ -6,18 +6,18 @@ using System.Reflection;
 
 namespace KEI.Infrastructure.Database
 {
-    public class Database : IDatabase
+    public class Database : IFileDatabase
     {
         private DataTable _table;
         private DatabaseSetup _setup;
         private PassFailDatabaseColumn _passFail;
         private IEnumerable<DatabaseColumn> _resultColumns;
         private IEnumerable<AggregateDatabaseColumn> _aggregateColumns;
-        public IDatabaseWritter DatabaseWritter { get; private set; }
+        private IFileDatabaseWritter _databaseWriter;
         
-        public Database(IDatabaseWritter dbWriter)
+        public Database(IFileDatabaseWritter dbWriter)
         {
-            DatabaseWritter = dbWriter;
+            _databaseWriter = dbWriter;
         }
 
         /// <summary>
@@ -31,16 +31,16 @@ namespace KEI.Infrastructure.Database
             _resultColumns = GetResultColumns();
             _aggregateColumns = GetAggregateColumns();
 
-            DatabaseWritter.Setup(setup);
+            _databaseWriter.Configure(setup);
 
             if (NeedToLoadDataTable())
             {
                 LoadDataTable();
-                DatabaseWritter.CreateNew();
+                _databaseWriter.CreateNewFile();
             }
-            else if (DatabaseWritter.CanWrite() == false)
+            else if (_databaseWriter.CanWrite() == false)
             {
-                DatabaseWritter.CreateNew();
+                _databaseWriter.CreateNewFile();
             }
 
         }
@@ -49,7 +49,7 @@ namespace KEI.Infrastructure.Database
         {
             _table = new DataTable(_setup.Name);
 
-            foreach (var col in _setup.Schema)
+            foreach (var col in _setup.Columns)
             {
                 var newCol = new TaggedDataColumn
                 {
@@ -73,15 +73,15 @@ namespace KEI.Infrastructure.Database
             }
 
             // Setup changed
-            if (_table.Columns.Count != _setup.Schema.Count())
+            if (_table.Columns.Count != _setup.Columns.Count())
             {
                 return true;
             }
 
             /// Need to recreate if order of columns changed
-            for (int i = 0; i < _setup.Schema.Count(); i++)
+            for (int i = 0; i < _setup.Columns.Count(); i++)
             {
-                if (_table.Columns[i].ColumnName != _setup.Schema.ElementAt(i).DisplayName)
+                if (_table.Columns[i].ColumnName != _setup.Columns.ElementAt(i).DisplayName)
                 {
                     return true;
                 }
@@ -91,7 +91,7 @@ namespace KEI.Infrastructure.Database
             for (int i = 0; i < _table.Columns.Count; i++)
             {
                 var tableColumn = (_table.Columns[i] as TaggedDataColumn).Tag as DatabaseColumn;
-                var schemaColumn = _setup.Schema.ElementAt(i);
+                var schemaColumn = _setup.Columns.ElementAt(i);
 
                 if (schemaColumn.Equals(tableColumn) == false)
                 {
@@ -112,13 +112,8 @@ namespace KEI.Infrastructure.Database
                 _table.Rows.Clear();
             }
 
-            DatabaseWritter.CreateNew();
+            _databaseWriter.CreateNewFile();
         }
-        /// <summary>
-        /// Get Database information
-        /// </summary>
-        /// <returns>Database schema</returns>
-        public IEnumerable<DatabaseColumn> GetSchema() => _setup.Schema;
 
         /// <summary>
         /// Append record to database
@@ -155,7 +150,12 @@ namespace KEI.Infrastructure.Database
             _table.Rows.Add(row);
 
             /// Write to db.
-            DatabaseWritter.Write(row);
+            _databaseWriter.Write(row);
+        }
+
+        public string GetFilePath()
+        {
+            return _databaseWriter.DestinationPath;
         }
 
         /// <summary>
@@ -165,14 +165,14 @@ namespace KEI.Infrastructure.Database
         public DataTable GetData() => _table;
 
         private IEnumerable<DatabaseColumn> GetResultColumns()
-            => _setup.Schema.Where(x => typeof(AggregateDatabaseColumn).IsAssignableFrom(x.GetType()) == false);
+            => _setup.Columns.Where(x => typeof(AggregateDatabaseColumn).IsAssignableFrom(x.GetType()) == false);
         
         private IEnumerable<AggregateDatabaseColumn> GetAggregateColumns()
-            => _setup.Schema.Where(x => x is AggregateDatabaseColumn && x.GetType() != typeof(PassFailDatabaseColumn))
+            => _setup.Columns.Where(x => x is AggregateDatabaseColumn && x.GetType() != typeof(PassFailDatabaseColumn))
                .Cast<AggregateDatabaseColumn>();
 
         private PassFailDatabaseColumn GetPassFailColumn() =>
-            _setup.Schema.FirstOrDefault(x => x is PassFailDatabaseColumn) as PassFailDatabaseColumn;
+            _setup.Columns.FirstOrDefault(x => x is PassFailDatabaseColumn) as PassFailDatabaseColumn;
     }
 
     public static class DatabaseExtensions

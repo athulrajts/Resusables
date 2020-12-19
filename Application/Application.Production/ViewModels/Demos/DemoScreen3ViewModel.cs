@@ -3,6 +3,8 @@ using KEI.Infrastructure.Prism;
 using KEI.Infrastructure.Screen;
 using KEI.UI.Wpf.Hotkey;
 using Application.Production.Views;
+using System.Collections.ObjectModel;
+using System.Collections.Generic;
 
 namespace Application.Production.ViewModels
 {
@@ -10,6 +12,13 @@ namespace Application.Production.ViewModels
     {
         Rectangle,
         Ellipse
+    }
+
+    public class TestClass
+    {
+        public int MyProp { get; set; } = 24;
+        public string MyProperty { get; set; } = "Hello";
+        public bool World { get; set; } = true;
     }
 
     [Screen(DisplayName = "Demos 3",
@@ -21,6 +30,8 @@ namespace Application.Production.ViewModels
 
         public DemoScreen3ViewModel(IHotkeyService hotkeyService) : base(hotkeyService)
         {
+            var test = new List<TestClass> { new(), new(), new() };
+
             SamplePropertyContainer = PropertyContainerBuilder.Create("Sample Confing")
                 .Color("Fill", "#FFFFFF", p => p
                     .SetCategory("Visualization")
@@ -46,7 +57,13 @@ namespace Application.Production.ViewModels
                 .Number("Y", 50.0, p => p
                     .SetCategory("Definition")
                     .SetDescription("Y-Coordinate of top left point"))
+                .Property("Container", test, SerializationFormat.Container)
+                .Property("Xml", test, SerializationFormat.Xml)
+                .Property("Json", test, SerializationFormat.Json)
                 .Build();
+
+            var xml = XmlHelper.SerializeToString(SamplePropertyContainer);
+            //var obj = XmlHelper.DeserializeFromString<PropertyContainer>(xml);
         }
 
     }

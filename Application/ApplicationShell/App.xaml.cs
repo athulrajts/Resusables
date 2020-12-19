@@ -214,13 +214,13 @@ namespace ApplicationShell
                 },
                 new ServiceInfo
                 {
-                    ServiceType = typeof(IDatabaseReader),
+                    ServiceType = typeof(IFileDatabaseReader),
                     ImplementationType = typeof(CSVDatabaseReader),
                     Name = "Database Reader"
                 },
                 new ServiceInfo
                 {
-                    ServiceType = typeof(IDatabaseWritter),
+                    ServiceType = typeof(IFileDatabaseWritter),
                     ImplementationType = typeof(CSVDatabaseWritter),
                     Name = "Database Writter"
                 },
@@ -229,7 +229,10 @@ namespace ApplicationShell
 
         private void PrismApplication_Exit(object sender, ExitEventArgs e)
         {
-            Container.Resolve<IServer>().StopServer();
+            if (Container.IsRegistered<IServer>())
+            {
+                Container.Resolve<IServer>().StopServer(); 
+            }
         }
     }
 }

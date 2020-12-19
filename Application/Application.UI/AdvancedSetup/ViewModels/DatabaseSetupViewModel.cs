@@ -37,9 +37,8 @@ namespace Application.UI.AdvancedSetup.ViewModels
             ResultTypes.CollectionChanged += ResultTypes_CollectionChanged;
 
             var appMode = systemStatusManager.ApplicationMode;
-            _currentRecipe.GetValue($"{appMode} DB", ref _setupConfig);
-            _setup = (DatabaseSetup)_setupConfig.Morph();
-
+            _currentRecipe.GetValue($"{appMode} DB", ref _setup);
+            
             // Take currently valid results
             PopulateSetup(provider.GetImplementations<IDatabaseContext>().ToArray());
 
@@ -94,13 +93,14 @@ namespace Application.UI.AdvancedSetup.ViewModels
             get
             {
                 if (saveSchemaCommand == null)
+                {
                     saveSchemaCommand = new DelegateCommand(() =>
                     {
-                        _setup.Schema = SelectedResultProperties.Select(x => x.Column).ToList();
-                        _setupConfig.SetValue("Schema", DataContainerBuilder.CreateList("Schema", _setup.Schema));
+                        _setup.Columns = SelectedResultProperties.Select(x => x.Column).ToList();
                         _currentRecipe?.Store();
-
                     });
+                }
+                
                 return saveSchemaCommand;
             }
         }
@@ -152,7 +152,7 @@ namespace Application.UI.AdvancedSetup.ViewModels
                     {
                         property.PropertyChanged += Selection_Changed;
 
-                        if (_setup?.Schema.FirstOrDefault(col => col.FullName == property.Column.FullName) is DatabaseColumn dc)
+                        if (_setup?.Columns.FirstOrDefault(col => col.FullName == property.Column.FullName) is DatabaseColumn dc)
                         {
                             property.Column = dc;
                             property.IsSelected = true;
@@ -191,11 +191,11 @@ namespace Application.UI.AdvancedSetup.ViewModels
             });
 
             errColumn.IsSelected = _setup?
-                .Schema
+                .Columns
                 .FirstOrDefault(col => col.GetType() == typeof(ErrorDatabaseColumn)) is ErrorDatabaseColumn;
 
             passFailColumn.IsSelected = _setup?
-                .Schema
+                .Columns
                 .FirstOrDefault(col => col.GetType() == typeof(PassFailDatabaseColumn)) is PassFailDatabaseColumn;
         }
 

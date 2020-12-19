@@ -278,7 +278,7 @@ namespace KEI.Infrastructure
             set
             {
                 // update string value whenever our value changes
-                stringValue = ConvertToString(_value);
+                stringValue = ConvertToString(value);
 
                 if (EqualityComparer<T>.Default.Equals(_value, value) == true)
                 {

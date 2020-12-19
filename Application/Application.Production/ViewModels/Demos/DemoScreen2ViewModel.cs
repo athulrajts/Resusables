@@ -27,7 +27,7 @@ namespace Application.Production.ViewModels
 
         private readonly IDatabaseManager _databaseManager;
         private readonly IViewService _viewService;
-        private readonly IDatabase _database;
+        private readonly IFileDatabase _database;
 
         public DemoScreen2ViewModel(IHotkeyService hotkeyService, 
             IDatabaseManager databaseManager, IViewService viewService) : base(hotkeyService)
@@ -74,10 +74,11 @@ namespace Application.Production.ViewModels
                 {
                     CreationMode = DatabaseCreationMode.Daily,
                     Name = dbPath,
-                    Schema = DatabaseSchema.SchemaFor<DatabaseItem>().ToList()
+                    Columns = DatabaseColumnGenerator.ColumnsFor<DatabaseItem>()
                 };
 
-                DataContainerBuilder.CreateObject("DB", setup).Store(dbSetupPath);
+                var config = DataContainerBuilder.CreateObject("DB", setup);
+                config.Store(dbSetupPath);
             }
 
             _database.StartSession(setup);
@@ -107,7 +108,7 @@ namespace Application.Production.ViewModels
             {
                 try
                 {
-                    Process.Start("notepad", _database.DatabaseWritter.DestinationPath);
+                    Process.Start("notepad", _database.GetFilePath());
                 }
                 catch (System.Exception) { }
             });

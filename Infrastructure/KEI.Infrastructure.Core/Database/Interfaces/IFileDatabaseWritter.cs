@@ -4,13 +4,13 @@ using KEI.Infrastructure.Service;
 namespace KEI.Infrastructure.Database
 {
     [Service("Database Writter")]
-    public interface IDatabaseWritter
+    public interface IFileDatabaseWritter
     {
         public string DestinationPath { get; set; }
-        public void Setup(DatabaseSetup schema);
+        public void Configure(DatabaseSetup schema);
         public void Write(DataRow row);
         public void WriteHeader();
-        public void CreateNew();
+        public void CreateNewFile();
         public bool CanWrite();
     }
 }

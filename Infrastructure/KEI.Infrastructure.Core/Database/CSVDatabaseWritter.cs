@@ -10,7 +10,7 @@ namespace KEI.Infrastructure.Database
     /// <summary>
     /// Writes Database into a CSV file
     /// </summary>
-    public class CSVDatabaseWritter : IDatabaseWritter
+    public class CSVDatabaseWritter : IFileDatabaseWritter
     {
         /// <summary>
         /// Path to save file
@@ -33,7 +33,7 @@ namespace KEI.Infrastructure.Database
         /// Configure the DB
         /// </summary>
         /// <param name="schema"></param>
-        public void Setup(DatabaseSetup setup) => _setup = setup;
+        public void Configure(DatabaseSetup setup) => _setup = setup;
 
         /// <summary>
         /// Append Row to CSV
@@ -49,7 +49,7 @@ namespace KEI.Infrastructure.Database
         /// <summary>
         /// Create a new .csv file with existing config
         /// </summary>
-        public void CreateNew() => WriteHeader();
+        public void CreateNewFile() => WriteHeader();
 
         public bool CanWrite()
         {
@@ -77,7 +77,7 @@ namespace KEI.Infrastructure.Database
                 ? Path.Combine(directory, $"{fileName}_[{now:dd-MMM-yyyy}]_[{now:HH_mm_ss}].csv")
                 : Path.Combine(directory, $"{fileName}_[{now:dd-MMM-yyyy}].csv");
 
-            var schema = _setup.Schema;
+            var schema = _setup.Columns;
             string headers = string.Join(",", schema.Select(x => x.DisplayName));
             string units = string.Join(",", schema.Select(x => x.GetUnit()));
             string lower = string.Empty;

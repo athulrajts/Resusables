@@ -27,12 +27,14 @@ namespace KEI.Infrastructure
             { "dc" , typeof(ContainerDataObject) },
             { "char", typeof(CharDataObject)},
             { "color", typeof(ColorDataObject)},
-            { "dcl", typeof(ContainerCollectionDataObject) },
+            { "dcl", typeof(CollectionDataObject) },
             { "array-1", typeof(Array1DDataObject)},
             { "array-2", typeof(Array2DDataObject)},
             { "dt", typeof(DateTimeDataObject)},
             { "ts", typeof(TimeSpanDataObject)},
-            { "pt", typeof(PointDataObject)}
+            { "pt", typeof(PointDataObject)},
+            { "xml", typeof(XmlDataObject) },
+            { "json", typeof(JsonDataObject) }
         };
 
         /// <summary>
@@ -70,14 +72,16 @@ namespace KEI.Infrastructure
             { "dc" , typeof(ContainerPropertyObject) },
             { "char", typeof(CharPropertyObject)},
             { "color", typeof(ColorPropertyObject)},
-            { "dcl", typeof(ContainerCollectionPropertyObject)},
+            { "dcl", typeof(CollectionPropertyObject)},
             { "file", typeof(FilePropertyObject)},
             { "folder", typeof(FolderPropertyObject)},
             { "array-1", typeof(Array1DPropertyObject) },
             { "array-2", typeof(Array2DPropertyObject) },
             { "dt", typeof(DateTimePropertyObject)},
             { "ts", typeof(TimeSpanPropertyObject)},
-            { "pt", typeof(PointPropertyObject)}
+            { "pt", typeof(PointPropertyObject)},
+            { "xml", typeof(XmlPropertyObject)},
+            { "json", typeof(JsonPropertyObject)}
         };
 
 
@@ -189,9 +193,9 @@ namespace KEI.Infrastructure
                     DataObject data => data,
                     Enum e => new EnumDataObject(name, e),
                     IDataContainer d => new ContainerDataObject(name, d),
-                    ObservableCollection<IDataContainer> ie => new ContainerCollectionDataObject(name, ie),
+                    ObservableCollection<IDataContainer> ie => new CollectionDataObject(name, ie),
                     Array a => GetArrayDataObject(name, a),
-                    IList l => new ContainerCollectionDataObject(name, l),
+                    IList l => new CollectionDataObject(name, l),
                     _ => new ContainerDataObject(name, value),
                 };
             }
@@ -256,10 +260,10 @@ namespace KEI.Infrastructure
                 {
                     PropertyObject data => data,
                     Enum e => new EnumPropertyObject(name, e),
-                    ObservableCollection<IDataContainer> ie => new ContainerCollectionPropertyObject(name, ie),
+                    ObservableCollection<IDataContainer> ie => new CollectionPropertyObject(name, ie),
                     IDataContainer d => new ContainerPropertyObject(name, d),
                     Array a => GetArrayPropertyObject(name, a),
-                    IList l => new ContainerCollectionPropertyObject(name, l),
+                    IList l => new CollectionPropertyObject(name, l),
                     _ => new ContainerPropertyObject(name, value),
                 };
             }
@@ -284,6 +288,8 @@ namespace KEI.Infrastructure
 
     public static class CustomUITypeEditorMapping
     {
+        public static Attribute ExpandableAttribute { get; set; }
+
         public static Dictionary<Type, Type> editorMapping = new Dictionary<Type, Type>();
         public static Dictionary<Type, Type> converterMapping = new Dictionary<Type, Type>();
 

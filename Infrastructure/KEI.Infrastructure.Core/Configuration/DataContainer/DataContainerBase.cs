@@ -219,22 +219,7 @@ namespace KEI.Infrastructure
                         
                         prop.SetValue(result, dc.Morph());
                     }
-                    else if(data.Type == "dcl" && data.GetValue() is ObservableCollection<IDataContainer> oc)
-                    {
-                        var listType = prop.PropertyType;
-                        
-                        if (listType is not null)
-                        {
-                            var list = (IList)Activator.CreateInstance(listType);
 
-                            foreach (var item in oc)
-                            {
-                                list.Add(item.Morph());
-                            }
-
-                            prop.SetValue(result, list);
-                        }
-                    }
                     else if (data is not null)
                     {
                         prop.SetValue(result, data.GetValue());
@@ -265,9 +250,9 @@ namespace KEI.Infrastructure
             {
                 foreach (var item in this)
                 {
-                    if (item is ContainerDataObject cdo)
+                    if (item.GetValue() is IDataContainer dc)
                     {
-                        list.Add(cdo.Value.Morph());
+                        list.Add(dc.Morph());
                     }
                 }
             }
@@ -821,6 +806,12 @@ namespace KEI.Infrastructure
             {
                 var attrs = new List<Attribute>();
 
+                if((data.Type == "xml" || data.Type == "dc" || data.Type == "json") 
+                    && CustomUITypeEditorMapping.ExpandableAttribute is not null)
+                {
+                    attrs.Add(CustomUITypeEditorMapping.ExpandableAttribute);
+                }
+
                 // add attributes for property grid
                 if (data is PropertyObject po)
                 {
@@ -896,9 +887,9 @@ namespace KEI.Infrastructure
 
                     Logger.Information($"Added new property {item.Name} = {item.StringValue}");
                 }
-                else if (item is ContainerDataObject baseChild)
+                else if (item.GetValue() is IDataContainer baseChild)
                 {
-                    AddNewItems(workingCopy.GetValue<IDataContainer>(item.Name), baseChild.Value, ref addActions);
+                    AddNewItems(workingCopy.GetValue<IDataContainer>(item.Name), baseChild, ref addActions);
                 }
 
             }
@@ -921,9 +912,9 @@ namespace KEI.Infrastructure
 
                     Logger.Information($"Removed property {item.Name} = {item.StringValue}");
                 }
-                else if (item is ContainerDataObject baseChild)
+                else if (item.GetValue() is IDataContainer baseChild)
                 {
-                    RemoveOldItems(workingCopy.GetValue<IDataContainer>(item.Name), baseChild.Value, ref removeActions);
+                    RemoveOldItems(workingCopy.GetValue<IDataContainer>(item.Name), baseChild, ref removeActions);
                 }
             }
         }

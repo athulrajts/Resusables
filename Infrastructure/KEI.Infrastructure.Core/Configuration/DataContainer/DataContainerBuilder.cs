@@ -1,21 +1,27 @@
 ﻿using System;
 using System.Reflection;
-using System.Collections;
-using System.Collections.Generic;
 
 namespace KEI.Infrastructure
 {
 
     public class DataContainerBuilder
     {
-        IDataContainer config;
+        protected readonly IDataContainer config;
         
-        public DataContainerBuilder(string name)
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="name"></param>
+        internal DataContainerBuilder(string name)
         {
             config = new DataContainer() { Name = name };
         }
 
-        public IDataContainer Build() => config;
+        /// <summary>
+        /// Return contructed <see cref="IDataContainer"/>
+        /// </summary>
+        /// <returns></returns>
+        public IDataContainer Build() { return config; }
 
         public void SetUnderlyingType(Type t) => config.UnderlyingType = t;
 
@@ -54,6 +60,35 @@ namespace KEI.Infrastructure
             }
 
             config.Add(DataObjectFactory.GetDataObjectFor(name, value));
+
+            return this;
+        }
+
+        /// <summary>
+        /// Creates a DataObject for storing CLR objects based on <paramref name="format"/>
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        /// <param name="format"></param>
+        /// <returns></returns>
+        public DataContainerBuilder Data<T>(string name, T value, SerializationFormat format)
+            where T : class, new()
+        {
+            if (config.ContainsData(name) || value is null)
+            {
+                return this;
+            }
+
+            DataObject obj = format switch
+            {
+                SerializationFormat.Container => DataObjectFactory.GetDataObjectFor(name, value),
+                SerializationFormat.Json => new JsonPropertyObject(name, value),
+                SerializationFormat.Xml => new XmlPropertyObject(name, value),
+                _ => throw new NotImplementedException()
+            };
+
+            config.Add(obj);
 
             return this;
         }
@@ -111,25 +146,24 @@ namespace KEI.Infrastructure
         }
 
         /// <summary>
-        /// Create <see cref="IEnumerable{IDataContainer}"/> from <paramref name="list"/>
+        /// Read DataContainer from file
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="list"></param>
+        /// <param name="path"></param>
         /// <returns></returns>
-        public static IEnumerable<IDataContainer> CreateList(string name, IList list)
-        {
-            if (list is null)
-            {
-                return null;
-            }
-
-            var dataObject = new ContainerCollectionDataObject(name, list);
-
-            return dataObject.Value;
-        }
-
         public static IDataContainer FromFile(string path) => Infrastructure.DataContainer.FromFile(path);
 
+        /// <summary>
+        /// returns <see cref="IDataContainer"/> instance built
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public static DataContainerBuilder Create(string name) => new DataContainerBuilder(name);
+    }
+
+    public enum SerializationFormat
+    {
+        Container,
+        Json,
+        Xml
     }
 }

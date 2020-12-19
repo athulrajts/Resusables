@@ -43,14 +43,8 @@ namespace Application.Core.Modules
             _defaultRecipe = PropertyContainerBuilder.Create("Recipe")
                 .Property("MaximumTransmittance", 100.0)
                 .Property("MinimumTransmittance", 90.0)
-                .Property("Production DB", new DatabaseSetup { Schema = new List<DatabaseColumn>(DatabaseSchema.SchemaFor<TestResult>()), Name = PathUtils.GetPath("Database/Production/Production.csv"), CreationMode = DatabaseCreationMode.Daily })
-                .Property("Engineering DB", new DatabaseSetup { Schema = new List<DatabaseColumn>(DatabaseSchema.SchemaFor<TestResult>()), Name = PathUtils.GetPath("Database/Engineering/Engineering.csv"), CreationMode = DatabaseCreationMode.Daily });
-
-            //        _defaultRecipe = PropertyContainerBuilder.Create("Recipe", PathUtils.GetPath("Configs/DefaultRecipe.rcp"))
-            //.Property("MaximumTransmittance", 100.0, "Maximum Value of Transmittance allowed that considered pass")
-            //.Property("MinimumTransmittance", 90.0, "Maximum Value of Transmittance allowed that considered pass")
-            //.Property("Production DB", new DatabaseSetup { Schema = new List<DatabaseColumn>(DatabaseSchema.SchemaFor<TestResult>()), Name = PathUtils.GetPath("Database/Production/Production.csv"), CreationMode = DatabaseCreationMode.Daily })
-            //.Property("Engineering DB", new DatabaseSetup { Schema = new List<DatabaseColumn>(DatabaseSchema.SchemaFor<TestResult>()), Name = PathUtils.GetPath("Database/Engineering/Engineering.csv"), CreationMode = DatabaseCreationMode.Daily });
+                .Property("Production DB", new DatabaseSetup { Columns = DatabaseColumnGenerator.ColumnsFor<TestResult>(), Name = PathUtils.GetPath("Database/Production/Production.csv"), CreationMode = DatabaseCreationMode.Daily })
+                .Property("Engineering DB", new DatabaseSetup { Columns = DatabaseColumnGenerator.ColumnsFor<TestResult>(), Name = PathUtils.GetPath("Database/Engineering/Engineering.csv"), CreationMode = DatabaseCreationMode.Daily });
         }
 
         private IPropertyContainer currentRecipe;
@@ -60,9 +54,9 @@ namespace Application.Core.Modules
             private set { SetProperty(ref currentRecipe, value, OnRecipeChanged); }
         }
 
-        private IDataContainer engineeringDBSetup;
-        private IDataContainer productionDBSetup;
-        public IDataContainer CurrentDatabaseSetup
+        private DatabaseSetup engineeringDBSetup;
+        private DatabaseSetup productionDBSetup;
+        public DatabaseSetup CurrentDatabaseSetup
         {
             get
             {
@@ -75,8 +69,6 @@ namespace Application.Core.Modules
         private void OnRecipeChanged()
         {
             CurrentRecipe.GetValue($"{ApplicationMode.Production} DB", ref productionDBSetup);
-
-            var xml = XmlHelper.SerializeToString(productionDBSetup);
             CurrentRecipe.GetValue($"{ApplicationMode.Engineering} DB", ref engineeringDBSetup);
 
             RecipeLoaded?.Invoke(this, CurrentRecipe);
@@ -94,7 +86,7 @@ namespace Application.Core.Modules
                 CurrentRecipe.GetValue($"{ApplicationMode.Production} DB", ref productionDBSetup);
                 CurrentRecipe.GetValue($"{ApplicationMode.Engineering} DB", ref engineeringDBSetup);
 
-                CurrentRecipe.Store();
+                CurrentRecipe.Store(PathUtils.GetPath("Configs/DefaultRecipe.rcp"));
             }
         }
 

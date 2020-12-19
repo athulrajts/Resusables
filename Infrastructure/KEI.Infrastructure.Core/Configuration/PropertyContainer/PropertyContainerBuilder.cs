@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Reflection;
-using System.Collections;
 using KEI.Infrastructure.Helpers;
-using System.Collections.Generic;
 
 namespace KEI.Infrastructure
 {
@@ -17,29 +15,50 @@ namespace KEI.Infrastructure
         /// <summary>
         /// Object the builder uses
         /// </summary>
-        protected IPropertyContainer config;
+        protected readonly IPropertyContainer config;
 
 
         #endregion
 
         #region Creation
 
-        private PropertyContainerBuilder()
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        internal PropertyContainerBuilder()
         {
             config = new PropertyContainer();
         }
 
-        private PropertyContainerBuilder(string configName)
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="configName"></param>
+        internal PropertyContainerBuilder(string configName)
         {
             config = new PropertyContainer { Name = configName };
         }
 
+        /// <summary>
+        /// External libraries should use this method to create objects
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public static PropertyContainerBuilder Create(string name)
             => new PropertyContainerBuilder(name);
 
+        /// <summary>
+        /// External libraries should use this method to create objects
+        /// </summary>
+        /// <returns></returns>
         public static PropertyContainerBuilder Create()
             => new PropertyContainerBuilder();
 
+        /// <summary>
+        /// Create <see cref="IPropertyContainer"/> from file
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
         public static IPropertyContainer FromFile(string path) => Infrastructure.PropertyContainer.FromFile(path);
 
         #endregion
@@ -67,6 +86,38 @@ namespace KEI.Infrastructure
             containerBuilder?.Invoke(builder);
 
             config.Add(new ContainerPropertyObject(name, builder.Build()));
+
+            return this;
+        }
+
+        /// <summary>
+        /// Creates a DataObject implementation that serializes to <paramref name="format"/>
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        /// <param name="format"></param>
+        /// <param name="propertyBuilder"></param>
+        /// <returns></returns>
+        public PropertyContainerBuilder Property<T>(string name, T value, SerializationFormat format, Action<PropertyObjectBuilder> propertyBuilder = null)
+            where T : class, new()
+        {
+            if (config.ContainsData(name))
+            {
+                return this;
+            }
+
+            PropertyObject obj = format switch
+            {
+                SerializationFormat.Container => DataObjectFactory.GetPropertyObjectFor(name, value),
+                SerializationFormat.Json => new JsonPropertyObject(name, value),
+                SerializationFormat.Xml => new XmlPropertyObject(name, value),
+                _ => throw new NotImplementedException()
+            };
+
+            propertyBuilder?.Invoke(new PropertyObjectBuilder(obj));
+
+            config.Add(obj);
 
             return this;
         }
@@ -295,7 +346,7 @@ namespace KEI.Infrastructure
                 return this;
             }
 
-            if(a.GetType().GetElementType().IsPrimitive == false)
+            if (a.GetType().GetElementType().IsPrimitive == false)
             {
                 throw new NotSupportedException("Arrays of non primitive types not supported");
             }
@@ -325,7 +376,7 @@ namespace KEI.Infrastructure
         {
             return Number(name, (object)value, propertyBuilder);
         }
-        
+
         /// <summary>
         /// Adds <see cref="DoublePropertyObject"/>
         /// </summary>
@@ -337,7 +388,7 @@ namespace KEI.Infrastructure
         {
             return Number(name, (object)value, propertyBuilder);
         }
-        
+
         /// <summary>
         /// Adds <see cref="FloatPropertyObject"/>
         /// </summary>
@@ -403,25 +454,6 @@ namespace KEI.Infrastructure
         }
 
         /// <summary>
-        /// Creates a <see cref="IEnumerable{IPropertyContainer}"/> from an <see cref="IList"/>
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="list"></param>
-        /// <returns></returns>
-        public static IEnumerable<IPropertyContainer> CreateList(string name, IList list)
-        {
-            if (list is null)
-            {
-                return null;
-            }
-
-            var dataObj = new ContainerCollectionPropertyObject(name, list);
-
-            return dataObj.Value as IEnumerable<IPropertyContainer>;
-        }
-
-
-        /// <summary>
         /// Returns the config with data and configs specified by the builder
         /// </summary>
         /// <returns>DataContainer Object</returns>
@@ -437,7 +469,6 @@ namespace KEI.Infrastructure
         /// <returns></returns>
         private PropertyContainerBuilder Property(PropertyInfo pi, object obj)
         {
-
             if (pi.GetValue(obj) is not null)
             {
                 var option = pi.GetBrowseOption();

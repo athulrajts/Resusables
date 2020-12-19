@@ -37,11 +37,11 @@ namespace ApplicationShell.Commands
 
         private DelegateCommand startTest;
         public DelegateCommand StartTestCommand =>
-            startTest ?? (startTest = new DelegateCommand(ExecuteStartTestCommand));
+            startTest ??= new DelegateCommand(ExecuteStartTestCommand);
 
         void ExecuteStartTestCommand()
         {
-            _databaseManager[$"{ApplicationMode.Engineering} DB"].StartSession(_equipment.CurrentDatabaseSetup.Morph() as DatabaseSetup);
+            _databaseManager[$"{ApplicationMode.Engineering} DB"].StartSession(_equipment.CurrentDatabaseSetup);
 
             _equipment.ExecuteTest();
         }

@@ -1,8 +1,6 @@
 ﻿using KEI.Infrastructure.Types;
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Xml;
 
@@ -11,30 +9,19 @@ namespace KEI.Infrastructure
     /// <summary>
     /// PropertyObject Implementation for storing <see cref="IList"/> of not primitive types
     /// </summary>
-    internal class ContainerCollectionPropertyObject : PropertyObject
+    internal class CollectionPropertyObject : PropertyObject
     {
+        private IDataContainer readingHelper;
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="name"></param>
         /// <param name="value"></param>
-        public ContainerCollectionPropertyObject(string name, IList value)
-        {
-            Name = name;
-
-            int count = 0;
-            foreach (var item in value)
-            {
-                Value.Add(PropertyContainerBuilder.CreateObject($"{name}[{count++}]", item));
-            }
-
-            CollectionType = value.GetType();
-        }
-
-        public ContainerCollectionPropertyObject(string name, ObservableCollection<IDataContainer> value)
+        public CollectionPropertyObject(string name, IList value)
         {
             Name = name;
             Value = value;
+            CollectionType = value.GetType();
         }
 
         /// <summary>
@@ -45,7 +32,14 @@ namespace KEI.Infrastructure
         /// <summary>
         /// Value
         /// </summary>
-        public ObservableCollection<IDataContainer> Value { get; set; } = new ObservableCollection<IDataContainer>();
+        private IList _value;
+        public IList Value
+        {
+            get { return _value; }
+            set { SetProperty(ref _value, value); }
+        }
+
+        //public IDataContainer Value { get; set; } = PropertyContainerBuilder.Create().Build();
 
         /// <summary>
         /// Imlementation for <see cref="DataObject.Type"/>
@@ -58,7 +52,7 @@ namespace KEI.Infrastructure
         /// <returns></returns>
         public override Type GetDataType()
         {
-            return CollectionType;
+            return Value.GetType();
         }
 
         /// <summary>
@@ -77,12 +71,12 @@ namespace KEI.Infrastructure
         /// <returns></returns>
         public override bool SetValue(object value)
         {
-            if(Value is not ObservableCollection<IDataContainer>)
+            if (Value.GetType() != value.GetType())
             {
                 return false;
             }
 
-            Value = value as ObservableCollection<IDataContainer>;
+            Value = (IList)value;
 
             return true;
         }
@@ -107,16 +101,13 @@ namespace KEI.Infrastructure
             // Write base impl
             base.WriteXmlContent(writer);
 
-            // Write collection type
-            if (CollectionType is not null)
-            {
-                writer.WriteObjectXml(new TypeInfo(CollectionType));
-            }
+            writer.WriteObjectXml(new TypeInfo(Value.GetType()));
 
             // Write values
-            foreach (var dc in Value)
+            int count = 0;
+            foreach (var item in Value)
             {
-                new ContainerPropertyObject(dc.Name, dc).WriteXml(writer);
+                new ContainerPropertyObject($"{Name}[{count++}]", item).WriteXml(writer);
             }
         }
 
@@ -139,15 +130,15 @@ namespace KEI.Infrastructure
             {
                 var obj = DataObjectFactory.GetPropertyObject("dc");
 
-                if (obj is ContainerPropertyObject cdo)
+                if (obj is not null)
                 {
                     using var newReader = XmlReader.Create(new StringReader(reader.ReadOuterXml()));
 
                     newReader.Read();
 
-                    cdo.ReadXml(newReader);
+                    obj.ReadXml(newReader);
 
-                    Value.Add(cdo.Value);
+                    readingHelper.Add(obj);
                 }
 
                 return true;
@@ -157,19 +148,29 @@ namespace KEI.Infrastructure
             else if(elementName == nameof(TypeInfo))
             {
                 CollectionType = reader.ReadObjectXml<TypeInfo>();
-
+                
                 return true;
             }
 
             return false;
         }
 
+        protected override void OnXmlReadingCompleted()
+        {
+            Value = (IList)Activator.CreateInstance(CollectionType);
+
+            foreach (var item in readingHelper)
+            {
+                Value.Add(item.GetValue());
+            }
+        }
+
         /// <summary>
-        /// Implementatino for <see cref="DataObject.InitializeObject"/>
+        /// Implementation for <see cref="DataObject.InitializeObject"/>
         /// </summary>
         protected override void InitializeObject()
         {
-            Value = new ObservableCollection<IDataContainer>();
+            readingHelper = new PropertyContainer();
         }
     }
 }

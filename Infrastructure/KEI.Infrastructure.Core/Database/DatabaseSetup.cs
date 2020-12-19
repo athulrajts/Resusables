@@ -19,7 +19,7 @@ namespace KEI.Infrastructure.Database
         /// <summary>
         /// List of Column Information
         /// </summary>
-        public List<DatabaseColumn> Schema { get; set; }
+        public List<DatabaseColumn> Columns { get; set; }
 
         /// <summary>
         /// File Name of CSV
@@ -31,7 +31,7 @@ namespace KEI.Infrastructure.Database
         /// </summary>
         /// <param name="t">IDatabaseContext Instance</param>
         /// <returns></returns>
-        internal IEnumerable<DatabaseColumn> GetHeadersFor(IDatabaseContext t) => Schema.Where(x => x.Namespace == t.GetType().Name);
+        internal IEnumerable<DatabaseColumn> GetHeadersFor(IDatabaseContext t) => Columns.Where(x => x.Namespace == t.GetType().Name);
 
         public DatabaseCreationMode CreationMode { get; set; } = DatabaseCreationMode.Daily;
 
@@ -40,52 +40,16 @@ namespace KEI.Infrastructure.Database
     /// <summary>
     /// Class to store information about columns of database
     /// </summary>
-    public class DatabaseSchema : IEnumerable<DatabaseColumn>
+    public static class DatabaseColumnGenerator
     {
-        public List<DatabaseColumn> Columns;
-
-        public DatabaseSchema()
-        {
-            Columns = new List<DatabaseColumn>();
-        }
-
-        /// <summary>
-        /// Create Schema for list of <see cref="DatabaseColumn"/>
-        /// </summary>
-        /// <param name="columns"></param>
-        public DatabaseSchema(IEnumerable<DatabaseColumn> columns)
-        {
-            Columns = new List<DatabaseColumn>();
-
-            foreach (var col in columns)
-            {
-                Columns.Add(col);
-            }
-        }
-
-        /// <summary>
-        /// Add <see cref="DatabaseColumn"/> to Schema
-        /// </summary>
-        /// <param name="column"></param>
-        public void AddColumn(DatabaseColumn column)
-        {
-            Columns.Add(column);
-        }
-
-        #region IEnumerable<T> Members
-        public IEnumerator<DatabaseColumn> GetEnumerator() => Columns.GetEnumerator();
-        IEnumerator IEnumerable.GetEnumerator() => Columns.GetEnumerator();
-
-        #endregion
-
         /// <summary>
         /// Create DatabaseSchema for type of IDataContext implementations
         /// </summary>
         /// <typeparam name="T">IDataContext Type</typeparam>
         /// <returns>Database Schema</returns>
-        public static DatabaseSchema SchemaFor<T>() where T : IDatabaseContext
+        public static List<DatabaseColumn> ColumnsFor<T>() where T : IDatabaseContext
         {
-            var schema = new DatabaseSchema();
+            var schema = new List<DatabaseColumn>();
 
             var props = typeof(T).GetProperties();
 
@@ -95,11 +59,11 @@ namespace KEI.Infrastructure.Database
                    prop.PropertyType == typeof(float) ||
                    prop.PropertyType == typeof(double))
                 {
-                    schema.AddColumn(new NumericDatabaseColumn(prop));
+                    schema.Add(new NumericDatabaseColumn(prop));
                 }
                 else
                 {
-                    schema.AddColumn(new DatabaseColumn(prop));
+                    schema.Add(new DatabaseColumn(prop));
                 }
             }
 
@@ -111,9 +75,9 @@ namespace KEI.Infrastructure.Database
         /// </summary>
         /// <param name="types">List of IDataContext types</param>
         /// <returns>Database Schema</returns>
-        public static DatabaseSchema SchemaFor(params Type[] types)
+        public static List<DatabaseColumn> ColumnsFor(params Type[] types)
         {
-            var schema = new DatabaseSchema();
+            var schema = new List<DatabaseColumn>();
 
             foreach (var type in types)
             {
@@ -124,7 +88,16 @@ namespace KEI.Infrastructure.Database
 
                 foreach (var prop in props)
                 {
-                    schema.AddColumn(new DatabaseColumn(prop));
+                    if (prop.PropertyType == typeof(int) ||
+                       prop.PropertyType == typeof(float) ||
+                       prop.PropertyType == typeof(double))
+                    {
+                        schema.Add(new NumericDatabaseColumn(prop));
+                    }
+                    else
+                    {
+                        schema.Add(new DatabaseColumn(prop));
+                    }
                 } 
             }
 

@@ -45,6 +45,7 @@
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Infrastructure\KEI.Infrastructure.CLR\KEI.Infrastructure.CLR.vcxproj" />
     <ProjectReference Include="..\Application.UI\Application.UI.csproj" />
   </ItemGroup>
   <ItemGroup>

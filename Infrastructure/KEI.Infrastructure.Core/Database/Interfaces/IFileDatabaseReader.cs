@@ -4,7 +4,7 @@ using System.Data;
 namespace KEI.Infrastructure.Database
 {
     [Service("Database Reader")]
-    public interface IDatabaseReader
+    public interface IFileDatabaseReader
     {
         DataTable ReadDatabase(string filePath);
     }

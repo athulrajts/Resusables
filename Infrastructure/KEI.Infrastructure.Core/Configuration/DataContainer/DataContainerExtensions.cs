@@ -19,10 +19,10 @@ namespace KEI.Infrastructure
         {
             foreach (DataObject item in dc)
             {
-                if (item is ContainerDataObject cdo)
+                if (item.GetValue() is IDataContainer idc)
                 {
-                    var nameAppender = string.IsNullOrEmpty(name) ? cdo.Name : $"{name}.{cdo.Name}";
-                    ToFlatDictionaryInternal(cdo.Value, ref dictionary, nameAppender);
+                    var nameAppender = string.IsNullOrEmpty(name) ? idc.Name : $"{name}.{idc.Name}";
+                    ToFlatDictionaryInternal(idc, ref dictionary, nameAppender);
                 }
                 else
                 {

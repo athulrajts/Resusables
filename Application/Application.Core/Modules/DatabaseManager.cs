@@ -10,26 +10,26 @@ namespace Application.Core.Modules
 {
     public class DatabaseManager : IDatabaseManager
     {
-        private readonly Dictionary<string, IDatabase> _databaseCollection;
-        private readonly IDatabaseReader _databaseReader;
+        private readonly Dictionary<string, IFileDatabase> _databaseCollection;
+        private readonly IFileDatabaseReader _databaseReader;
         private IPropertyContainer _currentRecipe;
 
-        public DatabaseManager(IEventAggregator eventAggregator, IDatabaseWritter databaseWritter, IDatabaseReader databaseReader)
+        public DatabaseManager(IEventAggregator eventAggregator, IFileDatabaseWritter databaseWritter, IFileDatabaseReader databaseReader)
         {
             _databaseReader = databaseReader;
 
-            _databaseCollection = new Dictionary<string, IDatabase>();
+            _databaseCollection = new Dictionary<string, IFileDatabase>();
             _databaseCollection.Add($"{ApplicationMode.Production} DB", new Database(databaseWritter));
             _databaseCollection.Add($"{ApplicationMode.Engineering} DB", new Database(databaseWritter));
 
             eventAggregator.GetEvent<RecipeLoadedEvent>().Subscribe(rcp => _currentRecipe = rcp);
         }
 
-        public IDatabase this[string databaseName] => _databaseCollection.ContainsKey(databaseName) ? _databaseCollection[databaseName] : null;
+        public IFileDatabase this[string databaseName] => _databaseCollection.ContainsKey(databaseName) ? _databaseCollection[databaseName] : null;
 
         public DataTable GetData(string dbPath) => _databaseReader.ReadDatabase(dbPath);
 
-        public IDatabase GetDatabase(string databaseName) => this[databaseName];
+        public IFileDatabase GetDatabase(string databaseName) => this[databaseName];
 
         public void InitializeDatabase(string databaseName)
         {

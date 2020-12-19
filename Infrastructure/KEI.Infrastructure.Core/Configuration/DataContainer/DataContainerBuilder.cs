@@ -108,6 +108,11 @@ namespace KEI.Infrastructure
                 return this;
             }
 
+            if(value is IDataContainer dc && dc.Count == 0)
+            {
+                return this;
+            }
+
             config.Add(DataObjectFactory.GetDataObjectFor(pi.Name, value));
 
             return this;

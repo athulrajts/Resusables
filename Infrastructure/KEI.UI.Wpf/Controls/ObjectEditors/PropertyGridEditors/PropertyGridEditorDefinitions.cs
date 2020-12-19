@@ -15,6 +15,7 @@ namespace KEI.UI.Wpf.Controls
             CustomUITypeEditorMapping.RegisterEditor<PropertyGridEditors.FileNameEditor>("file");
             CustomUITypeEditorMapping.RegisterEditor<PropertyGridEditors.FolderNameEditor>("folder");
             CustomUITypeEditorMapping.RegisterEditor<PropertyGridEditors.ColorEditor>("color");
+            CustomUITypeEditorMapping.RegisterEditor<PropertyGridEditors.ComboBoxEditor>("enum");
         }
     }
 }

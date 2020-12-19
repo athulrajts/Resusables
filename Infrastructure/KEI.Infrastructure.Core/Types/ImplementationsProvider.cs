@@ -16,13 +16,32 @@ namespace KEI.Infrastructure.Types
 
         public ImplementationsProvider()
         {
-            var path = Assembly.GetEntryAssembly().Location;
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                if (assembly.IsDynamic == false)
+                {
+                    assemblies.Add(assembly); 
+                }
+            }
+        }
 
-            foreach (var file in Directory.GetFiles(Path.GetDirectoryName(path), "*.dll"))
+        public void LoadAssemblies(string path = "")
+        {
+            if(string.IsNullOrEmpty(path))
+            {
+                path = Assembly.GetEntryAssembly().Location;
+            }
+
+            foreach (var file in Directory.GetFiles(Path.GetDirectoryName(path), "*.dll", SearchOption.AllDirectories))
             {
                 try
                 {
-                    assemblies.Add(Assembly.LoadFrom(file));
+                    var assembly = Assembly.LoadFrom(file);
+                    
+                    if(assemblies.Contains(assembly) == false)
+                    {
+                        assemblies.Add(assembly);
+                    }
                 }
                 catch (Exception) { }
             }

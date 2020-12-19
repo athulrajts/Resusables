@@ -101,7 +101,7 @@ namespace KEI.Infrastructure.Configuration
                     int count = 0;
                     foreach (var item in listConfig)
                     {
-                        dc.Data($"{ConfigName}[{count++}]", item);
+                        dc.Data($"{ConfigName}_{count++}", item);
                     }
 
                     if (XmlHelper.SerializeToFile(dc.Build(), path) == false)

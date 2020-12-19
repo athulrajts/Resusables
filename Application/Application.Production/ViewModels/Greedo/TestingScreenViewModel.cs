@@ -99,7 +99,7 @@ namespace Application.Production.ViewModels
             testCommand ?? (testCommand = new DelegateCommand(ExecuteTestCommand));
         private void ExecuteTestCommand()
         {
-            _mainDatabase.StartSession(_equipment.CurrentDatabaseSetup.Morph() as DatabaseSetup);
+            _mainDatabase.StartSession(_equipment.CurrentDatabaseSetup);
 
             _equipment.ExecuteTest();
 

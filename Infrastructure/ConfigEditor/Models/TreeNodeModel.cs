@@ -35,21 +35,22 @@ namespace ConfigEditor.Models
 
             Container = dc;
 
-            foreach (var item in dc)
+            foreach (PropertyObject item in dc)
             {
-                if(item.GetValue() is IPropertyContainer dcValue)
-                {
-                    if(item is PropertyObject p)
-                    {
-                        p.SetBrowsePermission(BrowseOptions.NonBrowsable);
-                    }
+                var value = item.GetValue();
 
+                if(value is null)
+                {
+                    item.SetBrowsePermission(BrowseOptions.NonBrowsable);
+                }
+                else if(value is IPropertyContainer dcValue)
+                {
+                    item.SetBrowsePermission(BrowseOptions.NonBrowsable);
                     Children.Add(new TreeNodeModel(dcValue));
                 }
                 else
                 {
-                    var data = (PropertyObject)item;
-                    data.SetBrowsePermission(BrowseOptions.Browsable);
+                    item.SetBrowsePermission(BrowseOptions.Browsable);
                 }
             }
         }

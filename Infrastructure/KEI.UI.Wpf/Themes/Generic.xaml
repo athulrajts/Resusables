@@ -7,5 +7,16 @@
         <ResourceDictionary Source="pack://application:,,,/KEI.UI.Wpf;component/Themes/TextBoxes.xaml"/>
         <ResourceDictionary Source="pack://application:,,,/KEI.UI.Wpf;component/Themes/Buttons.xaml"/>
     </ResourceDictionary.MergedDictionaries>
+
+    <Style TargetType="c:VirtualizingComboBox" BasedOn="{StaticResource {x:Type ComboBox}}">
+        <Setter Property="ItemsPanel">
+            <Setter.Value>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel VirtualizingStackPanel.IsVirtualizing="True"
+                                            VirtualizingStackPanel.VirtualizationMode="Recycling"/>
+                </ItemsPanelTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
     
 </ResourceDictionary>

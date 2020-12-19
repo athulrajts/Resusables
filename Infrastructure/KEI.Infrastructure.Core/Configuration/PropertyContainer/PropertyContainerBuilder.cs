@@ -469,14 +469,19 @@ namespace KEI.Infrastructure
         /// <returns></returns>
         private PropertyContainerBuilder Property(PropertyInfo pi, object obj)
         {
-            if (pi.GetValue(obj) is not null)
+            if (pi.GetValue(obj) is object value)
             {
                 var option = pi.GetBrowseOption();
                 var description = pi.GetDescription();
                 var category = pi.GetCategory();
                 var displayName = pi.GetDisplayName();
 
-                config.Add(DataObjectFactory.GetPropertyObjectFor(pi.Name, pi.GetValue(obj))?
+                if (value is IDataContainer dc && dc.Count == 0)
+                {
+                    return this;
+                }
+
+                config.Add(DataObjectFactory.GetPropertyObjectFor(pi.Name, value)?
                     .SetBrowsePermission(option)
                     .SetDescription(description)
                     .SetCategory(category)

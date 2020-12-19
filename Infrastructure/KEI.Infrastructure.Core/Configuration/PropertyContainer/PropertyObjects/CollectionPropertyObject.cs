@@ -107,7 +107,7 @@ namespace KEI.Infrastructure
             int count = 0;
             foreach (var item in Value)
             {
-                new ContainerPropertyObject($"{Name}[{count++}]", item).WriteXml(writer);
+                new ContainerPropertyObject($"{Name}_{count++}", item).WriteXml(writer);
             }
         }
 

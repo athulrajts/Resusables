@@ -1,4 +1,5 @@
 ﻿using KEI.Infrastructure.Configuration;
+using System.Xml.Serialization;
 
 namespace KEI.Infrastructure.UserManagement
 {

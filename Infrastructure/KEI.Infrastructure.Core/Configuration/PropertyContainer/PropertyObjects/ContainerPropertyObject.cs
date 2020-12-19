@@ -49,8 +49,22 @@ namespace KEI.Infrastructure
         public ContainerPropertyObject(string name, object value)
         {
             Name = name;
-            Value = value;
-            ObjectType = value.GetType();
+
+            if (value is IDataContainer dc)
+            {
+                _container = dc;
+
+                if (dc.UnderlyingType is TypeInfo t)
+                {
+                    Value = dc.Morph();
+                    ObjectType = t;
+                }
+            }
+            else
+            {
+                Value = value;
+                ObjectType = value.GetType();
+            }
         }
 
         /// <summary>
@@ -137,6 +151,7 @@ namespace KEI.Infrastructure
         /// </summary>
         protected override void OnXmlReadingCompleted()
         {
+            _container.Name = Name;
             if(ObjectType is not null)
             {
                 _container.UnderlyingType = ObjectType;

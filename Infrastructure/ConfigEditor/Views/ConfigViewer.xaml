@@ -97,41 +97,6 @@
             <xctk:PropertyGrid SelectedObject="{Binding SelectedNode.Container}"
                                ShowTitle="False">
             </xctk:PropertyGrid>
-            <!--<DataGrid CanUserAddRows="False"
-                      AutoGenerateColumns="False"
-                      AlternatingRowBackground="{StaticResource AlternatingRowBrush}"
-                      ItemsSource="{Binding SelectedNode.DataItems}"
-                      BorderBrush="Transparent">
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="Name" Binding="{Binding Name}" IsReadOnly="True" Width="*"/>
-                    <DataGridTemplateColumn Header="Value" Width="*">
-                        <DataGridTemplateColumn.CellEditingTemplate>
-                            <DataTemplate>
-                                <ContentControl>
-                                    <ContentControl.Style>
-                                        <Style TargetType="ContentControl">
-                                            <Setter Property="ContentTemplate" Value="{StaticResource StringAndNumericTemplate}"/>
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding Type}" Value="bool">
-                                                    <Setter Property="ContentTemplate" Value="{StaticResource BooleanTemplate}"/>
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding Type}" Value="enum">
-                                                    <Setter Property="ContentTemplate" Value="{StaticResource EnumTemplate}"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </ContentControl.Style>
-                                </ContentControl>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellEditingTemplate>
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding StringValue}" Padding="5 0"/>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                </DataGrid.Columns>
-            </DataGrid>-->
         </Border>
     </Grid>
 </UserControl>

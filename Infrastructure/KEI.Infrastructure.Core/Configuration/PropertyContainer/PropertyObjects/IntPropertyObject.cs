@@ -26,7 +26,7 @@ namespace KEI.Infrastructure
         /// <summary>
         /// Increment for editors
         /// </summary>
-        public object Increment { get; set; } = 1;
+        public object Increment { get; set; }
 
         /// <summary>
         /// Max value of <see cref="DataObject{T}.Value"/>

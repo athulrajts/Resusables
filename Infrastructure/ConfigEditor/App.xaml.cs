@@ -7,6 +7,7 @@ using KEI.Infrastructure.Logging;
 using ConfigEditor.Views;
 using ConfigEditor.ViewModels;
 using ConfigEditor.Dialogs;
+using KEI.Infrastructure.Types;
 
 #pragma warning disable 3277
 
@@ -38,6 +39,8 @@ namespace ConfigEditor
 
         protected override void OnInitialized()
         {
+            ImplementationsProvider.Instance.LoadAssemblies();
+
             var regionManager = Container.Resolve<IRegionManager>();
 
             regionManager.RequestNavigate("MainContent", nameof(ConfigViewerTabs));

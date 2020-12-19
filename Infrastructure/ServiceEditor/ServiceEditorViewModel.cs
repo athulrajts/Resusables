@@ -19,11 +19,13 @@ namespace ServiceEditor.ViewModels
         private readonly string FilePath = PathUtils.GetPath("Configs/Services.cfg");
         private readonly IViewService _viewService;
 
-        public ServiceEditorViewModel(IViewService viewService, ImplementationsProvider provider)
+        public ServiceEditorViewModel(IViewService viewService)
         {
+            ImplementationsProvider.Instance.LoadAssemblies();
+
             _viewService = viewService;
 
-            Services = new ObservableCollection<ServiceInfo>(provider.GetServices());
+            Services = new ObservableCollection<ServiceInfo>(ImplementationsProvider.Instance.GetServices());
 
             SelectedServices = XmlHelper.DeserializeFromFile<ObservableCollection<ServiceInfo>>(FilePath) ?? new ObservableCollection<ServiceInfo>();
 

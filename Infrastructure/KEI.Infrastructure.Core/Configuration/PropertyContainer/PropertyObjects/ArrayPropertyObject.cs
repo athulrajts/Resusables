@@ -117,7 +117,7 @@ namespace KEI.Infrastructure
         /// <summary>
         /// Implementation for <see cref="DataObject.Type"/>
         /// </summary>
-        public override string Type => "array-1";
+        public override string Type => DataObjectType.Array1D;
 
         /// <summary>
         /// Constructor
@@ -184,8 +184,8 @@ namespace KEI.Infrastructure
         /// <summary>
         /// Implementation for <see cref="DataObject.Type"/>
         /// </summary>
-        public override string Type => "array-2";
-        
+        public override string Type => DataObjectType.Array2D;
+
         /// <summary>
         /// Constructor
         /// </summary>

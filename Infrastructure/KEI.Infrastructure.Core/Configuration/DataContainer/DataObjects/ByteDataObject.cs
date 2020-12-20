@@ -21,7 +21,7 @@ namespace KEI.Infrastructure
         /// <summary>
         /// Implementation for <see cref="DataObject.Type"/>
         /// </summary>
-        public override string Type => "byte";
+        public override string Type => DataObjectType.Byte;
 
         /// <summary>
         /// Implementation for <see cref="IWriteToBinaryStream.WriteBytes(BinaryWriter)"/>

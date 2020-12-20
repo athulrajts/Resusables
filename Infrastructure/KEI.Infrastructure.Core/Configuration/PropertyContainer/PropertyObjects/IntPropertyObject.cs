@@ -21,7 +21,7 @@ namespace KEI.Infrastructure
         /// <summary>
         /// Implementation for <see cref="DataObject.Type"/>
         /// </summary>
-        public override string Type => "int";
+        public override string Type => DataObjectType.Integer;
 
         /// <summary>
         /// Increment for editors

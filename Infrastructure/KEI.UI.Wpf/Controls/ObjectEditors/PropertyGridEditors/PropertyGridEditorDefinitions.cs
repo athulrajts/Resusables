@@ -7,15 +7,15 @@ namespace KEI.UI.Wpf.Controls
     {
         public static void SetDefaultEditors()
         {
-            CustomUITypeEditorMapping.ExpandableAttribute = new ExpandableObjectAttribute();
+            PropertyGridHelper.ExpandableAttribute = new ExpandableObjectAttribute();
 
-            CustomUITypeEditorMapping.RegisterEditor<PropertyGridEditors.IntegerUpDownEditor>("int");
-            CustomUITypeEditorMapping.RegisterEditor<PropertyGridEditors.FloatUpDownEditor>("float");
-            CustomUITypeEditorMapping.RegisterEditor<PropertyGridEditors.DoubleUpDownEditor>("double");
-            CustomUITypeEditorMapping.RegisterEditor<PropertyGridEditors.FileNameEditor>("file");
-            CustomUITypeEditorMapping.RegisterEditor<PropertyGridEditors.FolderNameEditor>("folder");
-            CustomUITypeEditorMapping.RegisterEditor<PropertyGridEditors.ColorEditor>("color");
-            CustomUITypeEditorMapping.RegisterEditor<PropertyGridEditors.ComboBoxEditor>("enum");
+            PropertyGridHelper.RegisterEditor<PropertyGridEditors.IntegerUpDownEditor>("int");
+            PropertyGridHelper.RegisterEditor<PropertyGridEditors.FloatUpDownEditor>("float");
+            PropertyGridHelper.RegisterEditor<PropertyGridEditors.DoubleUpDownEditor>("double");
+            PropertyGridHelper.RegisterEditor<PropertyGridEditors.FileNameEditor>("file");
+            PropertyGridHelper.RegisterEditor<PropertyGridEditors.FolderNameEditor>("folder");
+            PropertyGridHelper.RegisterEditor<PropertyGridEditors.ColorEditor>("color");
+            PropertyGridHelper.RegisterEditor<PropertyGridEditors.ComboBoxEditor>("enum");
         }
     }
 }

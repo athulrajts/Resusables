@@ -16,6 +16,6 @@
         /// <summary>
         /// Implementation for <see cref="DataObject.Type"/>
         /// </summary>
-        public override string Type => "pt";
+        public override string Type => DataObjectType.Point;
     }
 }

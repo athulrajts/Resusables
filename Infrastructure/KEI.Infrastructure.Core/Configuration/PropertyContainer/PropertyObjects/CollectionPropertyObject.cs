@@ -12,11 +12,12 @@ namespace KEI.Infrastructure
     internal class CollectionPropertyObject : PropertyObject
     {
         private IDataContainer readingHelper;
+        
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="value"></param>
+        /// <param name="name">name of object</param>
+        /// <param name="value">value of object</param>
         public CollectionPropertyObject(string name, IList value)
         {
             Name = name;
@@ -39,12 +40,10 @@ namespace KEI.Infrastructure
             set { SetProperty(ref _value, value); }
         }
 
-        //public IDataContainer Value { get; set; } = PropertyContainerBuilder.Create().Build();
-
         /// <summary>
         /// Imlementation for <see cref="DataObject.Type"/>
         /// </summary>
-        public override string Type => "dcl";
+        public override string Type => DataObjectType.Collection;
 
         /// <summary>
         /// Implementation for <see cref="DataObject.GetDataType"/>
@@ -85,12 +84,13 @@ namespace KEI.Infrastructure
         /// Implementation for <see cref="DataObject.GetStartElementName"/>
         /// </summary>
         /// <returns></returns>
-        protected override string GetStartElementName()
-        {
-            return ContainerDataObject.DC_START_ELEMENT_NAME;
-        }
+        protected override string GetStartElementName() => ContainerDataObject.DC_START_ELEMENT_NAME;
 
-        protected override bool CanWriteValueAsXmlAttribute() { return false; }
+        /// <summary>
+        /// Implementation for <see cref="DataObject.CanConvertFromString(string)"/>
+        /// </summary>
+        /// <returns></returns>
+        protected override bool CanWriteValueAsXmlAttribute() => false;
 
         /// <summary>
         /// Implementation for <see cref="DataObject.WriteXmlContent(XmlWriter)"/>
@@ -155,6 +155,9 @@ namespace KEI.Infrastructure
             return false;
         }
 
+        /// <summary>
+        /// Implementation for <see cref="DataObject.OnXmlReadingCompleted"/>
+        /// </summary>
         protected override void OnXmlReadingCompleted()
         {
             Value = (IList)Activator.CreateInstance(CollectionType);

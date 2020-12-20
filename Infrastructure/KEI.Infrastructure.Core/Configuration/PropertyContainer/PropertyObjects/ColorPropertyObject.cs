@@ -22,6 +22,6 @@ namespace KEI.Infrastructure
         /// <summary>
         /// Implementation for <see cref="DataObject.Type"/>
         /// </summary>
-        public override string Type => "color";
+        public override string Type => DataObjectType.Color;
     }
 }

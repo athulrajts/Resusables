@@ -2,11 +2,36 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Runtime.Serialization;
 
 namespace KEI.Infrastructure
 {
+    public static class DataObjectType
+    {
+        public const string Boolean = "bool";
+        public const string Byte = "byte";
+        public const string Char = "char";
+        public const string Integer = "int";
+        public const string Float = "float";
+        public const string Enum = "enum";
+        public const string Double = "double";
+        public const string String = "string";
+        public const string File = "file";
+        public const string Folder = "folder";
+        public const string Selectable = "opt";
+        public const string DateTime = "dt";
+        public const string TimeSpan = "ts";
+        public const string Color = "color";
+        public const string Point = "point";
+        public const string Array1D = "array-1";
+        public const string Array2D = "array-2";
+        public const string Container = "dc";
+        public const string Collection = "dcl";
+        public const string Xml = "xml";
+        public const string Json = "json";
+    }
+
+
     /// <summary>
     /// Class used internally to create DataObjects
     /// </summary>
@@ -17,24 +42,24 @@ namespace KEI.Infrastructure
         /// </summary>
         private static readonly Dictionary<string, Type> typeIdDataObjMapping = new Dictionary<string, Type>
         {
-            { "bool" , typeof(BoolDataObject) },
-            { "byte" , typeof(ByteDataObject) },
-            { "int" , typeof(IntDataObject) },
-            { "float" , typeof(FloatDataObject) },
-            { "double" , typeof(DoubleDataObject) },
-            { "string", typeof(StringDataObject) },
-            { "enum" , typeof(EnumDataObject) },
-            { "dc" , typeof(ContainerDataObject) },
-            { "char", typeof(CharDataObject)},
-            { "color", typeof(ColorDataObject)},
-            { "dcl", typeof(CollectionDataObject) },
-            { "array-1", typeof(Array1DDataObject)},
-            { "array-2", typeof(Array2DDataObject)},
-            { "dt", typeof(DateTimeDataObject)},
-            { "ts", typeof(TimeSpanDataObject)},
-            { "pt", typeof(PointDataObject)},
-            { "xml", typeof(XmlDataObject) },
-            { "json", typeof(JsonDataObject) }
+            { DataObjectType.Boolean , typeof(BoolDataObject) },
+            { DataObjectType.Byte , typeof(ByteDataObject) },
+            { DataObjectType.Integer , typeof(IntDataObject) },
+            { DataObjectType.Float , typeof(FloatDataObject) },
+            { DataObjectType.Double , typeof(DoubleDataObject) },
+            { DataObjectType.String , typeof(StringDataObject) },
+            { DataObjectType.Enum , typeof(EnumDataObject) },
+            { DataObjectType.Container , typeof(ContainerDataObject) },
+            { DataObjectType.Char , typeof(CharDataObject)},
+            { DataObjectType.Color , typeof(ColorDataObject)},
+            { DataObjectType.Collection , typeof(CollectionDataObject) },
+            { DataObjectType.Array1D , typeof(Array1DDataObject)},
+            { DataObjectType.Array2D , typeof(Array2DDataObject)},
+            { DataObjectType.DateTime , typeof(DateTimeDataObject)},
+            { DataObjectType.TimeSpan , typeof(TimeSpanDataObject)},
+            { DataObjectType.Point , typeof(PointDataObject)},
+            { DataObjectType.Xml , typeof(XmlDataObject) },
+            { DataObjectType.Json , typeof(JsonDataObject) }
         };
 
         /// <summary>
@@ -61,27 +86,27 @@ namespace KEI.Infrastructure
         /// </summary>
         private static readonly Dictionary<string, Type> typeIdPropObjMapping = new Dictionary<string, Type>
         {
-            { "bool" , typeof(BoolPropertyObject) },
-            { "byte" , typeof(BytePropertyObject) },
-            { "int" , typeof(IntPropertyObject) },
-            { "float" , typeof(FloatPropertyObject) },
-            { "double" , typeof(DoublePropertyObject) },
-            { "string", typeof(StringPropertyObject) },
-            { "enum" , typeof(EnumPropertyObject) },
-            { "opt" , typeof(SelectablePropertyObject) },
-            { "dc" , typeof(ContainerPropertyObject) },
-            { "char", typeof(CharPropertyObject)},
-            { "color", typeof(ColorPropertyObject)},
-            { "dcl", typeof(CollectionPropertyObject)},
-            { "file", typeof(FilePropertyObject)},
-            { "folder", typeof(FolderPropertyObject)},
-            { "array-1", typeof(Array1DPropertyObject) },
-            { "array-2", typeof(Array2DPropertyObject) },
-            { "dt", typeof(DateTimePropertyObject)},
-            { "ts", typeof(TimeSpanPropertyObject)},
-            { "pt", typeof(PointPropertyObject)},
-            { "xml", typeof(XmlPropertyObject)},
-            { "json", typeof(JsonPropertyObject)}
+            { DataObjectType.Boolean , typeof(BoolPropertyObject) },
+            { DataObjectType.Byte , typeof(BytePropertyObject) },
+            { DataObjectType.Integer , typeof(IntPropertyObject) },
+            { DataObjectType.Float , typeof(FloatPropertyObject) },
+            { DataObjectType.Double , typeof(DoublePropertyObject) },
+            { DataObjectType.String , typeof(StringPropertyObject) },
+            { DataObjectType.Enum , typeof(EnumPropertyObject) },
+            { DataObjectType.Selectable , typeof(SelectablePropertyObject) },
+            { DataObjectType.Container , typeof(ContainerPropertyObject) },
+            { DataObjectType.Char , typeof(CharPropertyObject)},
+            { DataObjectType.Color , typeof(ColorPropertyObject)},
+            { DataObjectType.Collection , typeof(CollectionPropertyObject)},
+            { DataObjectType.File , typeof(FilePropertyObject)},
+            { DataObjectType.Folder , typeof(FolderPropertyObject)},
+            { DataObjectType.Array1D , typeof(Array1DPropertyObject) },
+            { DataObjectType.Array2D , typeof(Array2DPropertyObject) },
+            { DataObjectType.DateTime , typeof(DateTimePropertyObject)},
+            { DataObjectType.TimeSpan , typeof(TimeSpanPropertyObject)},
+            { DataObjectType.Point , typeof(PointPropertyObject)},
+            { DataObjectType.Xml , typeof(XmlPropertyObject)},
+            { DataObjectType.Json , typeof(JsonPropertyObject)}
         };
 
 
@@ -193,16 +218,15 @@ namespace KEI.Infrastructure
                     DataObject data => data,
                     Enum e => new EnumDataObject(name, e),
                     IDataContainer d => new ContainerDataObject(name, d),
-                    ObservableCollection<IDataContainer> ie => new CollectionDataObject(name, ie),
                     Array a => GetArrayDataObject(name, a),
                     IList l => new CollectionDataObject(name, l),
-                    _ => new ContainerDataObject(name, value),
+                    _ => new ContainerDataObject(name, value), // TODO : give option to choose default ( xml | json | container )
                 };
             }
 
             static DataObject GetArrayDataObject(string name, Array a)
             {
-                if(a.GetType().GetElementType().IsPrimitive == false)
+                if (a.GetType().GetElementType().IsPrimitive == false)
                 {
                     throw new NotSupportedException("Array of non primitive types not supported");
                 }
@@ -211,7 +235,7 @@ namespace KEI.Infrastructure
                 {
                     1 => new Array1DDataObject(name, a),
                     2 => new Array2DDataObject(name, a),
-                    _ => throw new NotSupportedException("Array of more than 2 dimensions not allowed")
+                    _ => throw new NotSupportedException("Array of more than 2 dimensions not supported") // TODO : create data object save n-dimensional array
                 };
             }
         }
@@ -260,11 +284,10 @@ namespace KEI.Infrastructure
                 {
                     PropertyObject data => data,
                     Enum e => new EnumPropertyObject(name, e),
-                    ObservableCollection<IDataContainer> ie => new CollectionPropertyObject(name, ie),
                     IDataContainer d => new ContainerPropertyObject(name, d),
                     Array a => GetArrayPropertyObject(name, a),
                     IList l => new CollectionPropertyObject(name, l),
-                    _ => new ContainerPropertyObject(name, value),
+                    _ => new ContainerPropertyObject(name, value), // TODO : give option to choose default ( xml | json | container )
                 };
             }
 
@@ -279,108 +302,10 @@ namespace KEI.Infrastructure
                 {
                     1 => new Array1DPropertyObject(name, a),
                     2 => new Array2DPropertyObject(name, a),
-                    _ => throw new NotSupportedException("Array of more than 2 dimensions not allowed")
+                    _ => throw new NotSupportedException("Array of more than 2 dimensions not supported") // TODO : create property object save n-dimensional array
                 };
             }
         }
-
-    }
-
-    public static class CustomUITypeEditorMapping
-    {
-        public static Attribute ExpandableAttribute { get; set; }
-
-        public static Dictionary<Type, Type> editorMapping = new Dictionary<Type, Type>();
-        public static Dictionary<Type, Type> converterMapping = new Dictionary<Type, Type>();
-
-        /// <summary>
-        /// Registers an editor for <see cref="DataObject"/> with <see cref="DataObject.Type"/> equal to <paramref name="typeid"/>
-        /// this type will be use as parameter for <see cref="EditorAttribute"/> which is used by 3rd party PropertyGrid implementations
-        /// as well as WindowsForms property grid.
-        /// </summary>
-        /// <typeparam name="TEditor"></typeparam>
-        /// <param name="typeid"></param>
-        public static void RegisterEditor<TEditor>(string typeid)
-        {
-            var dataobj = DataObjectFactory.GetPropertyObject(typeid);
-
-            if (dataobj is null)
-            {
-                return;
-            }
-
-            var type = dataobj.GetType();
-
-            if (editorMapping.ContainsKey(type))
-            {
-                editorMapping[type] = typeof(TEditor);
-            }
-            else
-            {
-                editorMapping.Add(type, typeof(TEditor));
-            }
-        }
-
-        /// <summary>
-        /// Registers type converter for <see cref="DataObject"/> with <see cref="DataObject.Type"/> equal to <paramref name="typeid"/>
-        /// this type will be use as parameter for <see cref="TypeConverterAttribute"/> which is used by WindowsForms PropertyGrid
-        /// </summary>
-        /// <typeparam name="TEditor"></typeparam>
-        /// <param name="typeid"></param>
-        public static void RegisterConverter<TConverter>(string typeid)
-            where TConverter : TypeConverter
-        {
-            var dataobj = DataObjectFactory.GetPropertyObject(typeid);
-
-            if (dataobj is null)
-            {
-                return;
-            }
-
-            var type = dataobj.GetType();
-
-            if (converterMapping.ContainsKey(type))
-            {
-                converterMapping[type] = typeof(TConverter);
-            }
-            else
-            {
-                converterMapping.Add(type, typeof(TConverter));
-            }
-        }
-
-        /// <summary>
-        /// Called from <see cref="DataContainerBase.GetProperties(Attribute[])"/> to create <see cref="EditorAttribute"/>
-        /// </summary>
-        /// <param name="propertyObjectType"></param>
-        /// <returns></returns>
-        public static Type GetEditorType(Type propertyObjectType)
-        {
-            if (editorMapping.ContainsKey(propertyObjectType) == false)
-            {
-                return null;
-            }
-
-            return editorMapping[propertyObjectType];
-        }
-
-        /// <summary>
-        /// Called from <see cref="DataContainerBase.GetProperties(Attribute[])"/> to create <see cref="TypeConverterAttribute"/>
-        /// </summary>
-        /// <param name="propertyObjectType"></param>
-        /// <returns></returns>
-        public static Type GetConverterType(Type propertyObjectType)
-        {
-            if (converterMapping.ContainsKey(propertyObjectType) == false)
-            {
-                return null;
-            }
-
-            return converterMapping[propertyObjectType];
-        }
-
-        public static Type PropertyGridEditor { get; set; }
-        public static Type CollectionEditor { get; set; }
 
     }
 }

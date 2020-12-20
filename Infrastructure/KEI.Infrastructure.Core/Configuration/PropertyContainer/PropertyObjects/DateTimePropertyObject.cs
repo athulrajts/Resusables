@@ -21,6 +21,6 @@ namespace KEI.Infrastructure
         /// <summary>
         /// Implementation for <see cref="DataObject.Type"/>
         /// </summary>
-        public override string Type => "dt";
+        public override string Type => DataObjectType.DateTime;
     }
 }

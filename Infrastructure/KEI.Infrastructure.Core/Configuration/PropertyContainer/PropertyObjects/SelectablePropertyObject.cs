@@ -19,7 +19,7 @@ namespace KEI.Infrastructure
         /// <summary>
         /// Implementation for <see cref="DataObject.Type"/>
         /// </summary>
-        public override string Type => "opt";
+        public override string Type => DataObjectType.Selectable;
 
         public Selector Value { get; set; } = new Selector();
 
@@ -183,17 +183,20 @@ namespace KEI.Infrastructure
             Value.PropertyChanged += Value_PropertyChanged;
         }
 
+        /// <summary>
+        /// Implementation for <see cref="DataObject.InitializeObject"/>
+        /// </summary>
+        protected override void InitializeObject()
+        {
+            Value = new Selector();
+        }
+
         private void Value_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(Selector.SelectedItem))
             {
                 RaisePropertyChanged(nameof(Value));
             }
-        }
-
-        protected override void InitializeObject()
-        {
-            Value = new Selector();
         }
 
     }

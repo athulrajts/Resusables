@@ -13,7 +13,6 @@ using System.Xml.Schema;
 using System.Xml.Serialization;
 using System.Runtime.CompilerServices;
 using KEI.Infrastructure.Logging;
-using System.Collections.ObjectModel;
 
 namespace KEI.Infrastructure
 {
@@ -195,39 +194,7 @@ namespace KEI.Infrastructure
                 throw new InvalidOperationException("Morph not supported for this instance");
             }
 
-            Type morphType = UnderlyingType;
-
-            var result = Activator.CreateInstance(morphType);
-
-            foreach (var prop in morphType.GetProperties())
-            {
-                if (prop.CanWrite)
-                {
-                    var data = Find(prop.Name);
-
-                    if (data is null)
-                    {
-                        continue;
-                    }
-
-                    if (data.GetValue() is IDataContainer dc)
-                    {
-                        if (dc.UnderlyingType is null)
-                        {
-                            continue;
-                        }
-                        
-                        prop.SetValue(result, dc.Morph());
-                    }
-
-                    else if (data is not null)
-                    {
-                        prop.SetValue(result, data.GetValue());
-                    }
-                }
-            }
-
-            return result;
+            return MorphToObject(UnderlyingType);
         }
 
         /// <summary>
@@ -269,12 +236,13 @@ namespace KEI.Infrastructure
 
 
         /// <summary>
-        /// Maps this contents of this objects to a class objected
-        /// represented by <see cref="UnderlyingType"/>
+        /// tries Maps this contents of this objects to a class objected to given <typeparamref name="T"/>
+        /// create a new instance of <typeparamref name="T"/> and assigns value from this container
+        /// if they happened to be a property with the same name as a property in <typeparamref name="T"/>
         /// </summary>
         /// <typeparam name="T">Returns as specified type</typeparam>
         /// <returns></returns>
-        public T Morph<T>() => (T)Morph();
+        public T Morph<T>() => (T)MorphToObject(typeof(T));
 
         #endregion
 
@@ -337,7 +305,7 @@ namespace KEI.Infrastructure
 
             if (memberExpression is null)
             {
-                throw new InvalidCastException("Body of Lambda expression must be a Member expression");
+                throw new InvalidOperationException("Body of Lambda expression must be a Member expression");
             }
 
             var target = Expression.Lambda(memberExpression.Expression).Compile().DynamicInvoke();
@@ -367,7 +335,7 @@ namespace KEI.Infrastructure
 
             if (memberExpression is null)
             {
-                throw new InvalidCastException("Body of Lambda expression must be a Member expression");
+                throw new InvalidOperationException("Body of Lambda expression must be a Member expression");
             }
 
             var property = FindRecursive(propinfo.Name);
@@ -413,7 +381,7 @@ namespace KEI.Infrastructure
 
             if (memberExpression is null)
             {
-                throw new InvalidCastException("Body of Lambda expression must be a Member expression");
+                throw new InvalidOperationException("Body of Lambda expression must be a Member expression");
             }
 
             var target = Expression.Lambda(memberExpression.Expression).Compile().DynamicInvoke();
@@ -439,7 +407,7 @@ namespace KEI.Infrastructure
 
             if (memberExpression is null)
             {
-                throw new InvalidCastException("Body of Lambda expression must be a Member expression");
+                throw new InvalidOperationException("Body of Lambda expression must be a Member expression");
             }
 
             var property = FindRecursive(propinfo.Name);
@@ -531,10 +499,7 @@ namespace KEI.Infrastructure
         /// Implementation for <see cref="DynamicObject.GetDynamicMemberNames"/>
         /// </summary>
         /// <returns></returns>
-        public override IEnumerable<string> GetDynamicMemberNames()
-        {
-            return GetKeys();
-        }
+        public override IEnumerable<string> GetDynamicMemberNames() => GetKeys();
 
         #endregion
 
@@ -581,8 +546,8 @@ namespace KEI.Infrastructure
                     reader.Read();
                 }
 
-                // Start of Underlying type
-                // for DataObjects created from taking CLR objects as reference
+                // read UnderlyingType
+                // for IDataContainers created from taking CLR objects as reference
                 else if (reader.Name == nameof(Types.TypeInfo))
                 {
                     UnderlyingType = reader.ReadObjectXml<Types.TypeInfo>();
@@ -593,7 +558,7 @@ namespace KEI.Infrastructure
                 {
                     string dataObjectType = reader.GetAttribute(DataObject.TYPE_ID_ATTRIBUTE);
 
-                    /// Get uninitialized Object based on <see cref="DataObject.TYPE_ID_ATTRIBUTE"/>
+                    /// Get uninitialized Object based on type attribute
                     if(GetUnitializedDataObject(dataObjectType) is DataObject obj)
                     {
                         /// need to create a new XmlReader so that <see cref="DataObject"/> implementation
@@ -605,7 +570,7 @@ namespace KEI.Infrastructure
 
                         obj.ReadXml(newReader);
 
-                        /// If we got an un recognized data object, don't add it, because it's just a dummy object
+                        /// If we get a <see cref="NotSupportedDataObject"/>, don't add it, because it's just a dummy object
                         /// which reads all the xml and does nothing with it.
                         /// 3rd party implementation of <see cref="DataObject"/> should be registered by using
                         /// <see cref="DataObjectFactory.RegisterDataObject{T}"/> or <see cref="DataObjectFactory.RegisterPropertyObject{T}"/> methods
@@ -632,7 +597,7 @@ namespace KEI.Infrastructure
                 writer.WriteAttributeString(DataObject.KEY_ATTRIBUTE, Name);
             }
 
-            // write underlying type if this was created from a .NET object
+            // write underlying type if this was created from a CLR object
             if (UnderlyingType is not null)
             {
                 writer.WriteObjectXml(UnderlyingType);
@@ -658,25 +623,9 @@ namespace KEI.Infrastructure
         #region INotifyPropertyChanged Memmbers
 
         public event PropertyChangedEventHandler PropertyChanged;
-        public void RaisePropertyChanged([CallerMemberName] string property = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
-        }
-
-        public bool SetProperty<T>(ref T storage, T value, [CallerMemberName] string property = "")
-        {
-            if (EqualityComparer<T>.Default.Equals(storage, value) == true)
-            {
-                return false;
-            }
-
-            storage = value;
-
-            RaisePropertyChanged(property);
-
-            return true;
-        }
-
+        public void RaisePropertyChanged([CallerMemberName] string property = "") 
+            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
+        
         #endregion
 
         #region IEnumerable Members
@@ -795,24 +744,44 @@ namespace KEI.Infrastructure
 
         /// <summary>
         /// Implementation for <see cref="ICustomTypeDescriptor.GetProperties(Attribute[])"/>
+        /// This is a called by PropertyGrid Implementations, both in WinForms and WPF.
         /// </summary>
         /// <param name="attributes"></param>
         /// <returns></returns>
         public PropertyDescriptorCollection GetProperties(Attribute[] attributes)
         {
             ArrayList properties = new ArrayList();
-            
+
+            // add attributes for property grid
             foreach (DataObject data in this)
             {
                 var attrs = new List<Attribute>();
 
+                // add expandable attributes for data objects holding complex objects
                 if((data.Type == "xml" || data.Type == "dc" || data.Type == "json") 
-                    && CustomUITypeEditorMapping.ExpandableAttribute is not null)
+                    && PropertyGridHelper.ExpandableAttribute is not null)
                 {
-                    attrs.Add(CustomUITypeEditorMapping.ExpandableAttribute);
+                    attrs.Add(PropertyGridHelper.ExpandableAttribute);
                 }
 
-                // add attributes for property grid
+                /// add editor attribute
+                /// custom editors should be registered using <see cref="PropertyGridHelper.RegisterEditor{TEditor}(string)"/>
+                if (PropertyGridHelper.GetEditorType(data.GetType()) is Type t)
+                {
+                    attrs.Add(new EditorAttribute(t, t));
+                }
+
+                /// add type converter attribute
+                /// custom type converters should be registered using <see cref="PropertyGridHelper.RegisterConverter{TConverter}(string)"/>
+                if (PropertyGridHelper.GetConverterType(data.GetType()) is Type ct)
+                {
+                    attrs.Add(new TypeConverterAttribute(ct));
+                }
+
+                /// if it's a property object have some additional that the property grid could make use of
+                /// such as <see cref="PropertyObject.Description"/>, <see cref="PropertyObject.Category"/> <see cref="PropertyObject.DisplayName"/>
+                /// also <see cref="PropertyObject.BrowseOption"/> decided whether it's readonly or whether it should be displayed in
+                /// property grid.
                 if (data is PropertyObject po)
                 {
                     // add description attribute
@@ -841,20 +810,6 @@ namespace KEI.Infrastructure
                         BrowseOptions.NonEditable => new ReadOnlyAttribute(true),
                         _ => throw new NotImplementedException()
                     });
-
-                    /// add editor attribute
-                    /// custom editors should be registered using <see cref="CustomUITypeEditorMapping.RegisterEditor{TEditor}(string)"/>
-                    if (CustomUITypeEditorMapping.GetEditorType(po.GetType()) is Type t)
-                    {
-                        attrs.Add(new EditorAttribute(t, t));
-                    }
-
-                    /// add type converter attribute
-                    /// custom type converters should be registered using <see cref="CustomUITypeEditorMapping.RegisterConverter{TConverter}(string)"/>
-                    if (CustomUITypeEditorMapping.GetConverterType(po.GetType()) is Type ct)
-                    {
-                        attrs.Add(new TypeConverterAttribute(ct));
-                    }
 
                 }
 
@@ -917,6 +872,48 @@ namespace KEI.Infrastructure
                     RemoveOldItems(workingCopy.GetValue<IDataContainer>(item.Name), baseChild, ref removeActions);
                 }
             }
+        }
+
+        /// <summary>
+        /// tries Maps this contents of this objects to a class objected to given <paramref name="morphType"/>
+        /// create a new instance of <paramref name="morphType"/> and assigns value from this container
+        /// if they happened to be a property with the same name as a property in <paramref name="morphType"/>
+        /// </summary>
+        /// <param name="morphType"></param>
+        /// <returns></returns>
+        private object MorphToObject(Type morphType)
+        {
+            var result = Activator.CreateInstance(morphType);
+
+            foreach (var prop in morphType.GetProperties())
+            {
+                if (prop.CanWrite)
+                {
+                    var data = Find(prop.Name);
+
+                    if (data is null)
+                    {
+                        continue;
+                    }
+
+                    if (data.GetValue() is IDataContainer dc)
+                    {
+                        if (dc.UnderlyingType is null)
+                        {
+                            continue;
+                        }
+
+                        prop.SetValue(result, dc.Morph());
+                    }
+
+                    else if (data is not null)
+                    {
+                        prop.SetValue(result, data.GetValue());
+                    }
+                }
+            }
+
+            return result;
         }
 
         #endregion

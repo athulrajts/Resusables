@@ -11,6 +11,35 @@ namespace KEI.Infrastructure
     /// </summary>
     internal class DataObjectBinding : IDisposable
     {
+        /// <summary>
+        /// Referece to <see cref="DataObject"/> or more derrived classes.
+        /// </summary>
+        public DataObject Property { get; set; }
+
+        /// <summary>
+        /// Reference to CLR Property
+        /// </summary>
+        public PropertyInfo TargetProperty { get; set; }
+
+        /// <summary>
+        /// reference to owner of CLR Property
+        /// keeping a weak reference to owner to allow it to be 
+        /// garbage collected even when this object is alive
+        /// </summary>
+        public WeakReference BindingTarget { get; set; }
+
+        /// <summary>
+        /// Specifies the binding mode
+        /// </summary>
+        public BindingMode Mode { get; set; }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="target"></param>
+        /// <param name="property"></param>
+        /// <param name="targetProperty"></param>
+        /// <param name="mode"></param>
         public DataObjectBinding(object target, DataObject property, PropertyInfo targetProperty, BindingMode mode)
         {
             BindingTarget = new WeakReference(target);
@@ -62,28 +91,6 @@ namespace KEI.Infrastructure
                 }
             }
         }
-
-        /// <summary>
-        /// Referece to <see cref="DataObject"/> or more derrived classes.
-        /// </summary>
-        public DataObject Property { get; set; }
-
-        /// <summary>
-        /// Reference to CLR Property
-        /// </summary>
-        public PropertyInfo TargetProperty { get; set; }
-
-        /// <summary>
-        /// reference to owner of CLR Property
-        /// keeping a weak reference to owner to allow it to be 
-        /// garbage collected even when this object is alive
-        /// </summary>
-        public WeakReference BindingTarget { get; set; }
-
-        /// <summary>
-        /// Specifies the binding mode
-        /// </summary>
-        public BindingMode Mode { get; set; }
 
         /// <summary>
         /// Update value of CLR Property

@@ -11,10 +11,7 @@ namespace KEI.Infrastructure
     internal class ContainerDataObject : DataObject
     {
         internal const string DC_START_ELEMENT_NAME = "DataContainer";
-
         private IDataContainer _container;
-
-        public override string Type => "dc";
 
         /// <summary>
         /// Constructor to initialize with <see cref="IDataContainer"/>
@@ -61,6 +58,10 @@ namespace KEI.Infrastructure
             }
         }
 
+        /// <summary>
+        /// Implementation for <see cref="DataObject.Type"/>
+        /// </summary>
+        public override string Type => DataObjectType.Container;
 
         /// <summary>
         /// Holds CLR object
@@ -88,6 +89,39 @@ namespace KEI.Infrastructure
         }
 
         /// <summary>
+        /// Implementation for <see cref="DataObject.CanConvertFromString(string)"/>
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public override bool CanConvertFromString(string value) => false;
+
+        /// <summary>
+        /// Implementation for <see cref="DataObject.GetValue"/>
+        /// </summary>
+        /// <returns></returns>
+        public override object GetValue()
+        {
+            return _container ?? Value;
+        }
+
+        /// <summary>
+        /// Implementation for <see cref="DataObject.SetValue(object)"/>
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public override bool SetValue(object value)
+        {
+            if (Value.GetType() != value.GetType())
+            {
+                return false;
+            }
+
+            Value = value;
+
+            return true;
+        }
+
+        /// <summary>
         /// Implementation for <see cref="DataObject.InitializeObject"/>
         /// </summary>
         protected override void InitializeObject()
@@ -99,16 +133,13 @@ namespace KEI.Infrastructure
         /// Implementation for <see cref="DataObject.GetStartElementName"/>
         /// </summary>
         /// <returns></returns>
-        protected override string GetStartElementName()
-        {
-            return DC_START_ELEMENT_NAME;
-        }
+        protected override string GetStartElementName() => DC_START_ELEMENT_NAME;
 
         /// <summary>
         /// Implementation for <see cref="DataObject.CanWriteValueAsXmlAttribute"/>
         /// </summary>
         /// <returns></returns>
-        protected override bool CanWriteValueAsXmlAttribute() { return false; }
+        protected override bool CanWriteValueAsXmlAttribute() => false;
 
         /// <summary>
         /// Implementation for <see cref="DataObject.ReadXmlElement(string, XmlReader)"/>
@@ -189,39 +220,6 @@ namespace KEI.Infrastructure
                 // free memory, we don't need it anymore
                 _container = null;
             }
-        }
-
-        /// <summary>
-        /// Implementation for <see cref="DataObject.CanConvertFromString(string)"/>
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public override bool CanConvertFromString(string value) => false;
-
-        /// <summary>
-        /// Implementation for <see cref="DataObject.GetValue"/>
-        /// </summary>
-        /// <returns></returns>
-        public override object GetValue()
-        {
-            return _container ?? Value;
-        }
-
-        /// <summary>
-        /// Implementation for <see cref="DataObject.SetValue(object)"/>
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public override bool SetValue(object value)
-        {
-            if(Value.GetType() != value.GetType())
-            {
-                return false;
-            }
-
-            Value = value;
-
-            return true;
         }
     }
 }

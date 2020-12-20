@@ -39,7 +39,7 @@ namespace KEI.Infrastructure
         /// <summary>
         /// Implementation for <see cref="DataObject.Type"/>
         /// </summary>
-        public override string Type => "json";
+        public override string Type => DataObjectType.Json;
 
         /// <summary>
         /// Implementation for <see cref="DataObject.GetDataType"/>

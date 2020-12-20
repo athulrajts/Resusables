@@ -26,7 +26,7 @@ namespace KEI.Infrastructure
         /// <summary>
         /// Implementation for <see cref="DataObject.Type"/>
         /// </summary>
-        public override string Type => "xml";
+        public override string Type => DataObjectType.Xml;
 
         /// <summary>
         /// Holds the value

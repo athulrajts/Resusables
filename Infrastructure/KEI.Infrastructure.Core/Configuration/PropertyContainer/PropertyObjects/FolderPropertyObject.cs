@@ -12,7 +12,7 @@
         /// <summary>
         /// Implementation for <see cref="DataObject.Type"/>
         /// </summary>
-        public override string Type => "folder";
+        public override string Type => DataObjectType.Folder;
 
         /// <summary>
         /// Constructor

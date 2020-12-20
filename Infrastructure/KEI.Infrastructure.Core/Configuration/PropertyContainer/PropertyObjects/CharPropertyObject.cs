@@ -19,7 +19,7 @@
         /// <summary>
         /// Implementation for <see cref="DataObject.Type"/>
         /// </summary>
-        public override string Type => "char";
+        public override string Type => DataObjectType.Char;
 
     }
 }

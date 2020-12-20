@@ -28,7 +28,7 @@ namespace KEI.Infrastructure
         /// <summary>
         /// Implementation for <see cref="DataObject.Type"/>
         /// </summary>
-        public override string Type => "file";
+        public override string Type => DataObjectType.File;
 
         /// <summary>
         /// Used by the editor, which should be a file browse dialog

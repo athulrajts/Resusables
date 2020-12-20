@@ -12,11 +12,12 @@ namespace KEI.Infrastructure
     internal class CollectionDataObject : DataObject
     {
         private IDataContainer readingHelper;
+        
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="value"></param>
+        /// <param name="name">name of object</param>
+        /// <param name="value">value of object</param>
         public CollectionDataObject(string name, IList value)
         {
             Name = name;
@@ -43,7 +44,7 @@ namespace KEI.Infrastructure
         /// <summary>
         /// Imlementation for <see cref="DataObject.Type"/>
         /// </summary>
-        public override string Type => "dcl";
+        public override string Type => DataObjectType.Collection;
 
         /// <summary>
         /// Implementation for <see cref="DataObject.GetDataType"/>
@@ -84,10 +85,7 @@ namespace KEI.Infrastructure
         /// Implementation for <see cref="DataObject.GetStartElementName"/>
         /// </summary>
         /// <returns></returns>
-        protected override string GetStartElementName()
-        {
-            return ContainerDataObject.DC_START_ELEMENT_NAME;
-        }
+        protected override string GetStartElementName() => ContainerDataObject.DC_START_ELEMENT_NAME;
 
         /// <summary>
         /// Implementation for <see cref="DataObject.CanWriteValueAsXmlAttribute"/>
@@ -141,7 +139,10 @@ namespace KEI.Infrastructure
 
                     obj.ReadXml(newReader);
 
-                    readingHelper.Add(obj);
+                    if (obj is not NotSupportedDataObject)
+                    {
+                        readingHelper.Add(obj); 
+                    }
                 }
 
                 return true;

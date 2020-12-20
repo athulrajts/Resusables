@@ -24,7 +24,7 @@ namespace KEI.Infrastructure
         /// <summary>
         /// Implementation for <see cref="DataObject.Type"/>
         /// </summary>
-        public override string Type => "enum";
+        public override string Type => DataObjectType.Enum;
 
         /// <summary>
         /// Implementation for <see cref="DataObject.CanConvertFromString(string)"/>

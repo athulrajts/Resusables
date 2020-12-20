@@ -14,7 +14,7 @@ namespace KEI.Infrastructure
         /// <summary>
         /// Implementation for <see cref="DataObject.Type"/>
         /// </summary>
-        public override string Type => "ts";
+        public override string Type => DataObjectType.TimeSpan;
 
         /// <summary>
         /// Constructor

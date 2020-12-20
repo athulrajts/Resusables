@@ -22,7 +22,7 @@ namespace KEI.Infrastructure
         /// <summary>
         /// Implementation for <see cref="DataObject.Type"/>
         /// </summary>
-        public override string Type => "string";
+        public override string Type => DataObjectType.String;
 
         /// <summary>
         /// Implementation for <see cref="DataObject.ConvertFromString(string)"/>

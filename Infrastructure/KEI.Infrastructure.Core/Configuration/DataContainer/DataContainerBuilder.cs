@@ -23,6 +23,10 @@ namespace KEI.Infrastructure
         /// <returns></returns>
         public IDataContainer Build() { return config; }
 
+        /// <summary>
+        /// Sets <see cref="IDataContainer.UnderlyingType"/>
+        /// </summary>
+        /// <param name="t"></param>
         public void SetUnderlyingType(Type t) => config.UnderlyingType = t;
 
         /// <summary>

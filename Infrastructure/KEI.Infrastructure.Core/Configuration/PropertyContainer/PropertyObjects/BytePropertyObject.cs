@@ -19,7 +19,7 @@
         /// <summary>
         /// Implementation for <see cref="DataObject.Type"/>
         /// </summary>
-        public override string Type => "byte";
+        public override string Type => DataObjectType.Byte;
 
     }
 }

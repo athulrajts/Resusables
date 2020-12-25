@@ -21,11 +21,11 @@ namespace ServiceEditor.ViewModels
 
         public ServiceEditorViewModel(IViewService viewService)
         {
-            ImplementationsProvider.Instance.LoadAssemblies();
+            ServiceManager.Instance.LoadAssemblies();
 
             _viewService = viewService;
 
-            Services = new ObservableCollection<ServiceInfo>(ImplementationsProvider.Instance.GetServices());
+            Services = new ObservableCollection<ServiceInfo>(ServiceManager.Instance.GetServices());
 
             SelectedServices = XmlHelper.DeserializeFromFile<ObservableCollection<ServiceInfo>>(FilePath) ?? new ObservableCollection<ServiceInfo>();
 

@@ -36,9 +36,11 @@ namespace KEI.Infrastructure.Configuration
             }
             else
             {
-                if(Config.Merge(DefineConfigShape().Build()) == true)
+                var defaultConfig = DefineConfigShape().Build();
+                if (Config.IsIdentical(defaultConfig) == false)
                 {
-                    Config.Store();
+                    Config = (IPropertyContainer)Config.Union(defaultConfig).Intersect(defaultConfig);
+                    Config.Store(ConfigPath);
                 }
             }
 

@@ -2,7 +2,6 @@
 using System.Reflection;
 using System.Collections.Generic;
 using System.IO;
-using KEI.Infrastructure.Service;
 
 namespace KEI.Infrastructure.Types
 {
@@ -83,33 +82,6 @@ namespace KEI.Infrastructure.Types
                 _implementations.Add(t, implementationsTypes);
             }
             return _implementations[t];
-        }
-
-        public List<ServiceInfo> GetServices()
-        {
-            var services = new List<ServiceInfo>();
-
-            foreach (var assembly in assemblies)
-            {
-                if (assembly.IsDynamic == false)
-                {
-                    try
-                    {
-                        var types = assembly.GetExportedTypes();
-
-                        foreach (var type in types)
-                        {
-                            if (type.GetCustomAttribute<ServiceAttribute>(true) is ServiceAttribute sa)
-                            {
-                                services.Add(new ServiceInfo(type, sa));
-                            }
-
-                        }
-                    }
-                    catch (Exception) { }
-                }
-            }
-            return services;
         }
     }
 }

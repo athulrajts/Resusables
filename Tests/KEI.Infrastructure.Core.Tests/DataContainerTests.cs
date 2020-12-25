@@ -1,6 +1,5 @@
 ﻿using System;
 using Xunit;
-using KEI.Infrastructure.Configuration;
 
 namespace KEI.Infrastructure.Core.Tests
 {

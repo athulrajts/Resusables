@@ -12,7 +12,6 @@ using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
 using System.Runtime.CompilerServices;
-using KEI.Infrastructure.Logging;
 
 namespace KEI.Infrastructure
 {
@@ -45,6 +44,37 @@ namespace KEI.Infrastructure
         /// </summary>
         public abstract int Count { get; }
 
+        /// <summary>
+        /// Indexer
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public object this[string key]
+        {
+            get
+            {
+                DataObject obj = FindRecursive(key);
+               
+                if(obj is null)
+                {
+                    throw new KeyNotFoundException();
+                }
+
+                return obj.GetValue();
+            }
+            set
+            {
+                DataObject obj = FindRecursive(key);
+
+                if (obj is null)
+                {
+                    throw new KeyNotFoundException();
+                }
+
+                obj.SetValue(value);
+            }
+        }
+
         #endregion
 
         #region Manipulation
@@ -61,12 +91,8 @@ namespace KEI.Infrastructure
             var data = FindRecursive(key);
 
             bool result = false;
-
-            if (data is null)
-            {
-                Logger.Warning($"Unable to find \"{key}\" from {Name}");
-            }
-            else if (data.GetValue() is T val)
+            
+            if (data.GetValue() is T val)
             {
                 value = val;
                 result = true;
@@ -84,38 +110,10 @@ namespace KEI.Infrastructure
         {
             var data = FindRecursive(key);
 
-            if (data is null)
-            {
-                Logger.Warning($"Unable to find \"{key}\" from {Name}");
-            }
-            else
+            if(data is not null)
             {
                 data.SetValue(value);
             }
-        }
-
-        /// <summary>
-        /// Merge two DataContainers
-        /// </summary>
-        /// <param name="right"></param>
-        /// <returns></returns>
-        public bool Merge(IDataContainer right)
-        {
-            List<Action> actions = new List<Action>();
-
-            AddNewItems(this, right, ref actions);
-
-            RemoveOldItems(this, right, ref actions);
-
-            // Store updated config if changes were made.
-            if (actions.Any())
-            {
-                actions.ForEach(action => action());
-
-                return true;
-            }
-
-            return false;
         }
 
         /// <summary>
@@ -129,7 +127,6 @@ namespace KEI.Infrastructure
 
             if (XmlHelper.SerializeToFile(this, path) == false)
             {
-                ViewService.Warn($"Unable to Write config \"{Name}\" ");
                 return false;
             }
 
@@ -766,7 +763,7 @@ namespace KEI.Infrastructure
 
                 /// add editor attribute
                 /// custom editors should be registered using <see cref="PropertyGridHelper.RegisterEditor{TEditor}(string)"/>
-                if (PropertyGridHelper.GetEditorType(data.GetType()) is Type t)
+                if (PropertyGridHelper.GetEditorType(data.Type) is Type t)
                 {
                     attrs.Add(new EditorAttribute(t, t));
                 }
@@ -825,54 +822,6 @@ namespace KEI.Infrastructure
         #endregion
 
         #region Private Functions
-
-        /// <summary>
-        /// helper methods to merge datacontainers
-        /// </summary>
-        /// <param name="workingCopy">left</param>
-        /// <param name="workingBase">right</param>
-        /// <param name="addActions"></param>
-        private void AddNewItems(IDataContainer workingCopy, IDataContainer workingBase, ref List<Action> addActions)
-        {
-            foreach (var item in workingBase)
-            {
-                if (workingCopy.ContainsData(item.Name) == false)
-                {
-                    addActions.Add(() => workingCopy.Add(item));
-
-                    Logger.Information($"Added new property {item.Name} = {item.StringValue}");
-                }
-                else if (item.GetValue() is IDataContainer baseChild)
-                {
-                    AddNewItems(workingCopy.GetValue<IDataContainer>(item.Name), baseChild, ref addActions);
-                }
-
-            }
-        }
-
-
-        /// <summary>
-        /// helper methods to merge datacontainers
-        /// </summary>
-        /// <param name="workingCopy">left</param>
-        /// <param name="workingBase">right</param>
-        /// <param name="addActions"></param>
-        private void RemoveOldItems(IDataContainer workingCopy, IDataContainer workingBase, ref List<Action> removeActions)
-        {
-            foreach (var item in workingCopy)
-            {
-                if (workingBase.ContainsData(item.Name) == false)
-                {
-                    removeActions.Add(() => workingCopy.Remove(item));
-
-                    Logger.Information($"Removed property {item.Name} = {item.StringValue}");
-                }
-                else if (item.GetValue() is IDataContainer baseChild)
-                {
-                    RemoveOldItems(workingCopy.GetValue<IDataContainer>(item.Name), baseChild, ref removeActions);
-                }
-            }
-        }
 
         /// <summary>
         /// tries Maps this contents of this objects to a class objected to given <paramref name="morphType"/>

@@ -1,28 +1,27 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Runtime.Serialization;
 
 namespace KEI.Infrastructure
 {
     public static class DataObjectType
     {
-        public const string Boolean = "bool";
+        public const string Boolean = "b";
         public const string Byte = "byte";
-        public const string Char = "char";
-        public const string Integer = "int";
-        public const string Float = "float";
+        public const string Char = "c";
+        public const string Integer = "i";
+        public const string Float = "f";
         public const string Enum = "enum";
-        public const string Double = "double";
-        public const string String = "string";
+        public const string Double = "d";
+        public const string String = "s";
         public const string File = "file";
         public const string Folder = "folder";
         public const string Selectable = "opt";
         public const string DateTime = "dt";
         public const string TimeSpan = "ts";
         public const string Color = "color";
-        public const string Point = "point";
+        public const string Point = "pt";
         public const string Array1D = "array-1";
         public const string Array2D = "array-2";
         public const string Container = "dc";

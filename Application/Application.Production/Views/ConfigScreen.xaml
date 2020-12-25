@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:inf="clr-namespace:KEI.Infrastructure;assembly=KEI.Infrastructure"
+             xmlns:dc="clr-namespace:KEI.Infrastructure;assembly=DataContainer"
              xmlns:prism="http://prismlibrary.com/"
              xmlns:wpf="http://gesinfotek.com/wpf" 
              xmlns:config="clr-namespace:KEI.UI.Wpf.Configuration;assembly=KEI.UI.Wpf"
@@ -115,7 +115,7 @@
                     </Style>
                 </TreeView.ItemContainerStyle>
                 <TreeView.ItemTemplate>
-                    <HierarchicalDataTemplate DataType="{x:Type inf:IPropertyContainer}"
+                    <HierarchicalDataTemplate DataType="{x:Type dc:IPropertyContainer}"
                                               ItemsSource="{Binding Children}">
                         <TextBlock Text="{Binding Name}" FontSize="12" FontWeight="DemiBold"/>
                     </HierarchicalDataTemplate>

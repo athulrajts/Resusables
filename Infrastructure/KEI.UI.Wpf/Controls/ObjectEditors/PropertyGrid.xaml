@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:KEI.UI.Wpf.Configuration"
              xmlns:wc="clr-namespace:KEI.UI.Wpf.Controls"
              xmlns:converters="clr-namespace:KEI.UI.Wpf.Converters"
+             xmlns:dc="clr-namespace:KEI.Infrastructure;assembly=DataContainer"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -237,22 +238,22 @@
                                     <Style TargetType="ContentControl">
                                         <Setter Property="ContentTemplate" Value="{StaticResource StringAndNumericTemplate}"/>
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding PropertyEditor}" Value="bool">
+                                            <DataTrigger Binding="{Binding PropertyEditor}" Value="{x:Static dc:DataObjectType.Boolean}">
                                                 <Setter Property="ContentTemplate" Value="{StaticResource BooleanTemplate}"/>
                                             </DataTrigger>
-                                            <DataTrigger Binding="{Binding PropertyEditor}" Value="enum">
+                                            <DataTrigger Binding="{Binding PropertyEditor}" Value="{x:Static dc:DataObjectType.Enum}">
                                                 <Setter Property="ContentTemplate" Value="{StaticResource EnumTemplate}"/>
                                             </DataTrigger>
-                                            <DataTrigger Binding="{Binding PropertyEditor}" Value="dc">
+                                            <DataTrigger Binding="{Binding PropertyEditor}" Value="{x:Static dc:DataObjectType.Container}">
                                                 <Setter Property="ContentTemplate" Value="{StaticResource ObjectTemplate}"/>
                                             </DataTrigger>
                                             <DataTrigger Binding="{Binding BrowseOption}" Value="NonEditable">
                                                 <Setter Property="IsEnabled" Value="False"/>
                                             </DataTrigger>
-                                            <DataTrigger Binding="{Binding PropertyEditor}" Value="folder">
+                                            <DataTrigger Binding="{Binding PropertyEditor}" Value="{x:Static dc:DataObjectType.Folder}">
                                                 <Setter Property="ContentTemplate" Value="{StaticResource FolderTemplate}"/>
                                             </DataTrigger>
-                                            <DataTrigger Binding="{Binding PropertyEditor}" Value="file">
+                                            <DataTrigger Binding="{Binding PropertyEditor}" Value="{x:Static dc:DataObjectType.File}">
                                                 <Setter Property="ContentTemplate" Value="{StaticResource FileTemplate}"/>
                                             </DataTrigger>
                                         </Style.Triggers>

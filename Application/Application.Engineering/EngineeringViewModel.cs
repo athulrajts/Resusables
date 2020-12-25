@@ -151,7 +151,7 @@ namespace Application.Engineering
 
         void ExecuteStartTestCommand()
         {
-            _databaseManager[$"{ApplicationMode.Engineering} DB"].StartSession(_equipment.CurrentDatabaseSetup.Morph() as DatabaseSetup);
+            _databaseManager[$"{ApplicationMode.Engineering} DB"].StartSession(_equipment.CurrentDatabaseSetup as DatabaseSetup);
 
             _equipment.ExecuteTest();
         }

@@ -4,7 +4,6 @@ using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
 using System.Collections.Generic;
-using Prism.Mvvm;
 using System.Collections;
 using System.ComponentModel;
 
@@ -20,7 +19,7 @@ namespace KEI.Infrastructure
     /// Handles Xml Serialization and Deserialization
     /// Handles validation when updating values.
     /// </summary>
-    public abstract class DataObject : BindableBase, IXmlSerializable
+    public abstract class DataObject : BindableObject, IXmlSerializable
     {
         // constants for xml serialization
         public const string KEY_ATTRIBUTE = "key";
@@ -45,7 +44,11 @@ namespace KEI.Infrastructure
         public virtual string StringValue
         {
             get { return stringValue; }
-            set { SetProperty(ref stringValue, value, () => OnStringValueChanged(value)); }
+            set
+            {
+                SetProperty(ref stringValue, value);
+                OnStringValueChanged(value); 
+            }
         }
 
         /// <summary>

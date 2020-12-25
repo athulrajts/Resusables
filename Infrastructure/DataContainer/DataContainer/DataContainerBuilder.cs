@@ -87,8 +87,8 @@ namespace KEI.Infrastructure
             DataObject obj = format switch
             {
                 SerializationFormat.Container => DataObjectFactory.GetDataObjectFor(name, value),
-                SerializationFormat.Json => new JsonPropertyObject(name, value),
-                SerializationFormat.Xml => new XmlPropertyObject(name, value),
+                SerializationFormat.Json => new JsonDataObject(name, value),
+                SerializationFormat.Xml => new XmlDataObject(name, value),
                 _ => throw new NotImplementedException()
             };
 

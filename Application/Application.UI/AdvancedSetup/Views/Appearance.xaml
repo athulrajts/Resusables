@@ -13,7 +13,6 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/KEI.UI.Wpf;component/Themes/CheckBoxes.xaml"/>
-                <ResourceDictionary Source="pack://application:,,,/Application.UI;component/Themes.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>

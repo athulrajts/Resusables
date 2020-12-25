@@ -2,7 +2,6 @@
 using System.ComponentModel;
 using System.Xml.Serialization;
 using System.Runtime.CompilerServices;
-using Prism.Mvvm;
 
 namespace KEI.Infrastructure.Validation
 {
@@ -20,7 +19,7 @@ namespace KEI.Infrastructure.Validation
     [XmlInclude(typeof(MustBeOneOfValidator))]
     [XmlInclude(typeof(TypeValidator))]
     [XmlInclude(typeof(ValidatorGroup))]
-    public abstract class ValidationRule : BindableBase, IValidationRule
+    public abstract class ValidationRule : BindableObject, IValidationRule
     {
         public abstract ValidationResult Validate(object value);
 

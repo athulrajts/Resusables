@@ -156,6 +156,9 @@ namespace KEI.Infrastructure
                 writer.WriteStartElement(nameof(Value));
                 writer.WriteCData(sb.ToString());
                 writer.WriteEndElement();
+
+                // Write element type
+                writer.WriteObjectXml(new TypeInfo(Value.GetType().GetElementType()));
             }
         }
 

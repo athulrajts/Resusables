@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Linq;
-using System.Xml.Serialization;
 using System.Collections.Generic;
-using Prism.Mvvm;
 using KEI.Infrastructure.Types;
 using System.Collections;
 
@@ -12,7 +9,7 @@ namespace KEI.Infrastructure
     /// Container for Holding <see cref="Enum"/> Properties or, Properties whos
     /// values are restricted to a set of values.
     /// </summary>
-    public class Selector : BindableBase
+    public class Selector : BindableObject
     {
         private string selectedItem;
         private List<string> options = new List<string>();

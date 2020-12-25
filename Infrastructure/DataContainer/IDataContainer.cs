@@ -15,6 +15,7 @@ namespace KEI.Infrastructure
         public TypeInfo UnderlyingType { get; set; }
         public int Count { get; }
         
+        public object this[string key] { get;set; }
         public bool GetValue<T>(string key, ref T value);
         public void SetValue(string key, object value);
         public object Morph();
@@ -30,7 +31,6 @@ namespace KEI.Infrastructure
         
         public DataObject Find(string key);
         public bool ContainsData(string key);
-        public bool Merge(IDataContainer data);
         public void Add(DataObject obj);
         public void Remove(DataObject obj);
 

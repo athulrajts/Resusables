@@ -102,7 +102,7 @@ namespace KEI.Infrastructure
         public PropertyContainerBuilder Property<T>(string name, T value, SerializationFormat format, Action<PropertyObjectBuilder> propertyBuilder = null)
             where T : class, new()
         {
-            if (config.ContainsData(name))
+            if (config.ContainsData(name) || value is null)
             {
                 return this;
             }

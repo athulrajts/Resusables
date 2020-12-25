@@ -4,4 +4,11 @@
                         xmlns:prism="http://prismlibrary.com/"
                         Startup="PrismApplication_Startup"
                         Exit="PrismApplication_Exit">
+    <prism:PrismApplication.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Application.UI;component/Themes.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </prism:PrismApplication.Resources>
 </prism:PrismApplication>

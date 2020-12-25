@@ -74,27 +74,20 @@ namespace KEI.Infrastructure.Server
 
             foreach (var prop in messageBody)
             {
-                if( prop is IntPropertyObject ||
-                    prop is FloatPropertyObject ||
-                    prop is IntDataObject ||
-                    prop is FloatDataObject)
+                var value = prop.GetValue();
+                if(value is int || value is float)
                 {
                     messageHeader.MessageLength += 4;
                 }
-                else if(prop is DoublePropertyObject ||
-                    prop is DoubleDataObject)
+                else if(value is double)
                 {
                     messageHeader.MessageLength += 8;
                 }
-                else if(prop is BoolDataObject ||
-                    prop is BoolPropertyObject ||
-                    prop is ByteDataObject ||
-                    prop is BytePropertyObject)
+                else if(value is bool || value is byte)
                 {
                     messageHeader.MessageLength += 1;
                 }
-                else if(prop is StringDataObject ||
-                    prop is StringPropertyObject)
+                else if(value is string)
                 {
                     if(prop.GetValue() is string s)
                     {

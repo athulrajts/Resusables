@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.IO;
 using System.Xml;
 using KEI.Infrastructure.Types;
@@ -6,37 +7,19 @@ using KEI.Infrastructure.Types;
 namespace KEI.Infrastructure
 {
     /// <summary>
-    /// PropertyObject implementation for <see cref="IDataContainer"/>
+    /// DataObject implementation for CLR object or <see cref="IDataContainer"/>
     /// </summary>
-    internal class ContainerPropertyObject : PropertyObject
+    internal class ContainerDataObject : DataObject
     {
+        internal const string DC_START_ELEMENT_NAME = "DataContainer";
         private IDataContainer _container;
 
         /// <summary>
-        /// Constructor to initialize with <see cref="IDataContainer"/>
-        /// </summary>
-        /// <param name="name">name of object</param>
-        /// <param name="value">value of object</param>
-        public ContainerPropertyObject(string name, IDataContainer value)
-        {
-            Name = name;
-            
-            if (value.UnderlyingType is TypeInfo t)
-            {
-                Value = value.Morph();
-                ObjectType = t;
-            }
-            
-            _container = value;
-        }
-
-        /// <summary>
         /// Contructor to initialize with <see cref="object"/>
-        /// Object is converted to <see cref="IDataContainer"/> using <see cref="PropertyContainerBuilder.CreateObject(string, object)"/>
         /// </summary>
         /// <param name="name"></param>
         /// <param name="value"></param>
-        public ContainerPropertyObject(string name, object value)
+        public ContainerDataObject(string name, object value)
         {
             Name = name;
 
@@ -44,7 +27,7 @@ namespace KEI.Infrastructure
             {
                 _container = dc;
 
-                if (dc.UnderlyingType is TypeInfo t)
+                if(dc.UnderlyingType is TypeInfo t)
                 {
                     Value = dc.Morph();
                     ObjectType = t;
@@ -55,10 +38,22 @@ namespace KEI.Infrastructure
                 Value = value;
                 ObjectType = value.GetType();
             }
+
+            /// If value implements <see cref="INotifyPropertyChanged"/> subscribe to <see cref="INotifyPropertyChanged.PropertyChanged"/>
+            /// and invoke PropertyChanged event on ourselves whenever a property of <see cref="Value"/> changes
+            if (Value is INotifyPropertyChanged inpc)
+            {
+                inpc.PropertyChanged += Inpc_PropertyChanged;
+            }
         }
 
         /// <summary>
-        /// Value held by object
+        /// Implementation for <see cref="DataObject.Type"/>
+        /// </summary>
+        public override string Type => DataObjectType.Container;
+
+        /// <summary>
+        /// Holds CLR object
         /// </summary>
         private object _value;
         public object Value
@@ -68,14 +63,19 @@ namespace KEI.Infrastructure
         }
 
         /// <summary>
-        /// Type of object held
+        /// Type of CLR object held
         /// </summary>
         public Type ObjectType { get; set; }
 
+
         /// <summary>
-        /// Implementation for <see cref="DataObject.Type"/>
+        /// Implementation of <see cref="DataObject.GetDataType"/>
         /// </summary>
-        public override string Type => DataObjectType.Container;
+        /// <returns></returns>
+        public override Type GetDataType()
+        {
+            return ObjectType ?? typeof(DataContainer);
+        }
 
         /// <summary>
         /// Implementation for <see cref="DataObject.CanConvertFromString(string)"/>
@@ -100,7 +100,7 @@ namespace KEI.Infrastructure
         /// <returns></returns>
         public override bool SetValue(object value)
         {
-            if(Value.GetType() != value.GetType())
+            if (Value.GetType() != value.GetType())
             {
                 return false;
             }
@@ -111,43 +111,18 @@ namespace KEI.Infrastructure
         }
 
         /// <summary>
-        /// Implementation for <see cref="DataObject.GetDataType"/>
-        /// </summary>
-        /// <returns></returns>
-        public override Type GetDataType()
-        {
-            return ObjectType ?? typeof(PropertyContainer);
-        }
-
-        /// <summary>
         /// Implementation for <see cref="DataObject.InitializeObject"/>
         /// </summary>
         protected override void InitializeObject()
         {
-            _container = new PropertyContainer();
-        }
-
-        /// <summary>
-        /// Implementation for <see cref="DataObject.OnXmlReadingCompleted"/>
-        /// </summary>
-        protected override void OnXmlReadingCompleted()
-        {
-            _container.Name = Name;
-            if (ObjectType is not null)
-            {
-                _container.UnderlyingType = ObjectType;
-
-                Value = _container.Morph();
-                // free memory, we don't need it anymore
-                _container = null;
-            }
+            _container = new DataContainer();
         }
 
         /// <summary>
         /// Implementation for <see cref="DataObject.GetStartElementName"/>
         /// </summary>
         /// <returns></returns>
-        protected override string GetStartElementName() => ContainerDataObject.DC_START_ELEMENT_NAME;
+        protected override string GetStartElementName() => DC_START_ELEMENT_NAME;
 
         /// <summary>
         /// Implementation for <see cref="DataObject.CanWriteValueAsXmlAttribute"/>
@@ -164,7 +139,7 @@ namespace KEI.Infrastructure
         protected override bool ReadXmlElement(string elementName, XmlReader reader)
         {
             // call base implementation
-            if (base.ReadXmlElement(elementName, reader))
+            if(base.ReadXmlElement(elementName, reader))
             {
                 return true;
             }
@@ -180,7 +155,7 @@ namespace KEI.Infrastructure
             /// Read <see cref="DataObject"/> implementation
             else
             {
-                if (DataObjectFactory.GetPropertyObject(reader.GetAttribute(TYPE_ID_ATTRIBUTE)) is DataObject obj)
+                if (DataObjectFactory.GetDataObject(reader.GetAttribute(TYPE_ID_ATTRIBUTE)) is DataObject obj)
                 {
                     using var newReader = XmlReader.Create(new StringReader(reader.ReadOuterXml()));
 
@@ -190,7 +165,7 @@ namespace KEI.Infrastructure
 
                     if (obj is not NotSupportedDataObject)
                     {
-                        _container.Add(obj);
+                        _container.Add(obj); 
                     }
 
                     return true;
@@ -199,7 +174,6 @@ namespace KEI.Infrastructure
 
             return false;
         }
-
 
         /// <summary>
         /// Implemementation for <see cref="DataObject.WriteXmlContent(XmlWriter)"/>
@@ -213,11 +187,45 @@ namespace KEI.Infrastructure
                 writer.WriteObjectXml(new TypeInfo(ObjectType));
             }
 
-            foreach (var obj in _container ?? PropertyContainerBuilder.CreateObject(Name, Value))
+            foreach (var obj in _container ?? DataContainerBuilder.CreateObject(Name, Value))
             {
                 obj.WriteXml(writer);
             }
         }
 
+        /// <summary>
+        /// Implementation for <see cref="DataObject.OnXmlReadingCompleted"/>
+        /// </summary>
+        protected override void OnXmlReadingCompleted()
+        {
+            _container.Name = Name;
+
+            if (ObjectType is not null)
+            {
+                _container.UnderlyingType = ObjectType;
+                
+                Value = _container.Morph();
+
+                /// If value implements <see cref="INotifyPropertyChanged"/> subscribe to <see cref="INotifyPropertyChanged.PropertyChanged"/>
+                /// and invoke PropertyChanged event on ourselves whenever a property of <see cref="Value"/> changes
+                if (Value is INotifyPropertyChanged inpc)
+                {
+                    inpc.PropertyChanged += Inpc_PropertyChanged;
+                }
+
+                // free memory, we don't need it anymore
+                _container = null;
+            }
+        }
+
+        /// <summary>
+        /// Inform that our value changed in any of our objects property changed.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Inpc_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            RaisePropertyChanged(nameof(Value));
+        }
     }
 }

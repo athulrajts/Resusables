@@ -106,7 +106,12 @@ namespace KEI.Infrastructure
         /// Implementation for <see cref="IDataContainer.Add(DataObject)"/>
         /// </summary>
         /// <param name="obj"></param>
-        public override void Add(DataObject obj) => Add(obj.Name, obj.GetValue());
+        public override void Add(DataObject obj)
+        {
+            internalDictionary.Add(obj.Name, obj);
+
+            RaiseCollectionChanged(NotifyCollectionChangedAction.Add, internalDictionary[obj.Name]);
+        }
 
         /// <summary>
         /// Implementation for <see cref="IDataContainer.Remove(DataObject)"/>

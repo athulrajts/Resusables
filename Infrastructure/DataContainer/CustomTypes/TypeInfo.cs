@@ -57,7 +57,7 @@ namespace KEI.Infrastructure.Types
 
             Type t = assembly.GetType(FullName);
 
-            if(t.IsGenericType)
+            if (t is not null && t.IsGenericType)
             {
                 return t.MakeGenericType(GenericTypeArgs.Select(x => x.GetUnderlyingType()).ToArray());
             }

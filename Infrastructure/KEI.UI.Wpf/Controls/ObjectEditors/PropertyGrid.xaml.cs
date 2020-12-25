@@ -272,8 +272,11 @@ namespace KEI.UI.Wpf.Controls.Configuration
             {
                 if (sender is PropertyObject p)
                 {
-                    PropertyValue = p.StringValue;
-                    RaisePropertyChanged(nameof(PropertyValue));
+                    if (PropertyValue != p.StringValue)
+                    {
+                        PropertyValue = p.StringValue;
+                        RaisePropertyChanged(nameof(PropertyValue)); 
+                    }
                 }
 
                 return true;

@@ -2,7 +2,6 @@
 using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
-using KEI.Infrastructure.Logging;
 
 namespace KEI.Infrastructure
 {
@@ -37,7 +36,7 @@ namespace KEI.Infrastructure
             }
             catch (Exception ex)
             {
-                Logger.Error($"Serialization of {filePath} failed", ex);
+                System.Diagnostics.Trace.TraceError(ex.ToString());
                 return false;
             }
         }
@@ -69,7 +68,7 @@ namespace KEI.Infrastructure
             }
             catch (Exception ex)
             {
-                Logger.Error($"Serialization of {typeof(T).FullName} failed", ex);
+                System.Diagnostics.Trace.TraceError(ex.ToString());
                 return string.Empty;
             }
         }
@@ -100,7 +99,7 @@ namespace KEI.Infrastructure
             }
             catch (Exception ex)
             {
-                Logger.Error($"Unable to deserialize \"{filePath}\" to {type.FullName}", ex);
+                System.Diagnostics.Trace.TraceError(ex.ToString());
                 return default;
             }
         }

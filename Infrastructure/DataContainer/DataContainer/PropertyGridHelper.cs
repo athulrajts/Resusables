@@ -8,7 +8,7 @@ namespace KEI.Infrastructure
     {
         public static Attribute ExpandableAttribute { get; set; }
 
-        public static Dictionary<Type, Type> editorMapping = new Dictionary<Type, Type>();
+        public static Dictionary<string, Type> editorMapping = new Dictionary<string, Type>();
         public static Dictionary<Type, Type> converterMapping = new Dictionary<Type, Type>();
 
         /// <summary>
@@ -20,22 +20,13 @@ namespace KEI.Infrastructure
         /// <param name="typeid"></param>
         public static void RegisterEditor<TEditor>(string typeid)
         {
-            var dataobj = DataObjectFactory.GetPropertyObject(typeid);
-
-            if (dataobj is null)
+            if (editorMapping.ContainsKey(typeid))
             {
-                return;
-            }
-
-            var type = dataobj.GetType();
-
-            if (editorMapping.ContainsKey(type))
-            {
-                editorMapping[type] = typeof(TEditor);
+                editorMapping[typeid] = typeof(TEditor);
             }
             else
             {
-                editorMapping.Add(type, typeof(TEditor));
+                editorMapping.Add(typeid, typeof(TEditor));
             }
         }
 
@@ -72,14 +63,14 @@ namespace KEI.Infrastructure
         /// </summary>
         /// <param name="propertyObjectType"></param>
         /// <returns></returns>
-        public static Type GetEditorType(Type propertyObjectType)
+        public static Type GetEditorType(string typeid)
         {
-            if (editorMapping.ContainsKey(propertyObjectType) == false)
+            if (editorMapping.ContainsKey(typeid) == false)
             {
                 return null;
             }
 
-            return editorMapping[propertyObjectType];
+            return editorMapping[typeid];
         }
 
         /// <summary>

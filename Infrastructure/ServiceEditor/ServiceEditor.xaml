@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:service="clr-namespace:KEI.Infrastructure.Service;assembly=KEI.Infrastructure"
         xmlns:c="clr-namespace:ServiceEditor.Converters"
-        xmlns:t="clr-namespace:KEI.Infrastructure.Types;assembly=KEI.Infrastructure"
+        xmlns:t="clr-namespace:KEI.Infrastructure.Types;assembly=DataContainer"
         xmlns:wpf="http://gesinfotek.com/wpf"
         mc:Ignorable="d"
         Title="Service Editor" Height="550" Width="850">

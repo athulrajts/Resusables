@@ -2,7 +2,7 @@
 using System.IO;
 using Xunit;
 
-namespace KEI.Infrastructure.Core.Tests
+namespace DataContainer.Tests
 {
     public class ValidationTests
     {

@@ -254,6 +254,9 @@
     <Image Include="app.ico" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="DataContainer">
+      <HintPath>..\..\Build\Release\DataContainer.dll</HintPath>
+    </Reference>
     <Reference Include="KEI.Infrastructure">
       <HintPath>..\..\Build\Debug\KEI.Infrastructure.dll</HintPath>
     </Reference>

@@ -92,7 +92,7 @@ namespace KEI.Infrastructure
 
             bool result = false;
             
-            if (data.GetValue() is T val)
+            if (data is not null && data.GetValue() is T val)
             {
                 value = val;
                 result = true;
@@ -106,14 +106,16 @@ namespace KEI.Infrastructure
         /// </summary>
         /// <param name="key">Key, which uniquely identifies the data</param>
         /// <param name="value">Value to set</param>
-        public virtual void SetValue(string key, object value)
+        public virtual bool SetValue(string key, object value)
         {
             var data = FindRecursive(key);
 
-            if(data is not null)
+            if(data is null)
             {
-                data.SetValue(value);
+                return false;
             }
+
+            return data.SetValue(value);
         }
 
         /// <summary>

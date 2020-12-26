@@ -90,12 +90,19 @@ namespace KEI.Infrastructure
         /// <returns></returns>
         public override bool SetValue(object value)
         {
-            if(Value.GetType() != value.GetType())
+            if (value is IDataContainer dc)
+            {
+                _container = dc;
+            }
+            else if (Value.GetType() != value.GetType())
             {
                 return false;
             }
-
-            Value = value;
+            else
+            {
+                Value = value;
+                return true;
+            }
 
             return true;
         }

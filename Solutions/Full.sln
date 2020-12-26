@@ -57,7 +57,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TCPClient", "..\Infrastruct
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleTest", "..\Infrastructure\ConsoleTest\ConsoleTest.csproj", "{1A882E29-2733-433C-8C2B-1138DAD8910A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataContainer", "..\Infrastructure\DataContainer\DataContainer.csproj", "{877C4B09-393E-45B9-A4DF-365A92009D4A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataContainer", "..\Infrastructure\DataContainer\DataContainer.csproj", "{877C4B09-393E-45B9-A4DF-365A92009D4A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataContainer.Tests", "..\Tests\DataContainer.Tests\DataContainer.Tests.csproj", "{54170159-4829-4169-A18E-66CC9263D745}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -353,6 +355,22 @@ Global
 		{877C4B09-393E-45B9-A4DF-365A92009D4A}.Release|x64.Build.0 = Release|Any CPU
 		{877C4B09-393E-45B9-A4DF-365A92009D4A}.Release|x86.ActiveCfg = Release|Any CPU
 		{877C4B09-393E-45B9-A4DF-365A92009D4A}.Release|x86.Build.0 = Release|Any CPU
+		{54170159-4829-4169-A18E-66CC9263D745}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{54170159-4829-4169-A18E-66CC9263D745}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{54170159-4829-4169-A18E-66CC9263D745}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{54170159-4829-4169-A18E-66CC9263D745}.Debug|ARM.Build.0 = Debug|Any CPU
+		{54170159-4829-4169-A18E-66CC9263D745}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{54170159-4829-4169-A18E-66CC9263D745}.Debug|x64.Build.0 = Debug|Any CPU
+		{54170159-4829-4169-A18E-66CC9263D745}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{54170159-4829-4169-A18E-66CC9263D745}.Debug|x86.Build.0 = Debug|Any CPU
+		{54170159-4829-4169-A18E-66CC9263D745}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{54170159-4829-4169-A18E-66CC9263D745}.Release|Any CPU.Build.0 = Release|Any CPU
+		{54170159-4829-4169-A18E-66CC9263D745}.Release|ARM.ActiveCfg = Release|Any CPU
+		{54170159-4829-4169-A18E-66CC9263D745}.Release|ARM.Build.0 = Release|Any CPU
+		{54170159-4829-4169-A18E-66CC9263D745}.Release|x64.ActiveCfg = Release|Any CPU
+		{54170159-4829-4169-A18E-66CC9263D745}.Release|x64.Build.0 = Release|Any CPU
+		{54170159-4829-4169-A18E-66CC9263D745}.Release|x86.ActiveCfg = Release|Any CPU
+		{54170159-4829-4169-A18E-66CC9263D745}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,7 +1,9 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Xml.Serialization;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using KEI.Infrastructure.Utils;
 
 namespace KEI.Infrastructure
 {
@@ -35,6 +37,11 @@ namespace KEI.Infrastructure
         /// <param name="value"></param>
         public void Add(string key, object value)
         {
+            if (IdentifierExtensions.IsValidIdentifier(key) == false)
+            {
+                throw new ArgumentException($"{key} is not a valid c# identifier");
+            }
+
             internalDictionary.Add(key, DataObjectFactory.GetDataObjectFor(key, value));
 
             RaiseCollectionChanged(NotifyCollectionChangedAction.Add, internalDictionary[key]);
@@ -108,6 +115,11 @@ namespace KEI.Infrastructure
         /// <param name="obj"></param>
         public override void Add(DataObject obj)
         {
+            if(IdentifierExtensions.IsValidIdentifier(obj.Name) == false)
+            {
+                throw new ArgumentException($"{obj.Name} is not a valid c# identifier");
+            }
+
             internalDictionary.Add(obj.Name, obj);
 
             RaiseCollectionChanged(NotifyCollectionChangedAction.Add, internalDictionary[obj.Name]);

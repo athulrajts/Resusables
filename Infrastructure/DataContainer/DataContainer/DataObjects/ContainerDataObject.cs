@@ -27,7 +27,7 @@ namespace KEI.Infrastructure
             {
                 _container = dc;
 
-                if(dc.UnderlyingType is TypeInfo t)
+                if (dc.UnderlyingType is TypeInfo t)
                 {
                     Value = dc.Morph();
                     ObjectType = t;
@@ -100,12 +100,19 @@ namespace KEI.Infrastructure
         /// <returns></returns>
         public override bool SetValue(object value)
         {
-            if (Value.GetType() != value.GetType())
+            if (value is IDataContainer dc)
+            {
+                _container = dc;
+            }
+            else if (Value.GetType() != value.GetType())
             {
                 return false;
             }
-
-            Value = value;
+            else
+            { 
+                Value = value;
+                return true;
+            }
 
             return true;
         }
@@ -139,7 +146,7 @@ namespace KEI.Infrastructure
         protected override bool ReadXmlElement(string elementName, XmlReader reader)
         {
             // call base implementation
-            if(base.ReadXmlElement(elementName, reader))
+            if (base.ReadXmlElement(elementName, reader))
             {
                 return true;
             }
@@ -165,7 +172,7 @@ namespace KEI.Infrastructure
 
                     if (obj is not NotSupportedDataObject)
                     {
-                        _container.Add(obj); 
+                        _container.Add(obj);
                     }
 
                     return true;
@@ -203,7 +210,7 @@ namespace KEI.Infrastructure
             if (ObjectType is not null)
             {
                 _container.UnderlyingType = ObjectType;
-                
+
                 Value = _container.Morph();
 
                 /// If value implements <see cref="INotifyPropertyChanged"/> subscribe to <see cref="INotifyPropertyChanged.PropertyChanged"/>

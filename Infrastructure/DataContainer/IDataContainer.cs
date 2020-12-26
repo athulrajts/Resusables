@@ -17,7 +17,7 @@ namespace KEI.Infrastructure
         
         public object this[string key] { get;set; }
         public bool GetValue<T>(string key, ref T value);
-        public void SetValue(string key, object value);
+        public bool SetValue(string key, object value);
         public object Morph();
         public T Morph<T>();
         public IList MorphList();

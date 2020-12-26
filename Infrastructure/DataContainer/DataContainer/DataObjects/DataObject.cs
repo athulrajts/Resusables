@@ -4,7 +4,6 @@ using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
 using System.Collections.Generic;
-using System.Collections;
 using System.ComponentModel;
 
 namespace KEI.Infrastructure
@@ -255,6 +254,7 @@ namespace KEI.Infrastructure
         /// </summary>
         /// <param name="value"></param>
         protected virtual void OnStringValueChanged(string value) { }
+
     }
 
     /// <summary>

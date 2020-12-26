@@ -2,7 +2,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 
-namespace KEI.Infrastructure.Core.Tests
+namespace DataContainer.Tests
 {
     public class POCO
     {
@@ -13,11 +13,12 @@ namespace KEI.Infrastructure.Core.Tests
         public double DoubleProperty { get; set; } = 1.21;
         public string StringProperty { get; set; } = "xUnit";
         public Enum EnumProperty { get; set; } = GCNotificationStatus.Succeeded;
+
     }
 
     public class NestedPOCO : POCO
     {
-        public object ObjectProperty { get; set; } = new POCO();
+        public POCO ObjectProperty { get; set; } = new POCO();
     }
 
     public class UnitializedNestedPOCO : NestedPOCO

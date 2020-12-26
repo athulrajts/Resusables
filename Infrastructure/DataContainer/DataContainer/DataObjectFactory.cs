@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using System.Text.RegularExpressions;
 
 namespace KEI.Infrastructure
 {
@@ -36,6 +37,8 @@ namespace KEI.Infrastructure
     /// </summary>
     public static class DataObjectFactory
     {
+        private static Regex propertyNameRegex = new Regex("[a-zA-Z]+[a-zA-Z0-9_]*", RegexOptions.Compiled);
+
         /// <summary>
         /// Create mapping for <see cref="DataObject.Type"/> to it's implementation
         /// </summary>
@@ -122,8 +125,8 @@ namespace KEI.Infrastructure
             { typeof(string), typeof(StringPropertyObject) },
             { typeof(char), typeof(CharPropertyObject)},
             { typeof(Color), typeof(ColorPropertyObject)},
-            { typeof(DateTime), typeof(DateTimeDataObject) },
-            { typeof(TimeSpan), typeof(TimeSpanDataObject)},
+            { typeof(DateTime), typeof(DateTimePropertyObject) },
+            { typeof(TimeSpan), typeof(TimeSpanPropertyObject)},
             { typeof(Point), typeof(PointPropertyObject)}
         };
 
@@ -305,6 +308,13 @@ namespace KEI.Infrastructure
                 };
             }
         }
+
+        /// <summary>
+        /// Make sure the string is a valid C# identifier
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static bool IsValidIdentifierName(string name) => propertyNameRegex.IsMatch(name);
 
     }
 }

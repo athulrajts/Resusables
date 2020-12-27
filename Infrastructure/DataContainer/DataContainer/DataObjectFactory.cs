@@ -37,8 +37,6 @@ namespace KEI.Infrastructure
     /// </summary>
     public static class DataObjectFactory
     {
-        private static Regex propertyNameRegex = new Regex("[a-zA-Z]+[a-zA-Z0-9_]*", RegexOptions.Compiled);
-
         /// <summary>
         /// Create mapping for <see cref="DataObject.Type"/> to it's implementation
         /// </summary>
@@ -139,6 +137,7 @@ namespace KEI.Infrastructure
         {
             var instance = (DataObject)FormatterServices.GetUninitializedObject(typeof(T));
 
+            // Allow replace existing implementation ??
             typeIdDataObjMapping.Add(instance.Type, typeof(T));
             typeDataObjMapping.Add(instance.GetDataType(), typeof(T));
         }
@@ -152,6 +151,7 @@ namespace KEI.Infrastructure
         {
             var instance = (DataObject)FormatterServices.GetUninitializedObject(typeof(T));
 
+            // Allow replace existing implementation ??
             typeIdPropObjMapping.Add(instance.Type, typeof(T));
             typePropObjMapping.Add(instance.GetDataType(), typeof(T));
         }
@@ -308,13 +308,6 @@ namespace KEI.Infrastructure
                 };
             }
         }
-
-        /// <summary>
-        /// Make sure the string is a valid C# identifier
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        public static bool IsValidIdentifierName(string name) => propertyNameRegex.IsMatch(name);
 
     }
 }

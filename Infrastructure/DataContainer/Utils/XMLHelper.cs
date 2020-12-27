@@ -20,7 +20,7 @@ namespace KEI.Infrastructure
             {
                 if(string.IsNullOrEmpty(filePath))
                 {
-                    throw new Exception("Invalid path");
+                    throw new ArgumentException("Invalid path");
                 }
 
                 var dir = Path.GetDirectoryName(filePath);

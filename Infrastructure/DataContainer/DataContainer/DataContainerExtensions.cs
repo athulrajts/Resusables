@@ -59,12 +59,12 @@ namespace KEI.Infrastructure
 
             T value = key.DefaultValue;
             
-            dc.GetValue(key.Name, ref value);
+            dc.GetValue(key, ref value);
             
             return value;
         }
 
-        public static bool SetValue<T>(this IDataContainer dc, Key<T> key, T value) => dc.SetValue(key.Name, value);
+        public static bool SetValue<T>(this IDataContainer dc, Key<T> key, T value) => dc.SetValue(key, value);
 
         public static void PutValue(this IDataContainer dc, string key, object value)
         {
@@ -90,7 +90,7 @@ namespace KEI.Infrastructure
             }
         }
 
-        public static void PutValue<T>(this IDataContainer dc, Key<T> key, T value) => dc.PutValue(key.Name, value);
+        public static void PutValue<T>(this IDataContainer dc, Key<T> key, T value) => dc.PutValue(key, value);
 
         #endregion
 
@@ -332,29 +332,5 @@ namespace KEI.Infrastructure
             }
 
         }
-    }
-
-    /// <summary>
-    /// Typed key, so you don't know to wonder what type the result will be
-    /// </summary>
-    /// <typeparam name="T"><see cref="System.Type"/> of value</typeparam>
-    public class Key<T>
-    {
-        public string Name { get; set; }
-
-        public T DefaultValue { get; set; } = default;
-
-        public Key(string name)
-        {
-            Name = name;
-        }
-
-        public Key(string name, T defaultValue)
-        {
-            Name = name;
-            DefaultValue = defaultValue;
-        }
-
-        public static implicit operator string(Key<T> key) => key.Name;
     }
 }

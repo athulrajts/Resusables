@@ -43,6 +43,7 @@ namespace KEI.Infrastructure
             }
 
             var builder = Create(name);
+            
             containerBuilder?.Invoke(builder);
 
             config.Add(new ContainerDataObject(name, builder.Build()));
@@ -112,6 +113,7 @@ namespace KEI.Infrastructure
                 return this;
             }
 
+            // ??
             if(value is IDataContainer dc && dc.Count == 0)
             {
                 return this;

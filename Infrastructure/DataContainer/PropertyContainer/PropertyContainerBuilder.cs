@@ -83,6 +83,7 @@ namespace KEI.Infrastructure
             }
 
             var builder = Create(name);
+            
             containerBuilder?.Invoke(builder);
 
             config.Add(new ContainerPropertyObject(name, builder.Build()));
@@ -268,7 +269,7 @@ namespace KEI.Infrastructure
                 return this;
             }
 
-            var obj = new FolderPropertyObject(name, value);
+            var obj = new FilePropertyObject(name, value);
 
             propertyBuilder?.Invoke(new FilePropertyObjectBuilder(obj));
 
@@ -407,7 +408,7 @@ namespace KEI.Infrastructure
         /// <param name="name"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        public PropertyContainerBuilder Folder(string name, string value)
+        public PropertyContainerBuilder Folder(string name, string value, Action<PropertyObjectBuilder> propertyBuilder = null)
         {
             if (config.ContainsData(name) || value is null)
             {
@@ -415,6 +416,8 @@ namespace KEI.Infrastructure
             }
 
             var obj = new FolderPropertyObject(name, value);
+
+            propertyBuilder?.Invoke(new PropertyObjectBuilder(obj));
 
             config.Add(obj);
 
@@ -476,6 +479,7 @@ namespace KEI.Infrastructure
                 var category = pi.GetCategory();
                 var displayName = pi.GetDisplayName();
 
+                // Why is this here ??
                 if (value is IDataContainer dc && dc.Count == 0)
                 {
                     return this;

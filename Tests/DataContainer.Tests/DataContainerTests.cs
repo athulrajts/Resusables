@@ -90,6 +90,34 @@ namespace DataContainer.Tests
         }
 
         [Fact]
+        public void DataContainerBase_CanSerializeAndDeserializeDefaultDataObjects()
+        {
+            IDataContainer Obj = DataContainerBuilder.Create("Object1")
+                .Data("IntegerProperty", 14)
+                .Data("CharacterProperty", '@')
+                .Data("ByteProperty", (byte)255)
+                .Data("BooleanProperty", true)
+                .Data("DoubleProperty", 3.1412)
+                .Data("ColorProperty", new Color(124, 101, 33))
+                .Data("PointProperty", new Point(24, 48))
+                .Data("TimeSpanProperty", TimeSpan.FromSeconds(39))
+                .Data("DateTimeProperty", DateTime.Now)
+                .Data("Array2DProperty", new int[,] { { 1, 0, 0, 0 }, { 0, 1, 0, 0 }, { 0, 0, 1, 0 }, { 0, 0, 0, 1 } })
+                .Data("Array1DProperty", new int[] { 1, 1, 2, 3, 5, 13 })
+                .Data("EnumProperty", DayOfWeek.Monday)
+                .Data("ObjectAsDataContainer", new BindingTestObject())
+                .Data("ObjectAsXML", new BindingTestObject(), SerializationFormat.Xml)
+                .Data("ObjectAsJson", new BindingTestObject(), SerializationFormat.Json)
+                .Build();
+
+            string xml = XmlHelper.SerializeToString(Obj);
+
+            IDataContainer newObj = XmlHelper.DeserializeFromString<KEI.Infrastructure.DataContainer>(xml);
+
+            Assert.Equal(15, newObj.Count);
+        }
+
+        [Fact]
         public void DataContainerBase_Get_MustGetCorrectValue()
         {
             const string PROP_NAME = "IntProperty";
@@ -1038,6 +1066,27 @@ namespace DataContainer.Tests
             A["A"] = 2;
             Assert.Equal("A", listener.LastChangedProperty);
             Assert.NotEmpty(listener.PropertiesChanged);
+        }
+
+        [Fact]
+        public void IDataContainer_ObjectDataObjectRaisesPropertyChangedWhenCLRObjectChanges()
+        {
+            BindingTestObject obj = new BindingTestObject();
+
+            IDataContainer A = DataContainerBuilder.Create("A")
+                .Data("Obj1", obj, SerializationFormat.Container)
+                .Data("Obj2", obj, SerializationFormat.Xml)
+                .Data("Obj3", obj, SerializationFormat.Json)
+                .Build();
+
+            var listener = new PropertyChangedListener(A);
+
+            obj.IntProperty = 44;
+
+            Assert.Contains("Obj1", listener.PropertiesChanged); 
+            Assert.Contains("Obj2", listener.PropertiesChanged);
+            Assert.Contains("Obj3", listener.PropertiesChanged);
+            Assert.Equal("Obj3", listener.LastChangedProperty);
         }
 
         #endregion

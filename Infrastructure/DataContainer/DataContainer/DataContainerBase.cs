@@ -260,6 +260,11 @@ namespace KEI.Infrastructure
         public abstract void Remove(DataObject name);
 
         /// <summary>
+        /// Removes all properties
+        /// </summary>
+        public abstract void Clear();
+
+        /// <summary>
         /// Gets a DataObject from this datacontainer
         /// </summary>
         /// <param name="key"></param>

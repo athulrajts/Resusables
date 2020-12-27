@@ -12,6 +12,7 @@ namespace KEI.Infrastructure
     {
         /// <summary>
         /// Storage structure for all data stored inside this object
+        /// TODO : Is there a need to use <see cref="System.Collections.Concurrent.ConcurrentDictionary{TKey, TValue}"/> ??
         /// </summary>
         protected readonly Dictionary<string, DataObject> internalDictionary;
 
@@ -41,6 +42,16 @@ namespace KEI.Infrastructure
             internalDictionary.Add(obj.Name, obj);
 
             RaiseCollectionChanged(NotifyCollectionChangedAction.Add, internalDictionary[obj.Name]);
+        }
+
+        /// <summary>
+        /// Clear everything
+        /// </summary>
+        public override void Clear()
+        {
+            internalDictionary.Clear();
+            
+            RaiseCollectionChanged(NotifyCollectionChangedAction.Reset, null);
         }
 
         /// <summary>

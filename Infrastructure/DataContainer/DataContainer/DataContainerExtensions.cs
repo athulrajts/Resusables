@@ -5,24 +5,6 @@ using System.Linq;
 
 namespace KEI.Infrastructure
 {
-    public class Key<T>
-    {
-        public string Name { get; set; }
-
-        public T DefaultValue { get; set; } = default;
-
-        public Key(string name)
-        {
-            Name = name;
-        }
-
-        public Key(string name, T defaultValue)
-        {
-            Name = name;
-            DefaultValue = defaultValue;
-        }
-    }
-
     public static class DataContainerExtensions
     {
         public static Dictionary<string, DataObject> ToFlatDictionary(this IDataContainer dc)
@@ -70,6 +52,11 @@ namespace KEI.Infrastructure
 
         public static T GetValue<T>(this IDataContainer dc, Key<T> key)
         {
+            if (dc is null)
+            {
+                throw new NullReferenceException();
+            }
+
             T value = key.DefaultValue;
             
             dc.GetValue(key.Name, ref value);
@@ -144,7 +131,10 @@ namespace KEI.Infrastructure
 
                         IDataContainer unionDC = unionObj.GetValue() as IDataContainer;
 
-                        unionObj.SetValue(unionDC.Union(dc));
+                        if (unionDC.IsIdentical(dc) == false)
+                        {
+                            unionObj.SetValue(unionDC.Union(dc)); 
+                        }
                     }
                 }
             }
@@ -179,7 +169,12 @@ namespace KEI.Infrastructure
                 // in case of nested IDataContainer
                 if (first.GetValue() is IDataContainer dc)
                 {
-                    first.SetValue(dc.Intersect(rhs.Find(first.Name).GetValue() as IDataContainer));
+                    var second = rhs.Find(first.Name).GetValue() as IDataContainer;
+
+                    if (dc.IsIdentical(second) == false)
+                    {
+                        first.SetValue(dc.Intersect(second)); 
+                    }
                 }
 
                 intersect.Add(first);
@@ -337,5 +332,29 @@ namespace KEI.Infrastructure
             }
 
         }
+    }
+
+    /// <summary>
+    /// Typed key, so you don't know to wonder what type the result will be
+    /// </summary>
+    /// <typeparam name="T"><see cref="System.Type"/> of value</typeparam>
+    public class Key<T>
+    {
+        public string Name { get; set; }
+
+        public T DefaultValue { get; set; } = default;
+
+        public Key(string name)
+        {
+            Name = name;
+        }
+
+        public Key(string name, T defaultValue)
+        {
+            Name = name;
+            DefaultValue = defaultValue;
+        }
+
+        public static implicit operator string(Key<T> key) => key.Name;
     }
 }

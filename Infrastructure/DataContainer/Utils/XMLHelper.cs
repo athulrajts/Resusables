@@ -24,7 +24,8 @@ namespace KEI.Infrastructure
                 }
 
                 var dir = Path.GetDirectoryName(filePath);
-                if (Directory.Exists(dir) == false)
+                
+                if (string.IsNullOrEmpty(dir) == false && Directory.Exists(dir) == false)
                 {
                     Directory.CreateDirectory(dir);
                 }

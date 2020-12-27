@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Xml.Serialization;
 
 namespace KEI.Infrastructure
 {
@@ -38,11 +39,6 @@ namespace KEI.Infrastructure
 
         public static T GetValue<T>(this IDataContainer dc, string key)
         {
-            if(dc is null)
-            {
-                throw new NullReferenceException();
-            }
-
             var retValue = default(T);
 
             dc.GetValue(key, ref retValue);
@@ -52,11 +48,6 @@ namespace KEI.Infrastructure
 
         public static T GetValue<T>(this IDataContainer dc, Key<T> key)
         {
-            if (dc is null)
-            {
-                throw new NullReferenceException();
-            }
-
             T value = key.DefaultValue;
             
             dc.GetValue(key, ref value);
@@ -68,11 +59,6 @@ namespace KEI.Infrastructure
 
         public static void PutValue(this IDataContainer dc, string key, object value)
         {
-            if(dc is null)
-            {
-                throw new NullReferenceException();
-            }
-
             if (dc.ContainsData(key))
             {
                 dc.SetValue(key, value);
@@ -318,6 +304,39 @@ namespace KEI.Infrastructure
 
 
         #endregion
+
+        /// <summary>
+        /// Reload values from file again
+        /// Doesn't need new properties if added, only updates existing ones
+        /// </summary>
+        /// <param name="dc"></param>
+        public static void Refresh(this IDataContainer dc)
+        {
+            if(string.IsNullOrEmpty(dc.FilePath))
+            {
+                return;
+            }
+
+            if (Activator.CreateInstance(dc.GetType()) is IDataContainer refreshed && refreshed is IXmlSerializable)
+            {
+                using var reader = System.Xml.XmlReader.Create(new StringReader(File.ReadAllText(dc.FilePath)));
+
+                reader.ReadToFollowing("DataContainer");
+
+                ((IXmlSerializable)refreshed).ReadXml(reader);
+
+                foreach (var data in refreshed)
+                {
+                    dc.SetValue(data.Name, data.GetValue());
+                }
+            }
+            else
+            {
+                throw new ArgumentException("IDataContainer implementation doesn't implement IXmlSeriazable");
+            }
+
+        }
+
 
         public static void WriteBytes(this IDataContainer container, Stream stream)
         {

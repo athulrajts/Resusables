@@ -1,12 +1,13 @@
-﻿using DataContainer.Tests.TestData;
-using KEI.Infrastructure;
-using KEI.Infrastructure.Utils;
-using System;
+﻿using System;
 using System.IO;
+using System.Xml;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
+using System.Runtime.Serialization;
 using Xunit;
+using KEI.Infrastructure;
+using KEI.Infrastructure.Utils;
+using DataContainer.Tests.TestData;
 
 namespace DataContainer.Tests
 {
@@ -1461,6 +1462,252 @@ namespace DataContainer.Tests
             File.Delete(path);
         }
 
+
+        #endregion
+
+        #region DataObjects
+        
+        [Theory]
+        [InlineData(typeof(IntDataObject), 42)]
+        [InlineData(typeof(DoubleDataObject), 3.14)]
+        [InlineData(typeof(FloatDataObject), 1.42f)]
+        [InlineData(typeof(ByteDataObject), (byte)22)]
+        [InlineData(typeof(BoolDataObject), true)]
+        [InlineData(typeof(CharDataObject), '!')]
+        [InlineData(typeof(EnumDataObject), EntityHandling.ExpandEntities)]
+        [InlineData(typeof(IntPropertyObject), 42)]
+        [InlineData(typeof(DoublePropertyObject), 3.14)]
+        [InlineData(typeof(FloatPropertyObject), 1.42f)]
+        [InlineData(typeof(BytePropertyObject), (byte)22)]
+        [InlineData(typeof(BoolPropertyObject), true)]
+        [InlineData(typeof(CharPropertyObject), '!')]
+        [InlineData(typeof(EnumPropertyObject), EntityHandling.ExpandEntities)]
+        public void DataObject_Serialization_Primitive(Type type, object value)
+        {
+            DataObject orig = (DataObject)Activator.CreateInstance(type, "A", value);
+
+            // create xml
+            StringWriter sw = new StringWriter();
+            var writer = new XmlTextWriter(sw);
+            orig.WriteXml(writer);
+
+            // deserialize xml
+            DataObject deserialized = (DataObject)FormatterServices.GetUninitializedObject(type);
+            var reader = new XmlTextReader(new StringReader(sw.ToString()));
+            reader.Read();
+            deserialized.ReadXml(reader);
+
+            // assert equal
+            Assert.Equal(orig.GetValue(), deserialized.GetValue());
+        }
+
+        [Theory]
+        [InlineData(typeof(ColorDataObject), 255,255,255)]
+        [InlineData(typeof(ColorPropertyObject), 255, 255, 255)]
+        public void DataObject_Serialization_Color(Type type, byte R, byte G, byte B)
+        {
+            DataObject orig = (DataObject)Activator.CreateInstance(type, "A", new Color(R,G,B));
+
+            // create xml
+            StringWriter sw = new StringWriter();
+            var writer = new XmlTextWriter(sw);
+            orig.WriteXml(writer);
+
+            // deserialize xml
+            DataObject deserialized = (DataObject)FormatterServices.GetUninitializedObject(type);
+            var reader = new XmlTextReader(new StringReader(sw.ToString()));
+            reader.Read();
+            deserialized.ReadXml(reader);
+
+            // assert equal
+            Assert.Equal(orig.GetValue(), deserialized.GetValue());
+        }
+
+        [Theory]
+        [InlineData(typeof(PointDataObject), 12, 55)]
+        [InlineData(typeof(PointPropertyObject), 12, 55)]
+        public void DataObject_Serialization_Point(Type type, double x, double y)
+        {
+            DataObject orig = (DataObject)Activator.CreateInstance(type, "A", new Point(x,y));
+
+            // create xml
+            StringWriter sw = new StringWriter();
+            var writer = new XmlTextWriter(sw);
+            orig.WriteXml(writer);
+
+            // deserialize xml
+            DataObject deserialized = (DataObject)FormatterServices.GetUninitializedObject(type);
+            var reader = new XmlTextReader(new StringReader(sw.ToString()));
+            reader.Read();
+            deserialized.ReadXml(reader);
+
+            // assert equal
+            Assert.Equal(orig.GetValue(), deserialized.GetValue());
+        }
+
+        [Theory]
+        [InlineData(typeof(DateTimeDataObject))]
+        [InlineData(typeof(DateTimePropertyObject))]
+        public void DataObject_Serialization_DateTime(Type type)
+        {
+            DataObject orig = (DataObject)Activator.CreateInstance(type, "A", DateTime.Now);
+
+            // create xml
+            StringWriter sw = new StringWriter();
+            var writer = new XmlTextWriter(sw);
+            orig.WriteXml(writer);
+
+            // deserialize xml
+            DataObject deserialized = (DataObject)FormatterServices.GetUninitializedObject(type);
+            var reader = new XmlTextReader(new StringReader(sw.ToString()));
+            reader.Read();
+            deserialized.ReadXml(reader);
+
+            DateTime origValue = (DateTime)orig.GetValue();
+            DateTime serializedValue = (DateTime)deserialized.GetValue();
+
+            // assert equal
+            // check time and date separately, 
+            Assert.Equal(origValue.Date, serializedValue.Date);
+            Assert.Equal(origValue.TimeOfDay.Hours, serializedValue.TimeOfDay.Hours);
+            Assert.Equal(origValue.TimeOfDay.Minutes, serializedValue.TimeOfDay.Minutes);
+            Assert.Equal(origValue.TimeOfDay.Seconds, serializedValue.TimeOfDay.Seconds);
+
+            //not serializing milliseconds so do check that
+        }
+
+        [Theory]
+        [InlineData(typeof(TimeSpanDataObject))]
+        [InlineData(typeof(TimeSpanPropertyObject))]
+        public void DataObject_Serialization_TimeSpan(Type type)
+        {
+            DataObject orig = (DataObject)Activator.CreateInstance(type, "A", TimeSpan.FromSeconds(144));
+
+            // create xml
+            StringWriter sw = new StringWriter();
+            var writer = new XmlTextWriter(sw);
+            orig.WriteXml(writer);
+
+            // deserialize xml
+            DataObject deserialized = (DataObject)FormatterServices.GetUninitializedObject(type);
+            var reader = new XmlTextReader(new StringReader(sw.ToString()));
+            reader.Read();
+            deserialized.ReadXml(reader);
+
+            // assert equal
+            Assert.Equal(orig.GetValue(), deserialized.GetValue());
+        }
+
+        [Theory]
+        [InlineData(typeof(Array1DDataObject), 5 , 10)]
+        [InlineData(typeof(Array1DPropertyObject), 5, 10)]
+        public void DataObject_Serialization_Array1D(Type type, int size, object value)
+        {
+            Array origValue = Array.CreateInstance(value.GetType(), size);
+            for (int i = 0; i < size; i++)
+            {
+                origValue.SetValue(value, i);
+            }
+
+            DataObject orig = (DataObject)Activator.CreateInstance(type, "A", origValue);
+
+            // create xml
+            StringWriter sw = new StringWriter();
+            var writer = new XmlTextWriter(sw);
+            orig.WriteXml(writer);
+
+            // deserialize xml
+            DataObject deserialized = (DataObject)FormatterServices.GetUninitializedObject(type);
+            var reader = new XmlTextReader(new StringReader(sw.ToString()));
+            reader.Read();
+            deserialized.ReadXml(reader);
+
+            Array deserializedValue = deserialized.GetValue() as Array;
+
+            // assert dimension
+            Assert.Equal(origValue.Rank, deserializedValue.Rank);
+
+            // assert values
+            for (int i = 0; i < size; i++)
+            {
+                Assert.Equal(origValue.GetValue(i), deserializedValue.GetValue(i));
+            }
+        }
+
+        [Theory]
+        [InlineData(typeof(Array2DDataObject), 5, 10, 3)]
+        [InlineData(typeof(Array2DPropertyObject), 5, 10, 3)]
+        public void DataObject_Serialization_Array2D(Type type, int rows, int columns, object value)
+        {
+            Array origValue = Array.CreateInstance(value.GetType(), rows, columns);
+            for (int i = 0; i < rows; i++)
+            {
+                for (int j = 0; j < columns; j++)
+                {
+                    origValue.SetValue(value, i, j);
+                }
+            }
+
+            DataObject orig = (DataObject)Activator.CreateInstance(type, "A", origValue);
+
+            // create xml
+            StringWriter sw = new StringWriter();
+            var writer = new XmlTextWriter(sw);
+            orig.WriteXml(writer);
+
+            // deserialize xml
+            DataObject deserialized = (DataObject)FormatterServices.GetUninitializedObject(type);
+            var reader = new XmlTextReader(new StringReader(sw.ToString()));
+            reader.Read();
+            deserialized.ReadXml(reader);
+
+            Array deserializedValue = deserialized.GetValue() as Array;
+
+            // assert dimension
+            Assert.Equal(origValue.Rank, deserializedValue.Rank);
+            Assert.Equal(origValue.GetLength(0), deserializedValue.GetLength(0));
+            Assert.Equal(origValue.GetLength(1), deserializedValue.GetLength(1));
+
+            // assert values
+            for (int i = 0; i < rows; i++)
+            {
+                for (int j = 0; j < columns; j++)
+                {
+                    Assert.Equal(origValue.GetValue(i, j), deserializedValue.GetValue(i, j));
+                }
+            }
+        }
+
+        [Theory]
+        [InlineData(typeof(ContainerDataObject))]
+        [InlineData(typeof(XmlDataObject))]
+        [InlineData(typeof(JsonDataObject))]
+        [InlineData(typeof(ContainerPropertyObject))]
+        [InlineData(typeof(XmlPropertyObject))]
+        [InlineData(typeof(JsonPropertyObject))]
+        public void DataObject_Serialization_Object(Type type)
+        {
+            BindingTestObject origValue = new BindingTestObject();
+            origValue.IntProperty = 35;
+
+            DataObject orig = (DataObject)Activator.CreateInstance(type, "A", origValue);
+
+            // create xml
+            StringWriter sw = new StringWriter();
+            var writer = new XmlTextWriter(sw);
+            orig.WriteXml(writer);
+
+            // deserialize xml
+            DataObject deserialized = (DataObject)FormatterServices.GetUninitializedObject(type);
+            var reader = new XmlTextReader(new StringReader(sw.ToString()));
+            reader.Read();
+            deserialized.ReadXml(reader);
+
+            BindingTestObject deserializedValue = deserialized.GetValue() as BindingTestObject;
+
+            // assert equal
+            Assert.Equal(origValue.IntProperty, deserializedValue.IntProperty);
+        }
 
         #endregion
     }

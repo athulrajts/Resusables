@@ -22,5 +22,13 @@ namespace KEI.Infrastructure
         /// Implementation for <see cref="DataObject.Type"/>
         /// </summary>
         public override string Type => DataObjectType.DateTime;
+
+        protected override void OnStringValueChanged(string value)
+        {
+            if(DateTime.TryParse(value, out _value))
+            {
+                RaisePropertyChanged(nameof(Value));
+            }
+        }
     }
 }

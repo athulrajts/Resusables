@@ -22,5 +22,13 @@ namespace KEI.Infrastructure
             Name = name;
             Value = value;
         }
+
+        protected override void OnStringValueChanged(string value)
+        {
+            if (DateTime.TryParse(value, out _value))
+            {
+                RaisePropertyChanged(nameof(Value));
+            }
+        }
     }
 }

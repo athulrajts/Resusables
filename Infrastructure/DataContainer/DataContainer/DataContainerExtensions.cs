@@ -285,6 +285,7 @@ namespace KEI.Infrastructure
             }
         }
 
+
         /// <summary>
         /// Removes the properties from first which are common to first and second.
         /// Same as Difference but does operation in place instead of returning new instance
@@ -302,6 +303,34 @@ namespace KEI.Infrastructure
             }
         }
 
+        /// <summary>
+        /// Removes all the properties that are not in second and in first from first
+        /// </summary>
+        /// <param name="lhs"></param>
+        /// <param name="rhs"></param>
+        public static void InvertedRemove(this IDataContainer lhs, IDataContainer rhs)
+        {
+            var toRemove = new List<DataObject>();
+
+            foreach (var data in lhs)
+            {
+                if (rhs.ContainsData(data.Name) == false)
+                {
+                    toRemove.Add(data);
+                }
+                else if (data.GetValue() is IDataContainer dc)
+                {
+                    var rhsDC = (IDataContainer)rhs[data.Name];
+                    dc.InvertedRemove(rhsDC);
+                }
+            }
+
+            foreach (var item in toRemove)
+            {
+                lhs.Remove(item);
+            }
+        }
+
 
         #endregion
 
@@ -310,32 +339,40 @@ namespace KEI.Infrastructure
         /// Doesn't need new properties if added, only updates existing ones
         /// </summary>
         /// <param name="dc"></param>
-        public static void Refresh(this IDataContainer dc)
+        public static void Refresh(this IDataContainer dc, IDataContainer changed)
         {
-            if(string.IsNullOrEmpty(dc.FilePath))
+            foreach (var data in changed)
             {
-                return;
-            }
+                object value = data.GetValue();
 
-            if (Activator.CreateInstance(dc.GetType()) is IDataContainer refreshed && refreshed is IXmlSerializable)
-            {
-                using var reader = System.Xml.XmlReader.Create(new StringReader(File.ReadAllText(dc.FilePath)));
-
-                reader.ReadToFollowing("DataContainer");
-
-                ((IXmlSerializable)refreshed).ReadXml(reader);
-
-                foreach (var data in refreshed)
+                if (value is IDataContainer changedChild)
                 {
-                    dc.SetValue(data.Name, data.GetValue());
+                    DataObject dcChild = dc.Find(data.Name);
+                    IDataContainer dcChildValue = dcChild.GetValue() as IDataContainer;
+                    dcChildValue.Refresh(changedChild);
+                }
+                else
+                {
+                    dc.SetValue(data.Name, value);
                 }
             }
-            else
-            {
-                throw new ArgumentException("IDataContainer implementation doesn't implement IXmlSeriazable");
-            }
-
         }
+
+        /// <summary>
+        /// Get instace of <see cref="DataContainerAutoSaver"/>
+        /// Always returns new instance.
+        /// </summary>
+        /// <param name="dc"></param>
+        /// <returns></returns>
+        public static DataContainerAutoSaver GetAutoSaver(this IDataContainer dc) => new DataContainerAutoSaver(dc);
+
+        /// <summary>
+        /// Get instance of <see cref="DataContainerAutoUpdater"/>
+        /// Always returns new instance.
+        /// </summary>
+        /// <param name="dc"></param>
+        /// <returns></returns>
+        public static DataContainerAutoUpdater GetAutoUpdater(this IDataContainer dc) => new DataContainerAutoUpdater(dc);
 
 
         public static void WriteBytes(this IDataContainer container, Stream stream)

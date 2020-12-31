@@ -31,4 +31,31 @@ namespace KEI.UI.Wpf
             return Instance;
         }
     }
+
+    public abstract class BaseMultiValueConverter<T> : MarkupExtension, IMultiValueConverter
+        where T : new()
+    {
+        public abstract object Convert(object[] values, Type targetType, object parameter, CultureInfo culture);
+
+        public virtual object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+
+        private T instance = default(T);
+        public T Instance
+        {
+            get
+            {
+                if (instance == null)
+                    instance = new T();
+                return instance;
+            }
+        }
+
+        public override object ProvideValue(IServiceProvider serviceProvider)
+        {
+            return Instance;
+        }
+    }
 }

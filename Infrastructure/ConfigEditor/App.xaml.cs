@@ -29,11 +29,14 @@ namespace ConfigEditor
         {
             containerRegistry.RegisterConsoleLogger();
             containerRegistry.RegisterUIServices();
+
             containerRegistry.RegisterSingleton<IConfigEditorViewService, ConfigEditorViewService>();
+
+            IDialogFactory factory = Container.Resolve<IDialogFactory>();
+            factory.RegisterDialog<SaveMergedFileDialog>("Save Merged");
 
             containerRegistry.RegisterSingleton<ConfigEditorViewModel>();
             containerRegistry.RegisterSingleton<ConfigViewerTabsViewModel>();
-
             containerRegistry.RegisterForNavigation<ConfigViewerTabs>();
         }
 

@@ -1,6 +1,6 @@
-﻿using KEI.Infrastructure;
+﻿using System.Collections.ObjectModel;
 using Prism.Mvvm;
-using System.Collections.ObjectModel;
+using KEI.Infrastructure;
 
 namespace ConfigEditor.Models
 {

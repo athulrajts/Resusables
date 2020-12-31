@@ -52,6 +52,7 @@ namespace ConfigEditor.ViewModels
             FullName = name;
             Name = Path.GetFileName(name);
             _viewService = viewService;
+            SelectedNode = Tree[0];
         }
 
         private DelegateCommand saveFileCommand;

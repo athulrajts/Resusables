@@ -293,7 +293,7 @@ namespace KEI.UI.Wpf.ViewService
         /// <param name="filters"></param>
         public void SaveFile(Action<string> saveAction, string filters = "")
         {
-            var sfd = new SaveFileDialog();
+            var sfd = new Microsoft.Win32.SaveFileDialog();
 
             if (string.IsNullOrEmpty(filters) == false)
             {

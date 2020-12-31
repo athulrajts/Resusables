@@ -5,51 +5,34 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ConfigEditor.Views"
              xmlns:model="clr-namespace:ConfigEditor.Models"
+             xmlns:c="clr-namespace:ConfigEditor.Converters"
              xmlns:wpf="http://gesinfotek.com/wpf"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
-        <local:DataContainerToDictionaryConverter x:Key="DataContainerToDictionaryConverter"/>
-
-        <Style TargetType="DataGridColumnHeader" x:Key="BaseHeader">
-            <Setter Property="HorizontalContentAlignment" Value="Center"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Foreground" Value="Black"/>
-        </Style>
-
-        <Style TargetType="DataGridColumnHeader" x:Key="MergedHeader" BasedOn="{StaticResource BaseHeader}">
-            <Setter Property="Background">
+       
+        <Style TargetType="{x:Type ListBoxItem}">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="HorizontalContentAlignment" Value="{Binding HorizontalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
+            <Setter Property="VerticalContentAlignment" Value="{Binding VerticalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
+            <Setter Property="Padding" Value="2,0,0,0"/>
+            <Setter Property="Template">
                 <Setter.Value>
-                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                        <GradientStop Color="SkyBlue" Offset="0"/>
-                        <GradientStop Color="LightGreen" Offset="1"/>
-                    </LinearGradientBrush>
+                    <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                        <Border x:Name="Bd" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}" SnapsToDevicePixels="true">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="Transparent"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
                 </Setter.Value>
             </Setter>
-        </Style>
-
-        <Style TargetType="DataGridColumnHeader" x:Key="LeftHeader" BasedOn="{StaticResource BaseHeader}">
-            <Setter Property="Background">
-                <Setter.Value>
-                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                        <GradientStop Color="Blue" Offset="0"/>
-                        <GradientStop Color="LightBlue" Offset="1"/>
-                    </LinearGradientBrush>
-                </Setter.Value>
-            </Setter>
-            <Setter Property="Height" Value="40"/>
-        </Style>
-
-        <Style TargetType="DataGridColumnHeader" x:Key="RightHeader" BasedOn="{StaticResource BaseHeader}">
-            <Setter Property="Background">
-                <Setter.Value>
-                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                        <GradientStop Color="Green" Offset="0"/>
-                        <GradientStop Color="LightGreen" Offset="1"/>
-                    </LinearGradientBrush>
-                </Setter.Value>
-            </Setter>
-            <Setter Property="Height" Value="40"/>
         </Style>
 
     </UserControl.Resources>
@@ -58,147 +41,174 @@
 
         <Grid Margin="3">
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <Border BorderBrush="Black" BorderThickness="1" Padding="4">
-                <WrapPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                    <WrapPanel.Resources>
-                        <Style TargetType="Separator" BasedOn="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}">
-                            <Setter Property="Background" Value="Black"/>
-                            <Setter Property="Margin" Value="5 0"/>
+            <Border Grid.Row="0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="3*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Grid.Resources>
+                        <Style TargetType="Label">
+                            <Setter Property="Background" Value="Transparent"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Content, RelativeSource={RelativeSource Self}}" Value="{x:Null}">
+                                    <Setter Property="Background">
+                                        <Setter.Value>
+                                            <SolidColorBrush Color="Red" Opacity="0.25"/>
+                                        </Setter.Value>
+                                    </Setter>
+                                </DataTrigger>
+                            </Style.Triggers>
                         </Style>
-                    </WrapPanel.Resources>
-                    <CheckBox Content="Show Changes Only"
-                              VerticalAlignment="Center"
-                              IsChecked="{Binding ShowDifferentItems}"/>
+                    </Grid.Resources>
 
-                    <Separator Background="Black"/>
+                    <Border Grid.Column="0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
 
-                    <Label Content="Shape" VerticalAlignment="Center"/>
-                    <ComboBox SelectedItem="{Binding MergedShape}"
-                              ItemsSource="{wpf:EnumBindingSource EnumType=model:MergeOption}"
-                              VerticalContentAlignment="Center"
-                              Width="100"
-                              Height="25"/>
+                            <Label Content="Key" 
+                                   FontWeight="Bold" 
+                                   FontSize="18"
+                                   Grid.Column="0"
+                                   HorizontalContentAlignment="Center"/>
 
-                    <Separator/>
+                            <Label Content="Left" 
+                                   FontWeight="Bold"
+                                   FontSize="18"
+                                   Grid.Column="1"
+                                   HorizontalContentAlignment="Center"/>
 
-                    <Button Height="20"
-                            Width="70"
-                            Content="Swap"
-                            ToolTip="Swap Left and Right"
-                            Command="{Binding SwapLeftRightCommand}"/>
+                            <Label Content="Right"
+                                   FontWeight="Bold"
+                                   FontSize="18"
+                                   Grid.Column="2"
+                                   HorizontalContentAlignment="Center"/>
+                        </Grid>
+                    </Border>
 
-                    <Separator/>
+                    <Border Grid.Column="1">
+                        <Label Content="Value" FontWeight="Bold" FontSize="18"
+                               HorizontalContentAlignment="Center"/>
+                    </Border>
 
-                    <Button Height="20"
-                            Width="70"
-                            Content="Save"
-                            ToolTip="Save Merged"
-                            Command="{Binding MergeCommand}"/>
+                    <ListBox ItemsSource="{Binding Diff}" HorizontalContentAlignment="Stretch"
+                                  BorderThickness="0"
+                                  Grid.Row="1"
+                                  ScrollViewer.VerticalScrollBarVisibility="Hidden">
+                        <ListBox.Resources>
+                            <Style TargetType="ScrollViewer">
+                                <Setter Property="wpf:ScrollSynchronizer.ScrollGroup" Value="1"/>
+                            </Style>
+                        </ListBox.Resources>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Border BorderBrush="Black" BorderThickness="1"
+                                        CornerRadius="3"
+                                        Height="30">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition/>
+                                            <ColumnDefinition/>
+                                            <ColumnDefinition/>
+                                        </Grid.ColumnDefinitions>
 
-                </WrapPanel>
+                                        <Label Content="{Binding DataObjectName}" Grid.Column="0"/>
 
+                                        <Label Content="{Binding Left}" Grid.Column="1"
+                                               HorizontalContentAlignment="Center"
+                                               BorderBrush="Black"
+                                               BorderThickness="1 0"/>
 
+                                        <Label Content="{Binding Right}" Grid.Column="2"
+                                               HorizontalContentAlignment="Center"/>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <ListBox ItemsSource="{Binding Merged}" HorizontalContentAlignment="Stretch"
+                             BorderThickness="0"
+                             Grid.Column="1"
+                             Grid.Row="1"
+                             x:Name="mergedList">
+                        <ListBox.Resources>
+                            <Style TargetType="ScrollViewer">
+                                <Setter Property="wpf:ScrollSynchronizer.ScrollGroup" Value="1"/>
+                            </Style>
+                        </ListBox.Resources>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Border BorderBrush="Black" BorderThickness="1"
+                                        CornerRadius="3"
+                                        Height="30">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="12"/>
+                                            <ColumnDefinition/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <Border>
+                                            <Border.Background>
+                                                <MultiBinding Converter="{c:SnapShotItemAndDiffToBackgroundColorConverter}">
+                                                    <Binding Path="."/>
+                                                    <Binding Path="DataContext.Diff" ElementName="mergedList"/>
+                                                </MultiBinding>
+                                            </Border.Background>
+                                        </Border>
+
+                                        <Label Content="{Binding Value}" Grid.Column="1"/>
+
+                                        <Button Content="Swap" Grid.Column="2"
+                                                Width="50"
+                                                Height="20"
+                                                Background="White"
+                                                BorderBrush="Black"
+                                                Foreground="Black"
+                                                FontWeight="Bold"
+                                                Margin="0 0 5 0"
+                                                Command="{Binding DataContext.SwapValueCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBox}}"
+                                                CommandParameter="{Binding}">
+                                            <Button.Resources>
+                                                <Style TargetType="Border">
+                                                    <Setter Property="CornerRadius" Value="15"/>
+                                                </Style>
+                                            </Button.Resources>
+                                        </Button>
+
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                </Grid>
             </Border>
 
-            <DataGrid ItemsSource="{Binding Merge.MergedModel}"
-                      BorderBrush="Black"
-                      BorderThickness="1 0 1 1"
-                      AutoGenerateColumns="False"
-                      Grid.Row="2"
-                      Visibility="{Binding Merge, Converter={wpf:ObjectToVisibilityConverter}}"
-                      LoadingRow="DataGrid_LoadingRow">
-                <DataGrid.Columns>
-                    <DataGridTextColumn  Header="Key" Binding="{Binding Key}" IsReadOnly="True" Width="*"
-                                         HeaderStyle="{StaticResource BaseHeader}">
-                        <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
-                                <Setter Property="ToolTip" Value="{Binding Key}"/>
-                            </Style>
-                        </DataGridTextColumn.ElementStyle>
-                    </DataGridTextColumn>
-
-                    <DataGridTextColumn  Header="Left" Binding="{Binding Left.ValueString, Mode=OneWay, FallbackValue='Not Present'}"
-                                         IsReadOnly="True" Width="*"
-                                         HeaderStyle="{StaticResource LeftHeader}">
-                        <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="TextWrapping" Value="Wrap"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Left}" Value="{x:Null}">
-                                        <Setter Property="Background" Value="Red"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </DataGridTextColumn.ElementStyle>
-                    </DataGridTextColumn>
-                    
-                    <DataGridTextColumn  Header="Right" Binding="{Binding Right.ValueString, Mode=OneWay, FallbackValue='Not Present'}" 
-                                         IsReadOnly="True" Width="*"
-                                         HeaderStyle="{StaticResource RightHeader}">
-                            <DataGridTextColumn.ElementStyle>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="TextWrapping" Value="Wrap"/>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Right}" Value="{x:Null}">
-                                            <Setter Property="Background" Value="Red"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </DataGridTextColumn.ElementStyle>
-                    </DataGridTextColumn>
-
-                    <DataGridTemplateColumn Header="Merged" Width="*"
-                                            HeaderStyle="{StaticResource MergedHeader}">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock TextWrapping="Wrap">
-                                    <TextBlock.Style>
-                                        <Style TargetType="TextBlock">
-                                            <Setter Property="Text" Value="{Binding Left.ValueString}"/>
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding Option}" Value="Right">
-                                                    <Setter Property="Text" Value="{Binding Right.ValueString}"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                        <DataGridTemplateColumn.CellEditingTemplate>
-                            <DataTemplate>
-                                <ComboBox SelectedItem="{Binding Option}"
-                                          ItemsSource="{wpf:EnumBindingSource EnumType=model:MergeOption}"/>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellEditingTemplate>
-                        <DataGridTemplateColumn.CellStyle>
-                            <Style TargetType="DataGridCell">
-                                <Setter Property="Background">
-                                    <Setter.Value>
-                                        <SolidColorBrush Color="Blue" Opacity="0.25"/>
-                                    </Setter.Value>
-                                </Setter>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Option}" Value="Right">
-                                        <Setter Property="Background">
-                                            <Setter.Value>
-                                                <SolidColorBrush Color="Green" Opacity="0.25"/>
-                                            </Setter.Value>
-                                        </Setter>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </DataGridTemplateColumn.CellStyle>
-                    </DataGridTemplateColumn>
-
-                </DataGrid.Columns>
-            </DataGrid>
+            <Border Grid.Row="1" BorderThickness="0 2 0 0"
+                    BorderBrush="Black">
+                <StackPanel Orientation="Horizontal" FlowDirection="RightToLeft">
+                    <Button Content="Save"
+                            Height="40"
+                            Width="100"
+                            Command="{Binding SaveCommand}"
+                            Margin="3"/>
+                </StackPanel>
+            </Border>
+            
         </Grid>
 
     </Grid>

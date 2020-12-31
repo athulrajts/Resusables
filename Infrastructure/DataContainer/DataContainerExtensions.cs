@@ -1,40 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
-using System.Xml.Serialization;
+using System.Collections.Generic;
 
 namespace KEI.Infrastructure
 {
     public static class DataContainerExtensions
     {
-        public static Dictionary<string, DataObject> ToFlatDictionary(this IDataContainer dc)
-        {
-            var dictionary = new Dictionary<string, DataObject>();
-
-            ToFlatDictionaryInternal(dc, ref dictionary, string.Empty);
-
-            return dictionary;
-        }
-
-        private static void ToFlatDictionaryInternal(IDataContainer dc, ref Dictionary<string, DataObject> dictionary, string name)
-        {
-            foreach (DataObject item in dc)
-            {
-                if (item.GetValue() is IDataContainer idc)
-                {
-                    var nameAppender = string.IsNullOrEmpty(name) ? idc.Name : $"{name}.{idc.Name}";
-                    ToFlatDictionaryInternal(idc, ref dictionary, nameAppender);
-                }
-                else
-                {
-                    var key = string.IsNullOrEmpty(name) ? item.Name : $"{name}.{item.Name}";
-                    dictionary.Add(key, item);
-                }
-
-            }
-        }
-
         #region DataContainer Get/Put Extensions
 
         public static T GetValue<T>(this IDataContainer dc, string key)
@@ -50,12 +21,12 @@ namespace KEI.Infrastructure
         {
             T value = key.DefaultValue;
             
-            dc.GetValue(key, ref value);
+            dc.GetValue(key.Name, ref value);
             
             return value;
         }
 
-        public static bool SetValue<T>(this IDataContainer dc, Key<T> key, T value) => dc.SetValue(key, value);
+        public static bool SetValue<T>(this IDataContainer dc, Key<T> key, T value) => dc.SetValue(key.Name, value);
 
         public static void PutValue(this IDataContainer dc, string key, object value)
         {
@@ -76,11 +47,11 @@ namespace KEI.Infrastructure
             }
         }
 
-        public static void PutValue<T>(this IDataContainer dc, Key<T> key, T value) => dc.PutValue(key, value);
+        public static void PutValue<T>(this IDataContainer dc, Key<T> key, T value) => dc.PutValue(key.Name, value);
 
         #endregion
 
-        #region Set Operatoins
+        #region Set Operations
 
         /// <summary>
         /// Takes in 2 <see cref="IDataContainer"/> returns a new instance of <see cref="IDataContainer"/>
@@ -176,7 +147,7 @@ namespace KEI.Infrastructure
         /// <param name="lhs"></param>
         /// <param name="rhs"></param>
         /// <returns></returns>
-        public static IDataContainer Difference(this IDataContainer lhs, IDataContainer rhs)
+        public static IDataContainer Except(this IDataContainer lhs, IDataContainer rhs)
         {
             IDataContainer difference = lhs is IPropertyContainer
                 ? new PropertyContainer()
@@ -261,7 +232,7 @@ namespace KEI.Infrastructure
 
         /// <summary>
         /// Add new properties from second to first, if they already exist, keep the values.
-        /// Same as Union but does operation inplace instead of returning new intance;
+        /// Same as <see cref="Union(IDataContainer, IDataContainer)"/> but does operation inplace instead of returning new intance;
         /// </summary>
         /// <param name="lhs"></param>
         /// <param name="rhs"></param>
@@ -288,7 +259,7 @@ namespace KEI.Infrastructure
 
         /// <summary>
         /// Removes the properties from first which are common to first and second.
-        /// Same as Difference but does operation in place instead of returning new instance
+        /// Same as <see cref="Except(IDataContainer, IDataContainer)"/> but does operation in place instead of returning new instance
         /// </summary>
         /// <param name="lhs"></param>
         /// <param name="rhs"></param>
@@ -374,6 +345,28 @@ namespace KEI.Infrastructure
         /// <returns></returns>
         public static DataContainerAutoUpdater GetAutoUpdater(this IDataContainer dc) => new DataContainerAutoUpdater(dc);
 
+        /// <summary>
+        /// Gets the current values in the datacontainer
+        /// </summary>
+        /// <param name="dc"></param>
+        /// <returns></returns>
+        public static SnapShot GetSnapShot(this IDataContainer dc) => new SnapShot(dc);
+
+        /// <summary>
+        /// Restore values from snapshot
+        /// </summary>
+        /// <param name="dc"></param>
+        /// <param name="s"></param>
+        public static void Restore(this IDataContainer dc, SnapShot s)
+        {
+            foreach (var key in s.Keys)
+            {
+                if (s[key].Value is object obj)
+                {
+                    dc.SetValue(key, obj); 
+                }
+            }
+        }
 
         public static void WriteBytes(this IDataContainer container, Stream stream)
         {

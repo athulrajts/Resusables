@@ -16,34 +16,33 @@
             DefaultValue = defaultValue;
         }
 
-        public static implicit operator string(Key<T> key) => key.Name;
     }
 
     #region Specific Implementations
 
     public class BoolKey : Key<bool>
     {
-        public BoolKey(string name, bool defaultValue) : base(name, defaultValue) { }
+        public BoolKey(string name, bool defaultValue = default) : base(name, defaultValue) { }
     }
 
     public class IntKey : Key<int>
     {
-        public IntKey(string name, int defaultValue) : base(name, defaultValue) { }
+        public IntKey(string name, int defaultValue = default) : base(name, defaultValue) { }
     }
 
     public class FloatKey : Key<float>
     {
-        public FloatKey(string name, float defaultValue) : base(name, defaultValue) { }
+        public FloatKey(string name, float defaultValue = default) : base(name, defaultValue) { }
     }
 
     public class DoubleKey : Key<double>
     {
-        public DoubleKey(string name, double defaultValue) : base(name, defaultValue) { }
+        public DoubleKey(string name, double defaultValue = default) : base(name, defaultValue) { }
     }
 
     public class StringKey : Key<string>
     {
-        public StringKey(string name, string defaultValue) : base(name, defaultValue) { }
+        public StringKey(string name, string defaultValue = default) : base(name, defaultValue) { }
     }
 
     #endregion

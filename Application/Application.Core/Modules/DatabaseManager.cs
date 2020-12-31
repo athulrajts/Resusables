@@ -19,8 +19,8 @@ namespace Application.Core.Modules
             _databaseReader = databaseReader;
 
             _databaseCollection = new Dictionary<string, IFileDatabase>();
-            _databaseCollection.Add($"{ApplicationMode.Production} DB", new Database(databaseWritter));
-            _databaseCollection.Add($"{ApplicationMode.Engineering} DB", new Database(databaseWritter));
+            _databaseCollection.Add($"{ApplicationMode.Production}_DB", new Database(databaseWritter));
+            _databaseCollection.Add($"{ApplicationMode.Engineering}_DB", new Database(databaseWritter));
 
             eventAggregator.GetEvent<RecipeLoadedEvent>().Subscribe(rcp => _currentRecipe = rcp);
         }

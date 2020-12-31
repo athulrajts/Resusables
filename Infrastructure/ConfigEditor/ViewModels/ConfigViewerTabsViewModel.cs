@@ -1,4 +1,5 @@
-﻿using ConfigEditor.Events;
+﻿using ConfigEditor.Dialogs;
+using ConfigEditor.Events;
 using KEI.Infrastructure;
 using Prism.Commands;
 using Prism.Events;
@@ -20,26 +21,18 @@ namespace ConfigEditor.ViewModels
             set { SetProperty(ref selectedTab, value); }
         }
 
-        private readonly IViewService _viewService;
-        public ConfigViewerTabsViewModel(IEventAggregator eventAggregator, IViewService viewService)
+        private readonly IConfigEditorViewService _viewService;
+        private readonly IDialogFactory _dialogFactory;
+
+        public ConfigViewerTabsViewModel(IEventAggregator eventAggregator, IConfigEditorViewService viewService, IDialogFactory dialogFactory)
         {
             _viewService = viewService;
+            _dialogFactory = dialogFactory;
+
             eventAggregator.GetEvent<DataContainerOpened>().Subscribe(dc =>
             {
                 var newTab = new ConfigViewerViewModel(dc.Item2, dc.Item1, _viewService);
-
-                if (Tabs.Where(x => x is ConfigViewerViewModel)
-                        .FirstOrDefault(x => (x as ConfigViewerViewModel).FullName == dc.Item1) is ConfigViewerViewModel tab)
-                {
-                    var index = Tabs.IndexOf(tab);
-                    Tabs.Remove(tab);
-                    Tabs.Insert(index, newTab);
-                }
-                else
-                {
-                    Tabs.Add(newTab);
-                }
-
+                Tabs.Add(newTab);
                 SelectedTab = newTab;
             });
 
@@ -49,13 +42,12 @@ namespace ConfigEditor.ViewModels
 
                 if (string.IsNullOrEmpty(left) == false && string.IsNullOrEmpty(right) == false)
                 {
-                    var newTab = new MergeViewModel(_viewService, left, right);
+                    var newTab = new MergeViewModel(_viewService, _dialogFactory, left, right);
 
                     Tabs.Add(newTab);
 
                     SelectedTab = newTab;
                 }
-
             });
         }
 

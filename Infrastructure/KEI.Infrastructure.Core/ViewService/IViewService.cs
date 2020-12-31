@@ -93,7 +93,6 @@ namespace KEI.Infrastructure
         /// <param name="filters">A System.String that contains the filter. The default is System.String.Empty,
         /// which means that no filter is applied and all file types are displayed.</param>
         void SaveFile(Action<string> saveAction, string filters = "");
-
     }
 
     public enum PromptOptions

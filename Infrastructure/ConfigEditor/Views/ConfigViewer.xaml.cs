@@ -1,17 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using ConfigEditor.Models;
+using ConfigEditor.ViewModels;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace ConfigEditor.Views
 {
@@ -25,9 +15,12 @@ namespace ConfigEditor.Views
             InitializeComponent();
         }
 
-        private void TreeView_Loaded(object sender, RoutedEventArgs e)
+        private void treeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            (treeView.ItemContainerGenerator.ContainerFromIndex(0) as TreeViewItem).IsSelected = true;
+            if(DataContext is ConfigViewerViewModel vm)
+            {
+                vm.SelectedNode = (TreeNodeModel)e.NewValue;
+            }
         }
     }
 }

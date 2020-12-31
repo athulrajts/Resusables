@@ -797,8 +797,8 @@ namespace DataContainer.Tests
                 .Data("Z", 3)
                 .Build();
 
-            IDataContainer AdifferenceB = A.Difference(B);
-            IDataContainer BdifferenceA = B.Difference(A);
+            IDataContainer AdifferenceB = A.Except(B);
+            IDataContainer BdifferenceA = B.Except(A);
 
             Assert.Equal(3, AdifferenceB.Count); // remove B,C from A
             Assert.Equal(4, BdifferenceA.Count); // remove B,C from B

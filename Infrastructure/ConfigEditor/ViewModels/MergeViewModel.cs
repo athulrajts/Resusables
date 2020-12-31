@@ -1,118 +1,95 @@
-﻿using ConfigEditor.Models;
+﻿using ConfigEditor.Dialogs;
 using KEI.Infrastructure;
-using KEI.Infrastructure.Configuration;
 using Prism.Commands;
 using Prism.Mvvm;
 using System.IO;
-using System.Threading.Tasks;
 
 namespace ConfigEditor.ViewModels
 {
     public class MergeViewModel : BindableBase
     {
-        private DataContainerMerger merge;
-        public DataContainerMerger Merge
-        {
-            get { return merge; }
-            set { SetProperty(ref merge, value); }
-        }
+        private readonly IConfigEditorViewService _viewService;
+        private readonly IDialogFactory _dialogFactory;
 
-        private bool showDifferentItems;
-        public bool ShowDifferentItems
-        {
-            get { return showDifferentItems; }
-            set { SetProperty(ref showDifferentItems, value, () => Merge.ShowDifferentItems(showDifferentItems)); }
-        }
-
-        private MergeOption mergedShape;
-        public MergeOption MergedShape
-        {
-            get { return mergedShape; }
-            set { SetProperty(ref mergedShape, value); }
-        }
-
-        private string leftPath;
-        public string LeftPath
-        {
-            get { return leftPath; }
-            set { SetProperty(ref leftPath, value); }
-        }
-
-        private string rightPath;
-        public string RightPath
-        {
-            get { return rightPath; }
-            set { SetProperty(ref rightPath, value); }
-        }
-
-        public string Name => $"{Path.GetFileNameWithoutExtension(LeftPath)} - {Path.GetFileNameWithoutExtension(RightPath)}";
-
+        public SnapShotDiff Diff { get; set; }
+        public SnapShot Merged { get; set; }
+        public IPropertyContainer Left { get; set; }
+        public IPropertyContainer Right { get; set; }
+        public string Name => $"{Path.GetFileNameWithoutExtension(Left.FilePath)} - {Path.GetFileNameWithoutExtension(Right.FilePath)}";
         public string FullName => Name;
 
-
-        private readonly IViewService _viewService;
-        public MergeViewModel(IViewService viewService, string left, string right)
+        public MergeViewModel(IConfigEditorViewService viewService, IDialogFactory dialogFactory, string left, string right)
         {
             _viewService = viewService;
-            LeftPath = left;
-            RightPath = right;
+            _dialogFactory = dialogFactory;
 
-            if(CanExecuteRefreshMergeCommand())
+            Compare(left, right);
+        }
+
+        private void Compare(string left, string right)
+        {
+            Left = PropertyContainerBuilder.FromFile(left);
+            Right = PropertyContainerBuilder.FromFile(right);
+
+            if (Left is null)
             {
-                _viewService.SetBusy();
-
-                Task.Run(() =>
-                {
-                    ExecuteRefreshMergeCommand();
-                    _viewService.SetAvailable();
-                });
-
+                _viewService.Error($"Invalid Config : {left}");
+                return;
             }
-
-            RaisePropertyChanged(nameof(Name));
-            RaisePropertyChanged(nameof(FullName));
-
-            MergedShape = MergeOption.Right;
-        }
-
-        private DelegateCommand swapLeftRightCommand;
-        public DelegateCommand SwapLeftRightCommand =>
-            swapLeftRightCommand ?? (swapLeftRightCommand = new DelegateCommand(ExecuteSwapLeftRightCommand));
-
-        void ExecuteSwapLeftRightCommand() => Merge.Swap();
-
-        private DelegateCommand mergeCommand;
-        public DelegateCommand MergeCommand =>
-            mergeCommand ?? (mergeCommand = new DelegateCommand(ExecuteMergeCommand));
-
-        void ExecuteMergeCommand()
-        {
-            var mergedDC = Merge.Merge(MergedShape);
-
-            _viewService.SaveFile(filePath => mergedDC.Store(filePath));
-        }
-
-        private DelegateCommand refreshMergeCommand;
-        public DelegateCommand RefreshMergeCommand =>
-            refreshMergeCommand ?? (refreshMergeCommand = new DelegateCommand(ExecuteRefreshMergeCommand, CanExecuteRefreshMergeCommand)
-            .ObservesProperty(() => LeftPath)
-            .ObservesProperty(() => RightPath));
-
-        private bool CanExecuteRefreshMergeCommand() 
-            => !(string.IsNullOrEmpty(LeftPath) || string.IsNullOrEmpty(RightPath));
-
-        void ExecuteRefreshMergeCommand()
-        {
-            var left = PropertyContainerBuilder.FromFile(LeftPath);
-            var right = PropertyContainerBuilder.FromFile(RightPath);
-
-            if(left == null || right == null)
+            if (Right == null)
             {
-                _viewService.Error("Invalid Config");
+                _viewService.Error($"Invalid Config : {right}");
                 return;
             }
 
-            Merge = new DataContainerMerger(left, right);
+            Diff = Left.GetSnapShot() - Right.GetSnapShot();
+
+            Merged = new SnapShot();
+
+            foreach (var key in Diff.Keys)
+            {
+                Merged.Add(key, Diff[key].DataObjectType, Diff[key].Left ?? Diff[key].Right);
+            }
         }
+
+        #region Commands
+
+        private DelegateCommand saveCommand;
+        public DelegateCommand SaveCommand =>
+            saveCommand ??= saveCommand = new DelegateCommand(ExecuteSaveCommand);
+
+        private void ExecuteSaveCommand()
+        {
+            var results = _dialogFactory.ShowDialog("Save Merged");
+
+            string filePath = results.GetValue(FileDialogKeys.FileName);
+            string shape = results.GetValue(SaveMergedFileDialog.Shape);
+            bool result = results.GetValue(FileDialogKeys.DialogResult);
+            
+            if (result)
+            {
+                IPropertyContainer merged = shape == "Left" ? Left : Right;
+                merged.Restore(Merged);
+                merged.Store(filePath); 
+            }
+        }
+
+        private DelegateCommand<SnapShotItem> swapValueCommand;
+        public DelegateCommand<SnapShotItem> SwapValueCommand =>
+            swapValueCommand ??= new DelegateCommand<SnapShotItem>(ExecuteSwapValueCommand);
+
+        private void ExecuteSwapValueCommand(SnapShotItem parameter)
+        {
+            object value = parameter.Value.Equals(Diff[parameter.Name].Left)
+                ? Diff[parameter.Name].Right
+                : Diff[parameter.Name].Left;
+
+            Merged.Update(parameter.Name, value);
+
+            RaisePropertyChanged(nameof(Diff));
+        }
+
+        #endregion;
+
     }
 }

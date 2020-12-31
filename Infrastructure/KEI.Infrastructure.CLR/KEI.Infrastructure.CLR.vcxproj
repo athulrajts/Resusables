@@ -273,4 +273,7 @@
   <ItemGroup>
     <FrameworkReference Include="Microsoft.WindowsDesktop.App.WPF" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\datacontainer\datacontainer\dataobjectbinding.cs" />
+  </ItemGroup>
 </Project>

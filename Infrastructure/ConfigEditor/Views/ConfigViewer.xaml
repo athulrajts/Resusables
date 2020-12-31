@@ -10,38 +10,6 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
-        <!--For String and Numeric Types-->
-        <DataTemplate x:Key="StringAndNumericTemplate">
-            <TextBox DataContext="{Binding Path=DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContentControl}}"
-                         VerticalContentAlignment="Center"
-                         TextWrapping="Wrap"
-                         AcceptsReturn="True"
-                         Text="{Binding StringValue}">
-            </TextBox>
-        </DataTemplate>
-
-        <!--For Boolean-->
-        <DataTemplate x:Key="BooleanTemplate">
-            <CheckBox DataContext="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContentControl}}" 
-                          IsChecked="{Binding StringValue}"
-                          VerticalAlignment="Center"
-                          HorizontalAlignment="Left"/>
-        </DataTemplate>
-
-        <!--For Enumerations-->
-        <DataTemplate x:Key="EnumTemplate">
-            <ComboBox DataContext="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContentControl}}" 
-                          ItemsSource="{Binding Value, Converter={c:EnumToValuesConverter}, Mode=OneWay}"
-                          SelectedItem="{Binding ValueString}"
-                          VerticalContentAlignment="Center">
-                <ComboBox.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <VirtualizingStackPanel VirtualizingStackPanel.IsVirtualizing="True"
-                                                VirtualizingStackPanel.VirtualizationMode="Recycling"/>
-                    </ItemsPanelTemplate>
-                </ComboBox.ItemsPanel>
-            </ComboBox>
-        </DataTemplate>
 
         <LinearGradientBrush x:Key="AlternatingRowBrush" EndPoint="1,0.5" StartPoint="0,0.5">
             <GradientStop Color="LightBlue" Offset="0"/>
@@ -70,10 +38,9 @@
         <!--Tree-->
         <TreeView Grid.Column="0" Grid.RowSpan="2"
                   ItemsSource="{Binding Tree}"
-                  ap:TreeViewBehaviours.TreeViewSelectedItem="{Binding SelectedNode, Mode=TwoWay}"
+                  SelectedItemChanged="treeView_SelectedItemChanged"
                   MinWidth="200"
                   Padding="1 10 10 0"
-                  Loaded="TreeView_Loaded"
                   BorderBrush="Black"
                   BorderThickness="0 0 1 0"
                   x:Name="treeView">

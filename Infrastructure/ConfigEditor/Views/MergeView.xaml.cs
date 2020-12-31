@@ -1,8 +1,4 @@
-﻿using KEI.Infrastructure;
-using System;
-using System.Globalization;
-using System.Windows.Controls;
-using System.Windows.Data;
+﻿using System.Windows.Controls;
 
 namespace ConfigEditor.Views
 {
@@ -14,29 +10,6 @@ namespace ConfigEditor.Views
         public MergeView()
         {
             InitializeComponent();
-        }
-
-        private void DataGrid_LoadingRow(object sender, DataGridRowEventArgs e)
-        {
-            e.Row.Header = (e.Row.GetIndex() + 1).ToString();
-        }
-    }
-
-    public class DataContainerToDictionaryConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if (value is IPropertyContainer dc)
-            {
-                return dc.ToFlatDictionary();
-            }
-
-            return null;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
         }
     }
 }

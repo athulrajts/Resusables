@@ -44,6 +44,15 @@ namespace KEI.Infrastructure
             RaiseCollectionChanged(NotifyCollectionChangedAction.Add, internalDictionary[obj.Name]);
         }
 
+
+        /// <summary>
+        /// Alow collection initliazer using <see cref="Key{T}"/> as key
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        public void Add<T>(Key<T> key, T value) => Add(key.Name, value);
+
         /// <summary>
         /// Clear everything
         /// </summary>

@@ -43,8 +43,8 @@ namespace Application.Core.Modules
             _defaultRecipe = PropertyContainerBuilder.Create("Recipe")
                 .Property("MaximumTransmittance", 100.0)
                 .Property("MinimumTransmittance", 90.0)
-                .Property("Production DB", new DatabaseSetup { Columns = DatabaseColumnGenerator.ColumnsFor<TestResult>(), Name = PathUtils.GetPath("Database/Production/Production.csv"), CreationMode = DatabaseCreationMode.Daily })
-                .Property("Engineering DB", new DatabaseSetup { Columns = DatabaseColumnGenerator.ColumnsFor<TestResult>(), Name = PathUtils.GetPath("Database/Engineering/Engineering.csv"), CreationMode = DatabaseCreationMode.Daily });
+                .Property("Production_DB", new DatabaseSetup { Columns = DatabaseColumnGenerator.ColumnsFor<TestResult>(), Name = PathUtils.GetPath("Database/Production/Production.csv"), CreationMode = DatabaseCreationMode.Daily })
+                .Property("Engineering_DB", new DatabaseSetup { Columns = DatabaseColumnGenerator.ColumnsFor<TestResult>(), Name = PathUtils.GetPath("Database/Engineering/Engineering.csv"), CreationMode = DatabaseCreationMode.Daily });
         }
 
         private IPropertyContainer currentRecipe;
@@ -68,8 +68,8 @@ namespace Application.Core.Modules
 
         private void OnRecipeChanged()
         {
-            CurrentRecipe.GetValue($"{ApplicationMode.Production} DB", ref productionDBSetup);
-            CurrentRecipe.GetValue($"{ApplicationMode.Engineering} DB", ref engineeringDBSetup);
+            CurrentRecipe.GetValue($"{ApplicationMode.Production}_DB", ref productionDBSetup);
+            CurrentRecipe.GetValue($"{ApplicationMode.Engineering}_DB", ref engineeringDBSetup);
 
             RecipeLoaded?.Invoke(this, CurrentRecipe);
             _eventAggregator.GetEvent<RecipeLoadedEvent>().Publish(CurrentRecipe);
@@ -83,8 +83,8 @@ namespace Application.Core.Modules
             {
                 RestoreDefaultRecipe();
 
-                CurrentRecipe.GetValue($"{ApplicationMode.Production} DB", ref productionDBSetup);
-                CurrentRecipe.GetValue($"{ApplicationMode.Engineering} DB", ref engineeringDBSetup);
+                CurrentRecipe.GetValue($"{ApplicationMode.Production}_DB", ref productionDBSetup);
+                CurrentRecipe.GetValue($"{ApplicationMode.Engineering}_DB", ref engineeringDBSetup);
 
                 CurrentRecipe.Store(PathUtils.GetPath("Configs/DefaultRecipe.rcp"));
             }
@@ -117,7 +117,7 @@ namespace Application.Core.Modules
 
             var result = _processor.Test(image);
 
-            result.ForEach(x => _databaseManager[$"{_statusManager.ApplicationMode} DB"].AddRecord(x));
+            result.ForEach(x => _databaseManager[$"{_statusManager.ApplicationMode}_DB"].AddRecord(x));
 
             _eventAggregator.GetEvent<TestExecuted>().Publish(new Tuple<ApplicationMode, string, List<TestResult>>(_statusManager.ApplicationMode, image, result));
         }

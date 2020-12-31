@@ -15,6 +15,12 @@ namespace KEI.UI.Wpf.ViewService
             registry.RegisterDialog<ConfigsChangedDialog>();
             registry.RegisterInstance<IStringLocalizer>(new ResourceManagerStringLocalizer(Assembly.GetExecutingAssembly()), Assembly.GetExecutingAssembly().GetName().Name);
 
+            IDialogFactory dialogFactory = new DialogFactory();
+            registry.RegisterInstance(dialogFactory);
+
+            dialogFactory.RegisterDialog<SaveFileDialog>("Save");
+            dialogFactory.RegisterDialog<OpenFileDialog>("Open");
+
             Controls.PropertyGridEditorDefinitions.SetDefaultEditors();
 
             Infrastructure.ViewService.Service = ContainerLocator.Container.Resolve<IViewService>();
